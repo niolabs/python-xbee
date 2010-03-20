@@ -19,10 +19,6 @@ class XBee:
                        'length': None,
                        'data': None,
                        'chksum':None}
-                       
-    # In order to generate an API frame, the following elements
-    # must be provided
-    api_required_data = ['data']
           
     @staticmethod
     def checksum(data):
@@ -78,13 +74,14 @@ class XBee:
         return struct.pack("> h", count)
         
     @staticmethod
-    def fill_frame(*args, **kwargs):
+    def fill_frame(data):
         """
-        fill_frame: binary data ... -> valid API frame (binary data)
+        fill_frame: binary data -> valid API frame (binary data)
         
         Given the data required to fill an API frame, fill_frame will
         generate all other data as required and produce a valid API
         frame for transmission to an XBee module.
         """
-        pass
+        # start byte, two length bytes, data byte, checksum
+        return XBee.START_BYTE + XBee.len_bytes(data) + data + XBee.checksum(data)
     
