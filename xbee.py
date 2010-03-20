@@ -67,6 +67,17 @@ class XBee:
         return total == 0xFF
         
     @staticmethod
+    def len_bytes(data):
+        """
+        len_data: binary data -> (MSB, LSB) 16-bit integer length, two bytes
+        
+        len_bytes counts the number of bytes to be sent and encodes the data
+        length in two bytes, big-endian (most significant first).
+        """
+        count = len(data)
+        return struct.pack("> h", count)
+        
+    @staticmethod
     def fill_frame(*args, **kwargs):
         """
         fill_frame: binary data ... -> valid API frame (binary data)

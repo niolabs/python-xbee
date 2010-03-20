@@ -61,6 +61,36 @@ class TestChecksumming(unittest.TestCase):
         """
         chksum = '\xFA'
         self.assertTrue(XBee.verify_checksum(self.data3, chksum))
+        
+class TestLenBytes(unittest.TestCase):
+    """
+    XBee class must properly encode the length of the data to be
+    sent to the XBee
+    """    
+    def test_single_byte(self):
+        """
+        run len_bytes on a single byte
+        """
+        MSB,LSB = XBee.len_bytes('\x00')
+        self.assertEqual(MSB, '\x00')
+        self.assertEqual(LSB, '\x01')
+        
+    def test_few_bytes(self):
+        """
+        run len_bytes on a few bytes
+        """
+        MSB,LSB = XBee.len_bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+        self.assertEqual(MSB, '\x00')
+        self.assertEqual(LSB, '\x09')
+        
+    def test_many_bytes(self):
+        """
+        run len_bytes on many bytes
+        """
+        bytes = '\x00' * 300
+        MSB,LSB = XBee.len_bytes(bytes)
+        self.assertEqual(MSB, '\x01')
+        self.assertEqual(LSB, ',')
 
 class TestAPIFrameGeneration(unittest.TestCase):
     """
