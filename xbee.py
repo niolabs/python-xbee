@@ -9,7 +9,7 @@ series-specific functionality.
 """
 
 class XBee:
-    START_BYTE = 0x7E
+    START_BYTE = '\x7E'
     
     # start is one byte long, length is two bytes
     # data is n bytes long (indicated by length)
@@ -43,7 +43,7 @@ class XBee:
         total = total & 0xFF
         
         # Subtract from 0xFF
-        return 0xFF - total
+        return chr(0xFF - total)
         
     @staticmethod
     def verify_checksum(data, chksum):
