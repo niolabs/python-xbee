@@ -15,41 +15,52 @@ class TestChecksumming(unittest.TestCase):
     XBee class must properly generate and verify checksums for binary
     data sent to and received from an XBee device
     """
+    def setUp(self):
+        self.data1 = '\x00'
+        self.data2 = '\x36'
+        self.data3 = '\x01\x01\x01\x01\x01'
+        
     def test_checksum(self):
         """
-        The checksum of binary data must be correct
+        checksum a simple byte
         """
-        # Simple start
-        data = '\x00'
-        chksum = XBee.checksum(data)
+        chksum = XBee.checksum(self.data1)
         self.assertEqual(chksum, 0xFF)
         
-        # Once more
-        data = '\x36'
-        chksum = XBee.checksum(data)
+    def test_checksum_again(self):
+        """
+        checksum a different byte
+        """
+        chksum = XBee.checksum(self.data2)
         self.assertEqual(chksum, 0xc9)
         
-        # Multi bytes
-        data = '\x01\x01\x01\x01\x01'
-        chksum = XBee.checksum(data)
+    def test_checksum_multibyte(self):
+        """
+        checksum more than one byte
+        """
+        chksum = XBee.checksum(self.data3)
         self.assertEqual(chksum, 0xFA)
         
     def test_verify_checksum(self):
         """
-        verify_checksum must properly assert that the given data
-        and checksum are correct
+        verify_checksum a single byte
         """
-        data = '\x00'
         chksum = '\xff'
-        self.assertTrue(XBee.verify_checksum(data, chksum))
+        self.assertTrue(XBee.verify_checksum(self.data1, chksum))
         
-        data = '\x36'
+    def test_verify_checksum_again(self):
+        """
+        verify_checksum a different byte
+        """
         chksum = '\xc9'
-        self.assertTrue(XBee.verify_checksum(data, chksum))
+        self.assertTrue(XBee.verify_checksum(self.data2, chksum))
         
-        data = '\x01\x01\x01\x01\x01'
+    def test_verify_checksum_multibyte(self):
+        """
+        verify_checksum multiple bytes
+        """
         chksum = '\xFA'
-        self.assertTrue(XBee.verify_checksum(data, chksum))
+        self.assertTrue(XBee.verify_checksum(self.data3, chksum))
 
 class TestAPIFrameGeneration(unittest.TestCase):
     """
