@@ -5,29 +5,6 @@ from test_xbee import FakeDevice
 from xbee1 import XBee1
 import pdb
 
-class FakeReadDevice:
-    """
-    Represents a fake serial port which can be read from in a similar
-    fashion to the real thing
-    """
-    
-    def __init__(self, data):
-        self.data = data
-        self.read_index = 0
-        
-    def read(self, bytes=1):
-        """
-        Read the indicated number of bytes from the port
-        """
-        # If too many bytes would be read, raise exception
-        if self.read_index + bytes > len(self.data):
-            raise ValueError("Not enough bytes exist!")
-        
-        read_data = self.data[self.read_index:self.read_index + bytes]
-        self.read_index += bytes
-        
-        return read_data
-
 """
 test_xbee1.py
 By Paul Malmsten
@@ -198,38 +175,7 @@ class TestWriteToDevice(unittest.TestCase):
         # Expect a full packet to be written to the device
         expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
         self.assertEqual(serial_port.data, expected_data)
-        
-class TestFakeReadDevice(unittest.TestCase):
-    """
-    FakeReadDevice class should work as intended to emluate a serial 
-    port
-    """
-    def setUp(self):
-        self.device = FakeReadDevice("test")
-    
-    def test_read_single_byte(self):
-        """
-        reading one byte at a time should work as expected
-        """
-        self.assertEqual(self.device.read(), 't')
-        self.assertEqual(self.device.read(), 'e')
-        self.assertEqual(self.device.read(), 's')
-        self.assertEqual(self.device.read(), 't')
-        
-    def test_read_multiple_bytes(self):
-        """
-        reading multiple bytes at a time should work as expected
-        """
-        self.assertEqual(self.device.read(3), 'tes')
-        self.assertEqual(self.device.read(), 't')
-        
-    def test_read_too_many(self):
-        """
-        attempting to read too many bytes should raise an exception
-        """
-        self.assertRaises(ValueError, self.device.read, 5)
-        
-        
+
 class TestReadFromDevice(unittest.TestCase):
     """
     XBee1 class should properly read and parse binary data from a serial 
