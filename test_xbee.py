@@ -115,6 +115,22 @@ class TestAPIFrameGeneration(unittest.TestCase):
         
         frame = XBee.fill_frame(bytes)
         self.assertEqual(frame, expected_frame)
+        
+class TestAPIFrameParsing(unittest.TestCase):
+    """
+    XBee class must be able to read and validate the data contained
+    by a valid API frame.
+    """
+    
+    def test_single_byte(self):
+        """
+        read a frame containing a single byte
+        """
+        frame = '\x7E\x00\x01\x00\xFF'
+        expected_data = '\x00'
+        
+        data = XBee.empty_frame(frame)
+        self.assertEqual(data, expected_data)
 
 class TestWriteToDevice(unittest.TestCase):
     """
@@ -149,6 +165,8 @@ class TestWriteToDevice(unittest.TestCase):
         # Check resuting state of fake device
         expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
         self.assertEqual(device.data, expected_frame)
+        
+
    
 if __name__ == '__main__':
     unittest.main()

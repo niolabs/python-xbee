@@ -88,6 +88,32 @@ class XBee(object):
         # start byte, two length bytes, data byte, checksum
         return XBee.START_BYTE + XBee.len_bytes(data) + data + XBee.checksum(data)
         
+    @staticmethod
+    def empty_frame(frame):
+        """
+        empty_frame: valid API frame (binary data) -> binary data
+        
+        Given a valid API frame, empty_frame extracts the data contained
+        inside it and verifies it against its checksum
+        """
+        # First two bytes are the length of the data
+        raw_len = frame[1:3]
+        
+        # Unpack it
+        data_len = struct.unpack("> h", raw_len)[0]
+        
+        # Read the data
+        data = frame[3:3 + data_len]
+        chksum = frame[-1]
+        
+        # Checksum check
+        if not XBee.verify_checksum(data, chksum):
+            raise ValueError("Invalid checksum on given frame")
+            
+        # If the result is valid, return it
+        return data
+        
+        
     def write_frame(self, data):
         """
         write_frame: binary data -> None
