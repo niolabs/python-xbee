@@ -48,7 +48,7 @@ class XBee1(XBee):
     reserved_names = ['id','order']
 
     @staticmethod
-    def build_command(cmd, *args, **kwargs):
+    def build_command(cmd, **kwargs):
         """
         build_command: string (binary data) ... -> binary data
         
