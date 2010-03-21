@@ -2,7 +2,6 @@
 
 import unittest
 from xbee import XBee
-import pdb
 
 """
 test_xbee.py
@@ -241,6 +240,17 @@ class TestReadFromDevice(unittest.TestCase):
         
         data = xbee.wait_for_frame()
         self.assertEqual(data, '\x00')
+        
+    def test_read_invalid_followed_by_valid(self):
+        """
+        wait_for_frame should skip invalid data
+        """
+        device = FakeReadDevice(
+            '\x7E\x00\x01\x00\xFA' + '\x7E\x00\x01\x05\xFA')
+        xbee = XBee(device)
+        
+        data = xbee.wait_for_frame()
+        self.assertEqual(data, '\x05')
         
 if __name__ == '__main__':
     unittest.main()
