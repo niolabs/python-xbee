@@ -19,6 +19,9 @@ class XBee:
                        'length': None,
                        'data': None,
                        'chksum':None}
+                       
+    def __init__(self, ser):
+        self.serial = ser
           
     @staticmethod
     def checksum(data):
@@ -84,4 +87,13 @@ class XBee:
         """
         # start byte, two length bytes, data byte, checksum
         return XBee.START_BYTE + XBee.len_bytes(data) + data + XBee.checksum(data)
+        
+    def write_frame(self, data):
+        """
+        write_frame: binary data -> None
+        
+        Packages the given binary data in an API frame and writes the 
+        result to the serial port
+        """
+        self.serial.write(XBee.fill_frame(data))
     

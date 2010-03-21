@@ -10,6 +10,14 @@ By Paul Malmsten, 2010
 Tests the XBee superclass module for XBee API conformance.
 """
 
+class FakeDevice:
+    """
+    Represents a fake serial port for testing purposes
+    """
+    
+    def write(self, data):
+        self.data = data
+
 class TestChecksumming(unittest.TestCase):
     """
     XBee class must properly generate and verify checksums for binary
@@ -107,6 +115,40 @@ class TestAPIFrameGeneration(unittest.TestCase):
         
         frame = XBee.fill_frame(bytes)
         self.assertEqual(frame, expected_frame)
+
+class TestWriteToDevice(unittest.TestCase):
+    """
+    XBee class should properly write binary data in a valid API
+    frame to a given serial device.
+    """
+    
+    def test_write(self):
+        """
+        write method should write the expected data to the serial
+        device
+        """
+        device = FakeDevice()
+        
+        xbee = XBee(device)
+        xbee.write_frame('\x00')
+        
+        # Check resuting state of fake device
+        expected_frame = '\x7E\x00\x01\x00\xFF'
+        self.assertEqual(device.data, expected_frame)
+        
+    def test_write_again(self):
+        """
+        write method should write the expected data to the serial
+        device
+        """
+        device = FakeDevice()
+        
+        xbee = XBee(device)
+        xbee.write_frame('\x00\x01\x02')
+        
+        # Check resuting state of fake device
+        expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
+        self.assertEqual(device.data, expected_frame)
    
 if __name__ == '__main__':
     unittest.main()
