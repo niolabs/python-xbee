@@ -280,7 +280,21 @@ class XBee1(XBee):
             # If one or more ADC lines are set, the remaining bytes, in
             # pairs, represent their values, MSB first.
             if adc_enabled:
-                pass
+                for adc in adc_enabled:
+                    # Analog reading stored in two bytes
+                    value_raw = data[byte_pos:byte_pos + 2]
+                    
+                    # Unpack the bits
+                    value = struct.unpack("> h", value_raw)[0]
+                    
+                    # Only 10 bits are meaningful
+                    value &= 0x3FF
+                    
+                    # Save the result
+                    sample["adc-%d" % adc] = value
+                    
+                    # Move the starting position for the next new byte
+                    byte_pos += 2
                 
             samples.append(sample)
             
