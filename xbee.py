@@ -8,7 +8,7 @@ Series 2 modules. This class should be subclassed in order to provide
 series-specific functionality.
 """
 
-class XBee:
+class XBee(object):
     START_BYTE = '\x7E'
     
     # start is one byte long, length is two bytes

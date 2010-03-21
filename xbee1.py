@@ -46,6 +46,27 @@ class XBee1(XBee):
                      }
 
     reserved_names = ['id','order']
+    
+    def __init__(self, ser):
+        # Call the super class constructor to save the serial port
+        super(XBee1, self).__init__(ser)
+
+    def send(self, cmd, **kwargs):
+        """
+        send: string param=binary data ... -> None
+        
+        When send is called with the proper arguments, an API command
+        will be written to the serial port for this XBee Series 1 device
+        containing the proper instructions and data.
+        
+        This method must be called with named arguments in accordance
+        with the api_command specification. Arguments matching all 
+        field names other than those in reserved_names (like 'id' and
+        'order') should be given, unless they are of variable length 
+        (of 'None' in the specification. Those are optional.
+        """
+        # Pass through the keyword arguments
+        self.write_frame(XBee1.build_command(cmd, **kwargs))
 
     @staticmethod
     def build_command(cmd, **kwargs):

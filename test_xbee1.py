@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import unittest
+from test_xbee import FakeDevice
 from xbee1 import XBee1
 import pdb
 
@@ -135,6 +136,28 @@ class TestSplitResponse(unittest.TestCase):
                          'status':'\x01',
                          'parameter':'ABCDEF'}
         self.assertEqual(info, expected_info)
+        
+class TestWriteToDevice(unittest.TestCase):
+    """
+    XBee1 class should properly write binary data in a valid API
+    frame to a given serial device, including a valid command packet.
+    """
+    
+    def test_send_at_command(self):
+        """
+        calling send should write a full API frame containing the
+        API AT command packet to the serial device.
+        """
+        
+        serial_port = FakeDevice()
+        xbee = XBee1(serial_port)
+        
+        # Send an AT command
+        xbee.send('at', frame_id='A', command='MY')
+        
+        # Expect a full packet to be written to the device
+        expected_data = '\x7E\x00\x04\x08AMY\x10'
+        self.assertEqual(serial_port.data, expected_data)
 
 if __name__ == '__main__':
     unittest.main()
