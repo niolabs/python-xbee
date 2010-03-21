@@ -256,6 +256,53 @@ class TestParseIOData(unittest.TestCase):
         results = XBee1.parse_samples(data)
         
         self.assertEqual(results, expected_results)
+        
+    def test_parse_multiple_dio(self):
+        """
+        parse_samples should properly parse a packet containing three 
+        samples of only digital io data
+        """
+        # Three samples, ADC disabled and DIO8 enabled, DIO 0-7 enabled
+        header = '\x03\x01\xFF'
+        
+        # First 7 bits ignored
+        # First sample: all bits on
+        # Second sample: alternating bits on
+        # Third sample: all bits off
+        sample = '\x01\xFF' + '\x00\xAA' + '\x00\x00'
+        data = header + sample
+        
+        expected_results = [{'dio-0':True,
+                             'dio-1':True,
+                             'dio-2':True,
+                             'dio-3':True,
+                             'dio-4':True,
+                             'dio-5':True,
+                             'dio-6':True,
+                             'dio-7':True,
+                             'dio-8':True},
+                             {'dio-0':False,
+                             'dio-1':True,
+                             'dio-2':False,
+                             'dio-3':True,
+                             'dio-4':False,
+                             'dio-5':True,
+                             'dio-6':False,
+                             'dio-7':True,
+                             'dio-8':False},
+                             {'dio-0':False,
+                             'dio-1':False,
+                             'dio-2':False,
+                             'dio-3':False,
+                             'dio-4':False,
+                             'dio-5':False,
+                             'dio-6':False,
+                             'dio-7':False,
+                             'dio-8':False}]
+                             
+        results = XBee1.parse_samples(data)
+        
+        self.assertEqual(results, expected_results)
 
 class TestWriteToDevice(unittest.TestCase):
     """
