@@ -103,7 +103,7 @@ class XBee1(XBee):
                     data = None
             
             # Ensure that the proper number of elements will be written
-            if data and len(data) != cmd_spec[param]:
+            if data and cmd_spec[param] and len(data) != cmd_spec[param]:
                 raise ValueError(
                     "The data provided was not %d bytes long"\
                     % cmd_spec[param])
