@@ -67,6 +67,20 @@ class XBee1(XBee):
         """
         # Pass through the keyword arguments
         self.write_frame(XBee1.build_command(cmd, **kwargs))
+        
+        
+    def wait_read_frame(self):
+        """
+        wait_read_frame: None -> frame info dictionary
+        
+        wait_read_frame calls XBee.wait_for_frame() and waits until a
+        valid frame appears on the serial port. Once it receives a frame,
+        wait_read_frame attempts to parse the data contained within it
+        and returns the resulting dictionary
+        """
+        
+        frame_data = self.wait_for_frame()
+        return XBee1.split_response(frame_data)
 
     @staticmethod
     def build_command(cmd, **kwargs):

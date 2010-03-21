@@ -122,4 +122,47 @@ class XBee(object):
         result to the serial port
         """
         self.serial.write(XBee.fill_frame(data))
+        
+    def wait_for_frame(self):
+        """
+        wait_for_frame: None -> binary data
+        
+        wait_for_frame will read from the serial port until a valid
+        API frame arrives. It will then return the binary data
+        contained within the frame.
+        """
+        WAITING = 0
+        PARSING = 1
+        
+        data = ''
+        state = WAITING
+        
+        while True:
+            byte = self.serial.read()
+            
+            if state == WAITING:
+                # If a start byte is found, swich states
+                if byte == chr(START_BYTE):
+                    data += byte
+                    state = PARSING
+            else:
+                # Save all following bytes
+                data += self.serial.read()
+                
+                if len(data) == 3:
+                    # We have the length bytes of the data
+                    # Now, wait for the rest to appear
+                    data_len = struct.unpack("> h", data[1:3])
+                    
+                    # Wait for the expected number of bytes to appear
+                    # Grab the checksum too
+                    data += self.serial.read(data_len + 1)
+                    
+                    try:
+                        # Try to parse and return result
+                        return empty_frame(data)
+                    except ValueError:
+                        # Bad frame, so restart
+                        data = ''
+                        state = WAITING
     
