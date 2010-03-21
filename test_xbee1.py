@@ -1,9 +1,8 @@
 #! /usr/bin/python
 
 import unittest
-from test_xbee import FakeDevice
+from test_xbee import FakeDevice, FakeReadDevice
 from xbee1 import XBee1
-import pdb
 
 """
 test_xbee1.py
@@ -181,7 +180,19 @@ class TestReadFromDevice(unittest.TestCase):
     XBee1 class should properly read and parse binary data from a serial 
     port device.
     """
-    pass
+    def test_read_at(self):
+        """
+        read and parse a parameterless AT command
+        """
+        device = FakeReadDevice('\x7E\x00\x05\x88DMY\x01\x8c')
+        xbee = XBee1(device)
+        
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'at_response',
+                         'frame_id':'D',
+                         'command':'MY',
+                         'status':'\x01'}
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()
