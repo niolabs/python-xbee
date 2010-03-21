@@ -138,11 +138,11 @@ class XBee(object):
         state = WAITING
         
         while True:
-            byte = self.serial.read()
-            
             if state == WAITING:
+                byte = self.serial.read()
+                
                 # If a start byte is found, swich states
-                if byte == chr(START_BYTE):
+                if byte == XBee.START_BYTE:
                     data += byte
                     state = PARSING
             else:
@@ -152,7 +152,7 @@ class XBee(object):
                 if len(data) == 3:
                     # We have the length bytes of the data
                     # Now, wait for the rest to appear
-                    data_len = struct.unpack("> h", data[1:3])
+                    data_len = struct.unpack("> h", data[1:3])[0]
                     
                     # Wait for the expected number of bytes to appear
                     # Grab the checksum too
@@ -160,7 +160,7 @@ class XBee(object):
                     
                     try:
                         # Try to parse and return result
-                        return empty_frame(data)
+                        return XBee.empty_frame(data)
                     except ValueError:
                         # Bad frame, so restart
                         data = ''

@@ -2,6 +2,7 @@
 
 import unittest
 from xbee import XBee
+import pdb
 
 """
 test_xbee.py
@@ -226,7 +227,20 @@ class TestWriteToDevice(unittest.TestCase):
         expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
         self.assertEqual(device.data, expected_frame)
         
-
-   
+class TestReadFromDevice(unittest.TestCase):
+    """
+    XBee class should properly read and extract data from a valid
+    API frame
+    """
+    def test_read(self):
+        """
+        wait_for_frame should properly read a frame of data
+        """
+        device = FakeReadDevice('\x7E\x00\x01\x00\xFF')
+        xbee = XBee(device)
+        
+        data = xbee.wait_for_frame()
+        self.assertEqual(data, '\x00')
+        
 if __name__ == '__main__':
     unittest.main()
