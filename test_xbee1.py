@@ -2,6 +2,7 @@
 
 import unittest
 from xbee1 import XBee1
+import pdb
 
 """
 test_xbee1.py
@@ -54,6 +55,57 @@ class TestBuildCommand(unittest.TestCase):
 
         expected_data = '\x08+MY'
         self.assertEqual(data, expected_data)
+        
+class TestSplitResponse(unittest.TestCase):
+    """
+    split_response should properly split a response packet
+    """
+    
+    def test_unrecognized_response(self):
+        """
+        if a response begins with an unrecognized id byte, split_response
+        should raise an exception
+        """
+        data = '\x23\x00\x00\x00'
+        
+        try:
+            XBee1.split_response(data)
+        except KeyError:
+            # Passes
+            return
+            
+        # Test Fails
+        self.fail()
+    
+    def test_bad_data_long(self):
+        """
+        if a response doesn't match the specification's layout, 
+        split_response should raise an exception
+        """
+        # Over length
+        data = '\x8a\x00\x00\x00'
+        self.assertRaises(ValueError, XBee1.split_response, data)
+        
+    def test_bad_data_short(self):
+        """
+        if a response doesn't match the specification's layout, 
+        split_response should raise an exception
+        """
+        # Under length
+        data = '\x8a'
+        self.assertRaises(ValueError, XBee1.split_response, data)
+    
+    def test_split_status_response(self):
+        """
+        split_response should properly split a status response packet
+        """
+        data = '\x8a\x01'
+        
+        info = XBee1.split_response(data)
+        expected_info = {'id':'status',
+                         'status':'\x01'}
+        
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()

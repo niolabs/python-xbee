@@ -33,9 +33,9 @@ class XBee1(XBee):
     #           param_name: number of bytes to read
     #           param_name: None (size of parameter is variable, 0<n<10) 
     api_responses = {'\x8a': 
-                            {"id": 'status',
-                             "data": 1,
-                             "order": ['data']},
+                        {"id": 'status',
+                         "status": 1,
+                         "order": ['status']},
                      '\x88':
                         {"id":'at_response',
                          'frame_id':1,
@@ -93,4 +93,73 @@ class XBee1(XBee):
                 packet += data
                 
         return packet
+        
+    @staticmethod
+    def split_response(data):
+        """
+        split_response: binary data -> {'id':str,
+                                        'param':binary data,
+                                        ...}
+                                        
+        split_response takes a data packet received from an XBee device
+        and converts it into a dictionary. This dictionary provides
+        names for each segment of binary data as specified in the 
+        api_responses spec.
+        """
+        # Fetch the first byte, identify the packet
+        # If the spec doesn't exist, raise exception
+        try:
+            packet_spec = XBee1.api_responses[data[0]]
+        except KeyError:
+            raise KeyError(
+                "Unrecognized response packet with id byte %s"
+                % data[0])
+        
+        # Current byte index in the data stream
+        index = 1
+        
+        # Result info
+        info = {'id':packet_spec['id']}
+        
+        # Parse the packet in the order specified
+        for param in packet_spec['order']:
+            # Skip reserved fields
+            if param in XBee1.reserved_names:
+                continue
+                
+            field_len = packet_spec[param]
+            
+            # Store the number of bytes specified
+            # If the data field has no length specified, store any
+            #  leftover bytes and quit
+            if field_len is not None:
+                # Are we trying to read beyond the last data element?
+                if index + field_len > len(data):
+                    raise ValueError(
+                        "Response packet was shorter than expected")
+                
+                field = data[index:index + field_len]
+                info[param] = field
+            else:
+                field = data[index:]
+                
+                # Were there any remaining bytes?
+                if field:
+                    # If so, store them
+                    info[param] = field
+                    index += len(field)
+                break
+            
+            # Move the index
+            index += field_len
+            
+        # If there are more bytes than expected, raise an exception
+        if index < len(data):
+            raise ValueError(
+                "Response packet was longer than expected")
+        
+        return info
+            
+                
+            
             
