@@ -193,6 +193,21 @@ class TestReadFromDevice(unittest.TestCase):
                          'command':'MY',
                          'status':'\x01'}
         self.assertEqual(info, expected_info)
+        
+    def test_read_at_params(self):
+        """
+        read and parse an AT command with a parameter
+        """
+        device = FakeReadDevice('\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c')
+        xbee = XBee1(device)
+        
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'at_response',
+                         'frame_id':'D',
+                         'command':'MY',
+                         'status':'\x01',
+                         'parameter':'\x00\x00\x00'}
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()
