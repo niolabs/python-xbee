@@ -195,3 +195,97 @@ class XBee1(XBee):
         
         return info
         
+    @staticmethod
+    def parse_samples(data):
+        """
+        parse_samples: binary data in XBee IO data format ->
+                        [ {"dio-0":True,
+                           "dio-1":False,
+                           "adc-0":100"}, ...]
+                           
+        parse_samples reads binary data from an XBee device in the IO
+        data format specified by the API. It will then return dictionary
+        indicating the status of each enabled IO port.
+        """
+        
+        ## Parse the header, bytes 0-2
+        #byte_1 = ['adc-%d' % i for i in range(0, 6)]
+        #byte_2 = ['dio-%d' % i for i in range(0, 8)]
+        dio_enabled = []
+        adc_enabled = []
+        
+        # First byte: number of samples
+        len_raw = data[0]
+        len_samples = ord(len_raw)
+        
+        # Second-third bytes: enabled pin flags
+        sources_raw = data[1:3]
+        
+        # In order to put the io line names in list positions which
+        # match their number (for ease of traversal), the second byte
+        # will be read first
+        byte_2_data = ord(sources_raw[1])
+        
+        # Check each flag
+        #  DIO lines 0-7
+        i = 1
+        for dio in range(0,8):
+            if byte_2_data & i:
+                dio_enabled.append(dio)
+            i *= 2
+            
+        # Byte 1
+        byte_1_data = ord(sources_raw[0])
+        
+        # Grab DIO8 first
+        if byte_1_data & 1:
+            dio_enabled.append(8)
+        
+        # Check each flag (after the first)
+        #  ADC lines 0-5
+        i = 2
+        for adc in range(0,6):
+            if byte_1_data & i:
+                adc_enabled.append(adc)
+            i *= 2
+        
+        samples = []
+        
+        ## Parse the samples
+        # Start at byte 3
+        byte_pos = 3
+        
+        for i in range(0, len_samples):
+            sample = {}
+            
+            # If one or more DIO lines are set, the first two bytes
+            # contain their values
+            if dio_enabled:
+                # Get two bytes
+                values = data[byte_pos:byte_pos + 2]
+                
+                # Read and store values for all enabled DIO lines
+                for dio in dio_enabled:
+                    # Second byte contains values for 0-7
+                    # If we want number 8, switch to the first byte, and
+                    #  move back to the beginning
+                    if dio > 7:
+                        sample["dio-%d" % dio] = True if ord(values[0]) & 2 ** (dio - 8) else False
+                    else:
+                        sample["dio-%d" % dio] = True if ord(values[1]) & 2 ** dio else False
+                
+                # Move the starting position for the next new byte
+                byte_pos += 2
+                
+            # If one or more ADC lines are set, the remaining bytes, in
+            # pairs, represent their values, MSB first.
+            if adc_enabled:
+                pass
+                
+            samples.append(sample)
+            
+        return samples
+        
+        
+        
+        

@@ -136,6 +136,38 @@ class TestSplitResponse(unittest.TestCase):
                          'parameter':'ABCDEF'}
         self.assertEqual(info, expected_info)
         
+        
+class TestParseIOData(unittest.TestCase):
+    """
+    XBee1 class should properly parse IO data received from an XBee device
+    """
+    
+    def test_parse_single_dio(self):
+        """
+        parse_samples should properly parse a packet containing a single 
+        sample of only digital io data
+        """
+        # One sample, ADC disabled and DIO8 enabled, DIO 0-7 enabled
+        header = '\x01\x01\xFF'
+        
+        # First 7 bits ignored, DIO8 high, DIO 0-7 high
+        sample = '\x01\xFF'
+        data = header + sample
+        
+        expected_results = [{'dio-0':True,
+                             'dio-1':True,
+                             'dio-2':True,
+                             'dio-3':True,
+                             'dio-4':True,
+                             'dio-5':True,
+                             'dio-6':True,
+                             'dio-7':True,
+                             'dio-8':True}]
+                             
+        results = XBee1.parse_samples(data)
+        
+        self.assertEqual(results, expected_results)
+
 class TestWriteToDevice(unittest.TestCase):
     """
     XBee1 class should properly write binary data in a valid API
