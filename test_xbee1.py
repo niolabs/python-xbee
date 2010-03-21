@@ -236,6 +236,26 @@ class TestParseIOData(unittest.TestCase):
         results = XBee1.parse_samples(data)
         
         self.assertEqual(results, expected_results)
+        
+    def test_parse_multiple_dio_subset(self):
+        """
+        parse_samples should properly parse a packet containing two 
+        samples of only digital io data for one dio line
+        """
+        # Two samples, ADC disabled
+        # DIO 0 enabled
+        header = '\x02\x00\x01'
+        
+        # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
+        sample = '\x00\xAA' + '\x00\x01'
+        data = header + sample
+        
+        expected_results = [{'dio-0':False},
+                            {'dio-0':True}]
+                             
+        results = XBee1.parse_samples(data)
+        
+        self.assertEqual(results, expected_results)
 
 class TestWriteToDevice(unittest.TestCase):
     """
