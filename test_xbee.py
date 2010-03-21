@@ -123,6 +123,13 @@ class TestChecksumming(unittest.TestCase):
         """
         self.assertTrue(XBee.verify_checksum(self.data3, self.chksum3))
         
+    def test_verify_checksum_uses_low_bits(self):
+        """
+        verify_checksum should only use the low bits of the 
+        byte summing process for verification
+        """
+        self.assertTrue(XBee.verify_checksum('\x88DMY\x01', '\x8c'))
+        
 class TestLenBytes(unittest.TestCase):
     """
     XBee class must properly encode the length of the data to be

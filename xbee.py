@@ -62,6 +62,9 @@ class XBee(object):
         # Add checksum too
         total += ord(chksum)
         
+        # Only keep low bits
+        total &= 0xFF
+        
         # Check result
         return total == 0xFF
         
