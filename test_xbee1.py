@@ -106,6 +106,35 @@ class TestSplitResponse(unittest.TestCase):
                          'status':'\x01'}
         
         self.assertEqual(info, expected_info)
+        
+    def test_split_short_at_response(self):
+        """
+        split_response should properly split an at_response packet which
+        has no parameter data
+        """
+        
+        data = '\x88DMY\x01'
+        info = XBee1.split_response(data)
+        expected_info = {'id':'at_response',
+                         'frame_id':'D',
+                         'command':'MY',
+                         'status':'\x01'}
+        self.assertEqual(info, expected_info)
+        
+    def test_split_at_response_with_parameter(self):
+        """
+        split_response should properly split an at_response packet which
+        has parameter data
+        """
+        
+        data = '\x88DMY\x01ABCDEF'
+        info = XBee1.split_response(data)
+        expected_info = {'id':'at_response',
+                         'frame_id':'D',
+                         'command':'MY',
+                         'status':'\x01',
+                         'parameter':'ABCDEF'}
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()
