@@ -131,6 +131,13 @@ class TestAPIFrameParsing(unittest.TestCase):
         
         data = XBee.empty_frame(frame)
         self.assertEqual(data, expected_data)
+        
+    def test_invalid_checksum(self):
+        """
+        when an invalid frame is read, an exception must be raised
+        """
+        frame = '\x7E\x00\x01\x00\xF6'
+        self.assertRaises(ValueError, XBee.empty_frame, frame)
 
 class TestWriteToDevice(unittest.TestCase):
     """
