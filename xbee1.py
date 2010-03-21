@@ -159,7 +159,4 @@ class XBee1(XBee):
                 "Response packet was longer than expected")
         
         return info
-            
-                
-            
-            
+        
