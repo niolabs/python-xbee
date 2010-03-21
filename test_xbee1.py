@@ -193,6 +193,29 @@ class TestParseIOData(unittest.TestCase):
         results = XBee1.parse_samples(data)
         
         self.assertEqual(results, expected_results)
+        
+    def test_parse_single_dio_subset(self):
+        """
+        parse_samples should properly parse a packet containing a single 
+        sample of only digital io data for only a subset of the available
+        pins
+        """
+        # One sample, ADC disabled
+        # DIO 1,3,5,7 enabled
+        header = '\x01\x00\xAA'
+        
+        # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
+        sample = '\x00\xAA'
+        data = header + sample
+        
+        expected_results = [{'dio-1':True,
+                             'dio-3':True,
+                             'dio-5':True,
+                             'dio-7':True}]
+                             
+        results = XBee1.parse_samples(data)
+        
+        self.assertEqual(results, expected_results)
 
 class TestWriteToDevice(unittest.TestCase):
     """
