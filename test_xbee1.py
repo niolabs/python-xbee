@@ -158,6 +158,23 @@ class TestWriteToDevice(unittest.TestCase):
         # Expect a full packet to be written to the device
         expected_data = '\x7E\x00\x04\x08AMY\x10'
         self.assertEqual(serial_port.data, expected_data)
+        
+        
+    def test_send_at_command_with_param(self):
+        """
+        calling send should write a full API frame containing the
+        API AT command packet to the serial device.
+        """
+        
+        serial_port = FakeDevice()
+        xbee = XBee1(serial_port)
+        
+        # Send an AT command
+        xbee.send('at', frame_id='A', command='MY', parameter='\x00\x00')
+        
+        # Expect a full packet to be written to the device
+        expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
+        self.assertEqual(serial_port.data, expected_data)
 
 if __name__ == '__main__':
     unittest.main()
