@@ -1,7 +1,9 @@
 #! /usr/bin/python
 """
 test_xbee1.py
-By Paul Malmsten
+
+By Paul Malmsten, 2010
+pmalmsten@gmail.com
 
 Tests the XBee Series 1 class for XBee API compliance
 """

@@ -1,6 +1,8 @@
 """
 xbee1.py
-By Paul Malmsten
+
+By Paul Malmsten, 2010
+pmalmsten@gmail.com
 
 This module implements an XBee Series 1 driver.
 """

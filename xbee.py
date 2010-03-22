@@ -1,4 +1,9 @@
 """
+xbee.py
+
+By Paul Malmsten, 2010
+pmalmsten@gmail.com
+
 XBee superclass module
 
 This class defines data and methods common to both the Xbee Series 1 and
