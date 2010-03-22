@@ -10,15 +10,6 @@ series-specific functionality.
 
 class XBee(object):
     START_BYTE = '\x7E'
-    
-    # start is one byte long, length is two bytes
-    # data is n bytes long (indicated by length)
-    # chksum is one byte long
-    api_frame_order = ['start', 'length', 'data', 'chksum']
-    api_frame_elems = {'start': START_BYTE,
-                       'length': None,
-                       'data': None,
-                       'chksum':None}
                        
     def __init__(self, ser):
         self.serial = ser
@@ -88,7 +79,9 @@ class XBee(object):
         generate all other data as required and produce a valid API
         frame for transmission to an XBee module.
         """
-        # start byte, two length bytes, data byte, checksum
+        # start is one byte long, length is two bytes
+        # data is n bytes long (indicated by length)
+        # chksum is one byte long
         return XBee.START_BYTE + XBee.len_bytes(data) + data + XBee.checksum(data)
         
     @staticmethod
