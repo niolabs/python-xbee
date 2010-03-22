@@ -1,21 +1,25 @@
 #! /usr/bin/python
 
-import unittest
-from xbee import XBee
-
 """
 test_xbee.py
 By Paul Malmsten, 2010
 
 Tests the XBee superclass module for XBee API conformance.
 """
+import unittest
+from xbee import XBee
 
 class FakeDevice:
     """
     Represents a fake serial port for testing purposes
     """
+    def __init__(self):
+        self.data = ''
     
     def write(self, data):
+        """
+        Writes data to the fake port for later evaluation
+        """
         self.data = data
         
 class FakeReadDevice:
@@ -28,16 +32,16 @@ class FakeReadDevice:
         self.data = data
         self.read_index = 0
         
-    def read(self, bytes=1):
+    def read(self, length=1):
         """
         Read the indicated number of bytes from the port
         """
         # If too many bytes would be read, raise exception
-        if self.read_index + bytes > len(self.data):
+        if self.read_index + length > len(self.data):
             raise ValueError("Not enough bytes exist!")
         
-        read_data = self.data[self.read_index:self.read_index + bytes]
-        self.read_index += bytes
+        read_data = self.data[self.read_index:self.read_index + length]
+        self.read_index += length
         
         return read_data
         
@@ -47,6 +51,9 @@ class TestFakeReadDevice(unittest.TestCase):
     port
     """
     def setUp(self):
+        """
+        Create a fake read device for each test
+        """
         self.device = FakeReadDevice("test")
     
     def test_read_single_byte(self):
@@ -77,6 +84,9 @@ class TestChecksumming(unittest.TestCase):
     data sent to and received from an XBee device
     """
     def setUp(self):
+        """
+        Factor out common data among most tests
+        """
         self.data1 = '\x00'
         self.data2 = '\x36'
         self.data3 = '\x01\x01\x01\x01\x01'
@@ -139,26 +149,26 @@ class TestLenBytes(unittest.TestCase):
         """
         run len_bytes on a single byte
         """
-        MSB,LSB = XBee.len_bytes('\x00')
-        self.assertEqual(MSB, '\x00')
-        self.assertEqual(LSB, '\x01')
+        msb, lsb = XBee.len_bytes('\x00')
+        self.assertEqual(msb, '\x00')
+        self.assertEqual(lsb, '\x01')
         
     def test_few_bytes(self):
         """
         run len_bytes on a few bytes
         """
-        MSB,LSB = XBee.len_bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-        self.assertEqual(MSB, '\x00')
-        self.assertEqual(LSB, '\x09')
+        msb, lsb = XBee.len_bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+        self.assertEqual(msb, '\x00')
+        self.assertEqual(lsb, '\x09')
         
     def test_many_bytes(self):
         """
         run len_bytes on many bytes
         """
-        bytes = '\x00' * 300
-        MSB,LSB = XBee.len_bytes(bytes)
-        self.assertEqual(MSB, '\x01')
-        self.assertEqual(LSB, ',')
+        data = '\x00' * 300
+        msb, lsb = XBee.len_bytes(data)
+        self.assertEqual(msb, '\x01')
+        self.assertEqual(lsb, ',')
 
 class TestAPIFrameGeneration(unittest.TestCase):
     """
@@ -169,11 +179,11 @@ class TestAPIFrameGeneration(unittest.TestCase):
         """
         create a frame containing a single byte
         """
-        bytes = '\x00'
+        data = '\x00'
         # start byte, two length bytes, data byte, checksum
         expected_frame = '\x7E\x00\x01\x00\xFF'
         
-        frame = XBee.fill_frame(bytes)
+        frame = XBee.fill_frame(data)
         self.assertEqual(frame, expected_frame)
         
 class TestAPIFrameParsing(unittest.TestCase):

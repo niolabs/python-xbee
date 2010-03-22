@@ -1,15 +1,13 @@
 #! /usr/bin/python
-
-import unittest
-from test_xbee import FakeDevice, FakeReadDevice
-from xbee1 import XBee1
-
 """
 test_xbee1.py
 By Paul Malmsten
 
 Tests the XBee Series 1 class for XBee API compliance
 """
+import unittest
+from test_xbee import FakeDevice, FakeReadDevice
+from xbee1 import XBee1
 
 class TestBuildCommand(unittest.TestCase):
     """
@@ -22,10 +20,10 @@ class TestBuildCommand(unittest.TestCase):
         be raised.
         """
         try:
-            data = XBee1.build_command("at")
+            XBee1.build_command("at")
         except KeyError:
-           # Test passes
-           return
+            # Test passes
+            return
     
         # No exception? Fail.
         self.fail("An exception was not raised with improper data supplied")
@@ -35,10 +33,10 @@ class TestBuildCommand(unittest.TestCase):
         if data of incorrect length is provided, an exception should be raised
         """
         try:
-            data = XBee1.build_command("at", frame_id="AB", command="MY")
+            XBee1.build_command("at", frame_id="AB", command="MY")
         except ValueError:
-           # Test passes
-           return
+            # Test passes
+            return
     
         # No exception? Fail.
         self.fail("An exception was not raised with improper data length")
@@ -121,7 +119,7 @@ class TestSplitResponse(unittest.TestCase):
                          'status':'\x01'}
         self.assertEqual(info, expected_info)
         
-    def test_split_at_response_with_parameter(self):
+    def test_split_at_resp_with_param(self):
         """
         split_response should properly split an at_response packet which
         has parameter data
