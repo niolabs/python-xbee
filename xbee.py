@@ -1,5 +1,3 @@
-import struct
-
 """
 XBee superclass module
 
@@ -7,8 +5,14 @@ This class defines data and methods common to both the Xbee Series 1 and
 Series 2 modules. This class should be subclassed in order to provide
 series-specific functionality.
 """
+import struct
 
 class XBee(object):
+    """
+    Abstract base class providing basic API frame generation, validation,
+    and data extraction methods for XBee modules
+    """
+    
     START_BYTE = '\x7E'
                        
     def __init__(self, ser):

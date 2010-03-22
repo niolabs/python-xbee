@@ -1,21 +1,30 @@
-import struct
-from xbee import XBee
-
 """
 xbee1.py
 By Paul Malmsten
 
 This module implements an XBee Series 1 driver.
 """
+import struct
+from xbee import XBee
 
 class XBee1(XBee):
+    """
+    Provides an implementation of the XBee API for Series 1 modules
+    with recent firmware.
+    
+    Commands may be sent to a device by instansiating this class with
+    a serial port object (see PySerial) and then calling the send
+    method with the proper information specified by the API. Data may
+    be read from a device (syncronously only, at the moment) by calling 
+    wait_read_frame.
+    """
     # Packets which can be sent to an XBee
     
     # Format: 
     #        name of command
     #           id: id byte to be sent to XBee
     #           param_name: number of bytes to send
-    #           param_name: None (size of parameter is variable, 0<n<10 bytes)
+    #           param_name: None (size of parameter is variable)
     #           order: [param_name, ...] (order in which parameters should be sent)  
     api_commands = {"at":
                         {"id":'\x08',
@@ -31,7 +40,7 @@ class XBee1(XBee):
     #        id byte received from XBee
     #           id: name of response
     #           param_name: number of bytes to read
-    #           param_name: None (size of parameter is variable, 0<n<10) 
+    #           param_name: None (size of parameter is variable) 
     api_responses = {'\x8a': 
                         {"id": 'status',
                          "status": 1,
@@ -59,7 +68,7 @@ class XBee1(XBee):
                          'order':['source','rssi','options','samples']}
                      }
 
-    reserved_names = ['id','order']
+    reserved_names = ['id', 'order']
     
     # When a packet with one of these ID's arrives, its data will be 
     # parsed as IO samples
@@ -81,7 +90,7 @@ class XBee1(XBee):
         with the api_command specification. Arguments matching all 
         field names other than those in reserved_names (like 'id' and
         'order') should be given, unless they are of variable length 
-        (of 'None' in the specification. Those are optional.
+        (of 'None' in the specification. Those are optional).
         """
         # Pass through the keyword arguments
         self.write_frame(XBee1.build_command(cmd, **kwargs))
@@ -220,21 +229,18 @@ class XBee1(XBee):
         return info
         
     @staticmethod
-    def parse_samples(data):
+    def parse_samples_header(data):
         """
-        parse_samples: binary data in XBee IO data format ->
-                        [ {"dio-0":True,
-                           "dio-1":False,
-                           "adc-0":100"}, ...]
-                           
-        parse_samples reads binary data from an XBee device in the IO
-        data format specified by the API. It will then return dictionary
-        indicating the status of each enabled IO port.
+        parse_samples_header: binary data in XBee IO data format ->
+                        (int, [int ...], [int ...])
+                        
+        parse_samples_header will read the first three bytes of the 
+        binary data given and will return the number of samples which
+        follow, a list of enabled digital inputs and a list of enabled
+        analog inputs
         """
         
         ## Parse the header, bytes 0-2
-        #byte_1 = ['adc-%d' % i for i in range(0, 6)]
-        #byte_2 = ['dio-%d' % i for i in range(0, 8)]
         dio_enabled = []
         adc_enabled = []
         
@@ -253,7 +259,7 @@ class XBee1(XBee):
         # Check each flag
         #  DIO lines 0-7
         i = 1
-        for dio in range(0,8):
+        for dio in range(0, 8):
             if byte_2_data & i:
                 dio_enabled.append(dio)
             i *= 2
@@ -268,10 +274,29 @@ class XBee1(XBee):
         # Check each flag (after the first)
         #  ADC lines 0-5
         i = 2
-        for adc in range(0,6):
+        for adc in range(0, 6):
             if byte_1_data & i:
                 adc_enabled.append(adc)
             i *= 2
+            
+        return (len_samples, dio_enabled, adc_enabled)
+        
+    @staticmethod
+    def parse_samples(data):
+        """
+        parse_samples: binary data in XBee IO data format ->
+                        [ {"dio-0":True,
+                           "dio-1":False,
+                           "adc-0":100"}, ...]
+                           
+        parse_samples reads binary data from an XBee device in the IO
+        data format specified by the API. It will then return a dictionary
+        indicating the status of each enabled IO port.
+        """
+        
+        ## Parse and store header information
+        header_data = XBee1.parse_samples_header(data)
+        len_samples, dio_enabled, adc_enabled = header_data
         
         samples = []
         
