@@ -427,6 +427,42 @@ class TestReadFromDevice(unittest.TestCase):
                          'status':'\x01',
                          'parameter':'\x00\x00\x00'}
         self.assertEqual(info, expected_info)
+        
+    def test_read_io_data(self):
+        """
+        XBee1 class should properly read and parse incoming IO data
+        """
+        ## Build IO data
+        # One sample, ADC 0 enabled
+        # DIO 1,3,5,7 enabled
+        header = '\x01\x02\xAA'
+        
+        # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
+        # ADC0 value of 255
+        sample = '\x00\xAA\x00\xFF'
+        data = header + sample
+        
+        ## Wrap data in frame
+        # RX frame data
+        rx_io_resp = '\x83\x00\x01\x28\x00'
+    
+        device = FakeReadDevice('\x7E\x00\x0C'+ rx_io_resp + data + '\xfd')
+        xbee = XBee1(device)
+        
+        #pdb.set_trace()
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'rx_io_data',
+                         'source':'\x00\x01',
+                         'rssi':'\x28',
+                         'options':'\x00',
+                         'samples': [{'dio-1':True,
+                                      'dio-3':True,
+                                      'dio-5':True,
+                                      'dio-7':True,
+                                      'adc-0':255}]
+                        }
+        self.assertEqual(info, expected_info)
+                    
 
 if __name__ == '__main__':
     unittest.main()

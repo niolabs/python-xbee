@@ -42,10 +42,28 @@ class XBee1(XBee):
                          'command':2,
                          'status':1,
                          'parameter': None,
-                         'order':['frame_id','command','status','parameter']}
+                         'order':['frame_id','command','status','parameter']},
+                      '\x81':
+                        {'id':'rx',
+                         'source':2,
+                         'rssi':1,
+                         'options':1,
+                         'rf_data':None,
+                         'order':['source','rssi','options','rf_data']},
+                      '\x83':
+                        {'id':'rx_io_data',
+                         'source':2,
+                         'rssi':1,
+                         'options':1,
+                         'samples':None,
+                         'order':['source','rssi','options','samples']}
                      }
 
     reserved_names = ['id','order']
+    
+    # When a packet with one of these ID's arrives, its data will be 
+    # parsed as IO samples
+    io_data_packets = ['\x83']
     
     def __init__(self, ser):
         # Call the super class constructor to save the serial port
@@ -143,8 +161,9 @@ class XBee1(XBee):
         """
         # Fetch the first byte, identify the packet
         # If the spec doesn't exist, raise exception
+        packet_id = data[0]
         try:
-            packet_spec = XBee1.api_responses[data[0]]
+            packet_spec = XBee1.api_responses[packet_id]
         except KeyError:
             raise KeyError(
                 "Unrecognized response packet with id byte %s"
@@ -192,7 +211,12 @@ class XBee1(XBee):
         if index < len(data):
             raise ValueError(
                 "Response packet was longer than expected")
-        
+                
+        # Check if this packet was an IO sample
+        # If so, process the sample data
+        if packet_id in XBee1.io_data_packets:
+            info['samples'] = XBee1.parse_samples(info['samples'])
+            
         return info
         
     @staticmethod
@@ -299,7 +323,3 @@ class XBee1(XBee):
             samples.append(sample)
             
         return samples
-        
-        
-        
-        
