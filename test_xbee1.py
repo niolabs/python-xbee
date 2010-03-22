@@ -304,6 +304,32 @@ class TestParseIOData(unittest.TestCase):
         
         self.assertEqual(results, expected_results)
         
+    def test_parse_multiple_adc_subset(self):
+        """
+        parse_samples should parse a data packet containing multiple
+        samples of adc data from multiple pins in the proper order
+        """
+        # One sample, ADC 0,1 enabled
+        # DIO disabled
+        header = '\x02\x06\x00'
+        
+        # No dio data
+        # ADC0 value of 0
+        # ADC1 value of 255
+        # ADC0 value of 5
+        # ADC1 value of 7
+        sample = '\x00\x00' + '\x00\xFF' + '\x00\x05' + '\x00\x07'
+        data = header + sample
+        
+        expected_results = [{'adc-0':0,
+                             'adc-1':255},
+                            {'adc-0':5,
+                             'adc-1':7}]
+        
+        results = XBee1.parse_samples(data)
+        
+        self.assertEqual(results, expected_results)
+        
     def test_parse_single_dio_adc_subset(self):
         """
         parse_samples should properly parse a packet containing a single 
