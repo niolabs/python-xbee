@@ -33,7 +33,36 @@ class XBee1(XBee):
                          'frame_id':1,
                          'command':2,
                          'parameter': None,
-                         'order':['frame_id','command','parameter']}
+                         'order':['frame_id','command','parameter']},
+                    "queued_at":
+                        {"id":'\x09',
+                         'frame_id':1,
+                         'command':2,
+                         'parameter': None,
+                         'order':['frame_id','command','parameter']},
+                    "remote_at":
+                        {"id":'\x17',
+                         'frame_id':1,
+                         'dest_addr_long':8,
+                         'dest_addr':2,
+                         'options':1,
+                         'command':2,
+                         'parameter': None,
+                         'order':['frame_id','dest_addr_long','dest_addr','options','command','parameter']},
+                    "tx_long_addr":
+                        {'id':'\x00',
+                         'frame_id':1,
+                         'dest_addr':8,
+                         'options':1,
+                         'data':None,
+                         'order':['frame_id','dest_addr','options','data']},
+                    "tx":
+                        {'id':'\x01',
+                         'frame_id':1,
+                         'dest_addr':2,
+                         'options':1,
+                         'data':None,
+                         'order':['frame_id','dest_addr','options','data']},
                     }
     
     # Packets which can be received from an XBee
@@ -43,7 +72,33 @@ class XBee1(XBee):
     #           id: name of response
     #           param_name: number of bytes to read
     #           param_name: None (size of parameter is variable) 
-    api_responses = {'\x8a': 
+    api_responses = {'\x80':
+                        {'id':'rx_long_addr',
+                         'source':8,
+                         'rssi':1,
+                         'options':1,
+                         'rf_data':None,
+                         'order':['source','rssi','options','rf_data']},
+                     '\x81':
+                        {'id':'rx',
+                         'source':2,
+                         'rssi':1,
+                         'options':1,
+                         'rf_data':None,
+                         'order':['source','rssi','options','rf_data']},
+                     '\x83':
+                        {'id':'rx_io_data',
+                         'source':2,
+                         'rssi':1,
+                         'options':1,
+                         'samples':None,
+                         'order':['source','rssi','options','samples']},
+                     '\x89':
+                        {'id':'tx_status',
+                         'frame_id':1,
+                         'status':1,
+                         'order':['frame_id','status']},
+                     '\x8a': 
                         {"id": 'status',
                          "status": 1,
                          "order": ['status']},
@@ -54,20 +109,15 @@ class XBee1(XBee):
                          'status':1,
                          'parameter': None,
                          'order':['frame_id','command','status','parameter']},
-                      '\x81':
-                        {'id':'rx',
-                         'source':2,
-                         'rssi':1,
-                         'options':1,
-                         'rf_data':None,
-                         'order':['source','rssi','options','rf_data']},
-                      '\x83':
-                        {'id':'rx_io_data',
-                         'source':2,
-                         'rssi':1,
-                         'options':1,
-                         'samples':None,
-                         'order':['source','rssi','options','samples']}
+                     '\x97':
+                        {"id":'remote_at_response',
+                         'frame_id':1,
+                         'source_addr_long':8,
+                         'source_addr':2,
+                         'command':2,
+                         'status':1,
+                         'parameter': None,
+                         'order':['frame_id','source_addr_long','source_addr','command','status','parameter']}
                      }
 
     reserved_names = ['id', 'order']
