@@ -187,8 +187,17 @@ class XBee1(XBee):
             try:
                 data = kwargs[param]
             except KeyError:
+                try:
+                    field_length = cmd_spec[param]
+                except KeyError:
+                    # The text in the 'order' API field def. was probably wrong
+                    raise KeyError(
+                        'The field \'%s\' was not found. Is the field order for \'%s\' properly defined?' % 
+                        (param, cmd_spec['id'])
+                    )
+                      
                 # Only a problem if the field has a specific length
-                if cmd_spec[param] is not None:
+                if field_length is not None:
                     raise KeyError(
                         "The expected field %s of length %d was not provided" 
                         % (param, cmd_spec[param]))
@@ -241,8 +250,15 @@ class XBee1(XBee):
             # Skip reserved fields
             if param in XBee1.reserved_names:
                 continue
-                
-            field_len = packet_spec[param]
+            
+            # Raise a nicer exception on a bad API definition
+            try:
+                field_len = packet_spec[param]
+            except KeyError:
+                # The text in the 'order' field was probably wrong
+                raise KeyError(
+                        'The field \'%s\' was not found. Is the field order for \'%s\' properly defined?' % 
+                        (param, packet_id))
             
             # Store the number of bytes specified
             # If the data field has no length specified, store any
