@@ -74,25 +74,25 @@ class XBee1(XBee):
     #           param_name: None (size of parameter is variable) 
     api_responses = {'\x80':
                         {'id':'rx_long_addr',
-                         'source':8,
+                         'source_addr':8,
                          'rssi':1,
                          'options':1,
                          'rf_data':None,
-                         'order':['source','rssi','options','rf_data']},
+                         'order':['source_addr','rssi','options','rf_data']},
                      '\x81':
                         {'id':'rx',
-                         'source':2,
+                         'source_addr':2,
                          'rssi':1,
                          'options':1,
                          'rf_data':None,
-                         'order':['source','rssi','options','rf_data']},
+                         'order':['source_addr','rssi','options','rf_data']},
                      '\x83':
                         {'id':'rx_io_data',
-                         'source':2,
+                         'source_addr':2,
                          'rssi':1,
                          'options':1,
                          'samples':None,
-                         'order':['source','rssi','options','samples']},
+                         'order':['source_addr','rssi','options','samples']},
                      '\x89':
                         {'id':'tx_status',
                          'frame_id':1,

@@ -452,7 +452,7 @@ class TestReadFromDevice(unittest.TestCase):
         #pdb.set_trace()
         info = xbee.wait_read_frame()
         expected_info = {'id':'rx_io_data',
-                         'source':'\x00\x01',
+                         'source_addr':'\x00\x01',
                          'rssi':'\x28',
                          'options':'\x00',
                          'samples': [{'dio-1':True,
