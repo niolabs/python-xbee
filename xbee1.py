@@ -23,108 +23,106 @@ class XBee1(XBee):
     # Packets which can be sent to an XBee
     
     # Format: 
-    #        name of command
-    #           id: id byte to be sent to XBee
-    #           param_name: number of bytes to send
-    #           param_name: None (size of parameter is variable)
-    #           order: [param_name, ...] (order in which parameters should be sent)  
+    #        {name of command:
+    #           [{name:field name, len:field length, default: default value sent}
+    #            ...
+    #            ]
+    #         ...
+    #         }
     api_commands = {"at":
-                        {"id":'\x08',
-                         'frame_id':1,
-                         'command':2,
-                         'parameter': None,
-                         'order':['frame_id','command','parameter']},
+                        [{'name':'id',        'len':1,      'default':'\x88'},
+                         {'name':'frame_id',  'len':1,      'default':'\x00'},
+                         {'name':'command',   'len':2,      'default':None},
+                         {'name':'parameter', 'len':None,   'default':None}],
                     "queued_at":
-                        {"id":'\x09',
-                         'frame_id':1,
-                         'command':2,
-                         'parameter': None,
-                         'order':['frame_id','command','parameter']},
+                        [{'name':'id',        'len':1,      'default':'\x09'},
+                         {'name':'frame_id',  'len':1,      'default':'\x00'},
+                         {'name':'command',   'len':2,      'default':None},
+                         {'name':'parameter', 'len':None,   'default':None}]
                     "remote_at":
-                        {"id":'\x17',
-                         'frame_id':1,
-                         'dest_addr_long':8,
-                         'dest_addr':2,
-                         'options':1,
-                         'command':2,
-                         'parameter': None,
-                         'order':['frame_id','dest_addr_long','dest_addr','options','command','parameter']},
+                        [{'name':'id',              'len':1,        'default':'\x17'},
+                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                         # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)}
+                         {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'}
+                         {'name':'command',         'len':2,        'default':None},
+                         {'name':'parameter',       'len':None,     'default':None}],
                     "tx_long_addr":
-                        {'id':'\x00',
-                         'frame_id':1,
-                         'dest_addr':8,
-                         'options':1,
-                         'data':None,
-                         'order':['frame_id','dest_addr','options','data']},
+                        [{'name':'id',              'len':1,        'default':'\x00'},
+                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)}
+                         {'name':'options',         'len':1,        'default':'\x00'},
+                         {'name':'data',            'len':None,     'default':None}],
                     "tx":
-                        {'id':'\x01',
-                         'frame_id':1,
-                         'dest_addr':2,
-                         'options':1,
-                         'data':None,
-                         'order':['frame_id','dest_addr','options','data']},
+                        [{'name':'id',              'len':1,        'default':'\x01'},
+                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)}
+                         {'name':'options',         'len':1,        'default':'\x00'},
+                         {'name':'data',            'len':None,     'default':None}]
                     }
     
     # Packets which can be received from an XBee
     
     # Format: 
-    #        id byte received from XBee
-    #           id: name of response
-    #           param_name: number of bytes to read
-    #           param_name: None (size of parameter is variable) 
-    api_responses = {'\x80':
-                        {'id':'rx_long_addr',
-                         'source_addr':8,
-                         'rssi':1,
-                         'options':1,
-                         'rf_data':None,
-                         'order':['source_addr','rssi','options','rf_data']},
-                     '\x81':
-                        {'id':'rx',
-                         'source_addr':2,
-                         'rssi':1,
-                         'options':1,
-                         'rf_data':None,
-                         'order':['source_addr','rssi','options','rf_data']},
-                     '\x83':
-                        {'id':'rx_io_data',
-                         'source_addr':2,
-                         'rssi':1,
-                         'options':1,
-                         'samples':None,
-                         'order':['source_addr','rssi','options','samples']},
-                     '\x89':
-                        {'id':'tx_status',
-                         'frame_id':1,
-                         'status':1,
-                         'order':['frame_id','status']},
-                     '\x8a': 
-                        {"id": 'status',
-                         "status": 1,
-                         "order": ['status']},
-                     '\x88':
-                        {"id":'at_response',
-                         'frame_id':1,
-                         'command':2,
-                         'status':1,
-                         'parameter': None,
-                         'order':['frame_id','command','status','parameter']},
-                     '\x97':
-                        {"id":'remote_at_response',
-                         'frame_id':1,
-                         'source_addr_long':8,
-                         'source_addr':2,
-                         'command':2,
-                         'status':1,
-                         'parameter': None,
-                         'order':['frame_id','source_addr_long','source_addr','command','status','parameter']}
+    #        {id byte received from XBee:
+    #           {name: name of response
+    #            structure:
+    #                [ {'name': name of field, 'len':length of field}
+                      ...
+                      ]
+    #            parse_as_io_samples:name of field to parse as io
+    #           }
+    #           ...
+    #        }
+    #
+    api_responses = {"\x80":
+                        {'name':'rx_long_addr',
+                         'structure':
+                            [{'name':'source_addr', 'len':8},
+                             {'name':'rssi',        'len':1},
+                             {'name':'options',     'len':1},
+                             {'name':'rf_data',     'len':None}]},
+                     "\x81":
+                        {'name':'rx',
+                         'structure':
+                            [{'name':'source_addr', 'len':2},
+                             {'name':'rssi',        'len':1},
+                             {'name':'options',     'len':1},
+                             {'name':'rf_data',     'len':None}]},
+                     "\x83":
+                        {'name':'rx_io_data',
+                         'structure':
+                            [{'name':'source_addr', 'len':2},
+                             {'name':'rssi',        'len':1},
+                             {'name':'options',     'len':1},
+                             {'name':'samples',     'len':None}]
+                         'parse_as_io_samples':'samples'},
+                     "\x89":
+                        {'name':'tx_status',
+                         'structure':
+                            [{'name':'frame_id',    'len':1},
+                             {'name':'status',      'len':1}]},
+                     "\x8a":
+                        {'name':'status',
+                         'structure':
+                            [{'name':'status',      'len':1}]},
+                     "\x88":
+                        {'name':'at_response',
+                         'structure':
+                            [{'name':'frame_id',    'len':1},
+                             {'name':'command',     'len':2},
+                             {'name':'status',      'len':1},
+                             {'name':'parameter',   'len':None}]},
+                     "\x97":
+                        {'name':'remote_at_response',
+                         'structure':
+                            [{'name':'frame_id',        'len':1},
+                             {'name':'source_addr_long','len':8},
+                             {'name':'source_addr',     'len':2},
+                             {'name':'command',         'len':2},
+                             {'name':'status',          'len':1},
+                             {'name':'parameter',       'len':None}]},
                      }
-
-    reserved_names = ['id', 'order']
-    
-    # When a packet with one of these ID's arrives, its data will be 
-    # parsed as IO samples
-    io_data_packets = ['\x83']
     
     def __init__(self, ser):
         # Call the super class constructor to save the serial port
