@@ -45,7 +45,7 @@ class XBee1(XBee):
                          # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
                          {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)},
                          {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'},
-                         {'name':'options',         'len':2,        'default':'\x02'},
+                         {'name':'options',         'len':1,        'default':'\x02'},
                          {'name':'command',         'len':2,        'default':None},
                          {'name':'parameter',       'len':None,     'default':None}],
                     "tx_long_addr":
