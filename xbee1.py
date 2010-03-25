@@ -166,47 +166,43 @@ class XBee1(XBee):
         
         build_command will construct a command packet according to the
         specified command's specification in api_commands. It will expect
-        named arguments for all fields other than 'id','order', and those 
-        with a specified length of 'None'.
+        named arguments for all fields other than those with a default 
+        value or a length of 'None'.
         
-        the 'id' field will be written first, followed by each other field
-        in the order specified by the 'order' key.
+        Each field will be written out in the order they are defined
+        in the command definition.
         """
         
         cmd_spec = XBee1.api_commands[cmd]
-        packet = cmd_spec['id']
+        packet = ''
         
-        for param in cmd_spec['order']:
-            # Skip 'id' and 'order'
-            if param in XBee1.reserved_names:
-                continue
-                
-            # Fetch it
+        for field in cmd_spec:
             try:
-                data = kwargs[param]
+                # Read this field's name from the function arguments dict
+                data = kwargs[field['name']]
             except KeyError:
-                try:
-                    field_length = cmd_spec[param]
-                except KeyError:
-                    # The text in the 'order' API field def. was probably wrong
-                    raise KeyError(
-                        'The field \'%s\' was not found. Is the field order for \'%s\' properly defined?' % 
-                        (param, cmd_spec['id'])
-                    )
-                      
+                # Data wasn't given
                 # Only a problem if the field has a specific length
-                if field_length is not None:
-                    raise KeyError(
-                        "The expected field %s of length %d was not provided" 
-                        % (param, cmd_spec[param]))
+                if field['len'] is not None:
+                    # Was a default value specified?
+                    default_value = field['default']
+                    if default_value:
+                        # If so, use it
+                        data = default_value
+                    else:
+                        # Otherwise, fail
+                        raise KeyError(
+                            "The expected field %s of length %d was not provided" 
+                            % (field['name'], field['len']))
                 else:
+                    # No specific length, ignore it
                     data = None
             
             # Ensure that the proper number of elements will be written
-            if data and cmd_spec[param] and len(data) != cmd_spec[param]:
+            if field['len'] and len(data) != field['len']:
                 raise ValueError(
                     "The data provided was not %d bytes long"\
-                    % cmd_spec[param])
+                    % field['len'])
         
             # Add the data to the packet, if it has been specified
             # Otherwise, the parameter was of variable length, and not given
