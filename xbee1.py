@@ -273,8 +273,8 @@ class XBee1(XBee):
                 
         # Check if this packet was an IO sample
         # If so, process the sample data
-        if 'process_as_io_samples' in packet:
-            field_to_process = packet['process_as_io_sample']
+        if 'parse_as_io_samples' in packet:
+            field_to_process = packet['parse_as_io_samples']
             info[field_to_process] = XBee1.parse_samples(
                                         info[field_to_process])
             
