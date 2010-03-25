@@ -56,6 +56,19 @@ class TestBuildCommand(unittest.TestCase):
         expected_data = '\x08+MY'
         self.assertEqual(data, expected_data)
         
+    def test_build_at_with_default(self):
+        """
+        build_command should build a valid at command packet which has
+        no parameter data to be saved and no frame specified (the default
+        value of \x00 should be used)
+        """
+        
+        at_command = "MY"
+        data = XBee1.build_command("at", command=at_command) 
+
+        expected_data = '\x08\x00MY'
+        self.assertEqual(data, expected_data)
+        
 class TestSplitResponse(unittest.TestCase):
     """
     split_response should properly split a response packet
