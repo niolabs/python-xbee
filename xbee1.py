@@ -30,7 +30,7 @@ class XBee1(XBee):
     #         ...
     #         }
     api_commands = {"at":
-                        [{'name':'id',        'len':1,      'default':'\x88'},
+                        [{'name':'id',        'len':1,      'default':'\x08'},
                          {'name':'frame_id',  'len':1,      'default':'\x00'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
