@@ -202,8 +202,8 @@ class XBee1(XBee):
             # Ensure that the proper number of elements will be written
             if field['len'] and len(data) != field['len']:
                 raise ValueError(
-                    "The data provided was not %d bytes long"\
-                    % field['len'])
+                    "The data provided for '%s' was not %d bytes long"\
+                    % (field['name'], field['len']))
         
             # Add the data to the packet, if it has been specified
             # Otherwise, the parameter was of variable length, and not given
