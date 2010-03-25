@@ -227,7 +227,7 @@ class XBee1(XBee):
         # If the spec doesn't exist, raise exception
         packet_id = data[0]
         try:
-            packet_spec = XBee1.api_responses[packet_id]
+            packet = XBee1.api_responses[packet_id]
         except KeyError:
             raise KeyError(
                 "Unrecognized response packet with id byte %s"
@@ -237,46 +237,34 @@ class XBee1(XBee):
         index = 1
         
         # Result info
-        info = {'id':packet_spec['id']}
+        info = {'id':packet['name']}
+        packet_spec = packet['structure']
         
         # Parse the packet in the order specified
-        for param in packet_spec['order']:
-            # Skip reserved fields
-            if param in XBee1.reserved_names:
-                continue
-            
-            # Raise a nicer exception on a bad API definition
-            try:
-                field_len = packet_spec[param]
-            except KeyError:
-                # The text in the 'order' field was probably wrong
-                raise KeyError(
-                        'The field \'%s\' was not found. Is the field order for \'%s\' properly defined?' % 
-                        (param, packet_id))
-            
+        for field in packet_spec:
             # Store the number of bytes specified
             # If the data field has no length specified, store any
             #  leftover bytes and quit
-            if field_len is not None:
+            if field['len'] is not None:
                 # Are we trying to read beyond the last data element?
-                if index + field_len > len(data):
+                if index + field['len'] > len(data):
                     raise ValueError(
                         "Response packet was shorter than expected")
                 
-                field = data[index:index + field_len]
-                info[param] = field
+                field_data = data[index:index + field['len']]
+                info[field['name']] = field_data
             else:
-                field = data[index:]
+                field_data = data[index:]
                 
                 # Were there any remaining bytes?
-                if field:
+                if field_data:
                     # If so, store them
-                    info[param] = field
-                    index += len(field)
+                    info[field['name']] = field_data
+                    index += len(field_data)
                 break
             
             # Move the index
-            index += field_len
+            index += field['len']
             
         # If there are more bytes than expected, raise an exception
         if index < len(data):
@@ -285,8 +273,10 @@ class XBee1(XBee):
                 
         # Check if this packet was an IO sample
         # If so, process the sample data
-        if packet_id in XBee1.io_data_packets:
-            info['samples'] = XBee1.parse_samples(info['samples'])
+        if 'process_as_io_samples' in packet:
+            field_to_process = packet['process_as_io_sample']
+            info[field_to_process] = XBee1.parse_samples(
+                                        info[field_to_process])
             
         return info
         
