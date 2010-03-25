@@ -38,25 +38,25 @@ class XBee1(XBee):
                         [{'name':'id',        'len':1,      'default':'\x09'},
                          {'name':'frame_id',  'len':1,      'default':'\x00'},
                          {'name':'command',   'len':2,      'default':None},
-                         {'name':'parameter', 'len':None,   'default':None}]
+                         {'name':'parameter', 'len':None,   'default':None}],
                     "remote_at":
                         [{'name':'id',              'len':1,        'default':'\x17'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
                          # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)}
-                         {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'}
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)},
+                         {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'},
                          {'name':'command',         'len':2,        'default':None},
                          {'name':'parameter',       'len':None,     'default':None}],
                     "tx_long_addr":
                         [{'name':'id',              'len':1,        'default':'\x00'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
-                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)}
+                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)},
                          {'name':'options',         'len':1,        'default':'\x00'},
                          {'name':'data',            'len':None,     'default':None}],
                     "tx":
                         [{'name':'id',              'len':1,        'default':'\x01'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
-                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)}
+                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)},
                          {'name':'options',         'len':1,        'default':'\x00'},
                          {'name':'data',            'len':None,     'default':None}]
                     }
@@ -68,8 +68,8 @@ class XBee1(XBee):
     #           {name: name of response
     #            structure:
     #                [ {'name': name of field, 'len':length of field}
-                      ...
-                      ]
+    #                  ...
+    #                  ]
     #            parse_as_io_samples:name of field to parse as io
     #           }
     #           ...
@@ -95,7 +95,7 @@ class XBee1(XBee):
                             [{'name':'source_addr', 'len':2},
                              {'name':'rssi',        'len':1},
                              {'name':'options',     'len':1},
-                             {'name':'samples',     'len':None}]
+                             {'name':'samples',     'len':None}],
                          'parse_as_io_samples':'samples'},
                      "\x89":
                         {'name':'tx_status',
