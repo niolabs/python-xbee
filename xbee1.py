@@ -45,18 +45,19 @@ class XBee1(XBee):
                          # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
                          {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)},
                          {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'},
+                         {'name':'options',         'len':2,        'default':'\x02'},
                          {'name':'command',         'len':2,        'default':None},
                          {'name':'parameter',       'len':None,     'default':None}],
                     "tx_long_addr":
                         [{'name':'id',              'len':1,        'default':'\x00'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
-                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)},
+                         {'name':'dest_addr',       'len':8,        'default':None},
                          {'name':'options',         'len':1,        'default':'\x00'},
                          {'name':'data',            'len':None,     'default':None}],
                     "tx":
                         [{'name':'id',              'len':1,        'default':'\x01'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
-                         {'name':'dest_addr',       'len':8,        'default':struct.pack('>Q', 0)},
+                         {'name':'dest_addr',       'len':2,        'default':None},
                          {'name':'options',         'len':1,        'default':'\x00'},
                          {'name':'data',            'len':None,     'default':None}]
                     }
