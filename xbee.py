@@ -2,6 +2,7 @@
 xbee.py
 
 By Paul Malmsten, 2010
+Inspired by code written by Amit Synderman and Marco Sangalli
 pmalmsten@gmail.com
 
 XBee superclass module
