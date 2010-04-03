@@ -270,5 +270,32 @@ class TestReadFromDevice(unittest.TestCase):
         data = xbee.wait_for_frame()
         self.assertEqual(data, '\x05')
         
+class TestNotImplementedFeatures(unittest.TestCase):
+    """
+    In order to properly use the XBee class for most situations,
+    it must be subclassed with the proper attributes definined. If
+    this is not the case, then a NotImplemented exception should be
+    raised as appropriate.
+    """
+    
+    def setUp(self):
+        """
+        Set up a base class XBee object which does not have api_commands
+        or api_responses defined
+        """
+        self.xbee = XBee(None)
+    
+    def test_build_command(self):
+        """
+        build_command should raise NotImplemented
+        """
+        self.assertRaises(NotImplementedError, self.xbee.build_command, "at")
+        
+    def test_split_response(self):
+        """
+        split_command should raise NotImplemented
+        """
+        self.assertRaises(NotImplementedError, self.xbee.split_response, "\00")
+        
 if __name__ == '__main__':
     unittest.main()

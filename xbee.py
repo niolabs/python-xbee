@@ -183,8 +183,11 @@ class XBee(object):
         Each field will be written out in the order they are defined
         in the command definition.
         """
-        
-        cmd_spec = self.api_commands[cmd]
+        try:
+            cmd_spec = self.api_commands[cmd]
+        except AttributeError:
+            raise NotImplementedError("API command specifications could not be found; use a derived class which defines 'api_commands'.")
+            
         packet = ''
         
         for field in cmd_spec:
@@ -238,6 +241,8 @@ class XBee(object):
         packet_id = data[0]
         try:
             packet = self.api_responses[packet_id]
+        except AttributeError:
+            raise NotImplementedError("API response specifications could not be found; use a derived class which defines 'api_responses'.")
         except KeyError:
             raise KeyError(
                 "Unrecognized response packet with id byte %s"
