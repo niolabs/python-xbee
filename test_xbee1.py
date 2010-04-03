@@ -413,6 +413,57 @@ class TestWriteToDevice(unittest.TestCase):
         # Expect a full packet to be written to the device
         expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
         self.assertEqual(serial_port.data, expected_data)
+        
+class TestSendShorthand(unittest.TestCase):
+    """
+    Tests shorthand for sending commands to an XBee provided by
+    XBee.__getattr__
+    """
+    
+    def setUp(self):
+        """
+        Prepare a fake device to read from
+        """
+        self.ser = FakeDevice()
+        self.xbee = XBee1(self.ser)
+    
+    def test_send_at_command(self):
+        """
+        Send an AT command with a shorthand call
+        """
+        # Send an AT command
+        self.xbee.at(frame_id='A', command='MY')
+        
+        # Expect a full packet to be written to the device
+        expected_data = '\x7E\x00\x04\x08AMY\x10'
+        self.assertEqual(self.ser.data, expected_data)
+        
+    def test_send_at_command_with_param(self):
+        """
+        calling send should write a full API frame containing the
+        API AT command packet to the serial device.
+        """
+        
+        # Send an AT command
+        self.xbee.at(frame_id='A', command='MY', parameter='\x00\x00')
+        
+        # Expect a full packet to be written to the device
+        expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
+        self.assertEqual(self.ser.data, expected_data)
+        
+    def test_shorthand_disabled(self):
+        """
+        When shorthand is disabled, any attempt at calling a non-existant
+        attribute should raise AttributeError
+        """
+        self.xbee = XBee1(self.ser, shorthand=False)
+        
+        try:
+            cmd = self.xbee.at
+        except AttributeError:
+            pass
+        else:
+            self.fail("Specified shorthand command should not exist")
 
 class TestReadFromDevice(unittest.TestCase):
     """

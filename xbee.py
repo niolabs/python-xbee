@@ -20,8 +20,9 @@ class XBee(object):
     
     START_BYTE = '\x7E'
                        
-    def __init__(self, ser):
+    def __init__(self, ser, shorthand=True):
         self.serial = ser
+        self.shorthand = shorthand
           
     @staticmethod
     def checksum(data):
@@ -446,3 +447,22 @@ class XBee(object):
         
         frame_data = self.wait_for_frame()
         return self.split_response(frame_data)
+        
+    def __getattr__(self, name):
+        """
+        If a method by the name of a valid api command is called,
+        the arguments will be automatically sent to an appropriate
+        send() call
+        """
+        # If api_commands is not defined, raise NotImplementedError\
+        #  If its not defined, _getattr__ will be called with its name
+        if name == 'api_commands':
+            raise NotImplementedError("API command specifications could not be found; use a derived class which defines 'api_commands'.")
+        
+        # Is shorthand enabled, and is the called name a command?
+        if self.shorthand and name in self.api_commands:
+            # If so, simply return a function which passes its arguments
+            # to an appropriate send() call
+            return lambda **kwargs: self.send(name, **kwargs)
+        else:
+            raise AttributeError("XBee has no attribute '%s'" % name)

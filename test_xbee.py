@@ -297,5 +297,16 @@ class TestNotImplementedFeatures(unittest.TestCase):
         """
         self.assertRaises(NotImplementedError, self.xbee.split_response, "\00")
         
+    def test_shorthand(self):
+        """
+        Shorthand calls should raise NotImplementedError
+        """
+        try:
+            cmd = self.xbee.at
+        except ValueError:
+            pass
+        else:
+            self.fail("Shorthand call on XBee base class should raise NotImplementedError")
+        
 if __name__ == '__main__':
     unittest.main()

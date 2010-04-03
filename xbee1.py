@@ -125,6 +125,6 @@ class XBee1(XBee):
                              {'name':'parameter',       'len':None}]},
                      }
     
-    def __init__(self, ser):
+    def __init__(self, *args, **kwargs):
         # Call the super class constructor to save the serial port
-        super(XBee1, self).__init__(ser)
+        super(XBee1, self).__init__(*args, **kwargs)
