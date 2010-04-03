@@ -11,7 +11,14 @@ import unittest
 from test_xbee import FakeDevice, FakeReadDevice
 from xbee1 import XBee1
 
-class TestBuildCommand(unittest.TestCase):
+class InitXBee(unittest.TestCase):
+    def setUp(self):
+        """
+        Initialize XBee1 object
+        """
+        self.xbee = XBee1(None)
+
+class TestBuildCommand(InitXBee):
     """
     build_command should properly build a command packet
     """
@@ -22,7 +29,7 @@ class TestBuildCommand(unittest.TestCase):
         be raised.
         """
         try:
-            XBee1.build_command("at")
+            self.xbee.build_command("at")
         except KeyError:
             # Test passes
             return
@@ -35,7 +42,7 @@ class TestBuildCommand(unittest.TestCase):
         if data of incorrect length is provided, an exception should be raised
         """
         try:
-            XBee1.build_command("at", frame_id="AB", command="MY")
+            self.xbee.build_command("at", frame_id="AB", command="MY")
         except ValueError:
             # Test passes
             return
@@ -51,7 +58,7 @@ class TestBuildCommand(unittest.TestCase):
         
         at_command = "MY"
         frame = chr(43)
-        data = XBee1.build_command("at", frame_id=frame, command=at_command) 
+        data = self.xbee.build_command("at", frame_id=frame, command=at_command) 
 
         expected_data = '\x08+MY'
         self.assertEqual(data, expected_data)
@@ -64,12 +71,12 @@ class TestBuildCommand(unittest.TestCase):
         """
         
         at_command = "MY"
-        data = XBee1.build_command("at", command=at_command) 
+        data = self.xbee.build_command("at", command=at_command) 
 
         expected_data = '\x08\x00MY'
         self.assertEqual(data, expected_data)
         
-class TestSplitResponse(unittest.TestCase):
+class TestSplitResponse(InitXBee):
     """
     split_response should properly split a response packet
     """
@@ -82,7 +89,7 @@ class TestSplitResponse(unittest.TestCase):
         data = '\x23\x00\x00\x00'
         
         try:
-            XBee1.split_response(data)
+            self.xbee.split_response(data)
         except KeyError:
             # Passes
             return
@@ -97,7 +104,7 @@ class TestSplitResponse(unittest.TestCase):
         """
         # Over length
         data = '\x8a\x00\x00\x00'
-        self.assertRaises(ValueError, XBee1.split_response, data)
+        self.assertRaises(ValueError, self.xbee.split_response, data)
         
     def test_bad_data_short(self):
         """
@@ -106,7 +113,7 @@ class TestSplitResponse(unittest.TestCase):
         """
         # Under length
         data = '\x8a'
-        self.assertRaises(ValueError, XBee1.split_response, data)
+        self.assertRaises(ValueError, self.xbee.split_response, data)
     
     def test_split_status_response(self):
         """
@@ -114,7 +121,7 @@ class TestSplitResponse(unittest.TestCase):
         """
         data = '\x8a\x01'
         
-        info = XBee1.split_response(data)
+        info = self.xbee.split_response(data)
         expected_info = {'id':'status',
                          'status':'\x01'}
         
@@ -127,7 +134,7 @@ class TestSplitResponse(unittest.TestCase):
         """
         
         data = '\x88DMY\x01'
-        info = XBee1.split_response(data)
+        info = self.xbee.split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
@@ -141,7 +148,7 @@ class TestSplitResponse(unittest.TestCase):
         """
         
         data = '\x88DMY\x01ABCDEF'
-        info = XBee1.split_response(data)
+        info = self.xbee.split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
@@ -150,7 +157,7 @@ class TestSplitResponse(unittest.TestCase):
         self.assertEqual(info, expected_info)
         
         
-class TestParseIOData(unittest.TestCase):
+class TestParseIOData(InitXBee):
     """
     XBee1 class should properly parse IO data received from an XBee device
     """
@@ -177,7 +184,7 @@ class TestParseIOData(unittest.TestCase):
                              'dio-7':True,
                              'dio-8':True}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -203,7 +210,7 @@ class TestParseIOData(unittest.TestCase):
                              'dio-7':True,
                              'dio-8':False}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -226,7 +233,7 @@ class TestParseIOData(unittest.TestCase):
                              'dio-5':True,
                              'dio-7':True}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -246,7 +253,7 @@ class TestParseIOData(unittest.TestCase):
         
         expected_results = [{'dio-0':False}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -266,7 +273,7 @@ class TestParseIOData(unittest.TestCase):
         expected_results = [{'dio-0':False},
                             {'dio-0':True}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -313,7 +320,7 @@ class TestParseIOData(unittest.TestCase):
                              'dio-7':False,
                              'dio-8':False}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -339,7 +346,7 @@ class TestParseIOData(unittest.TestCase):
                             {'adc-0':5,
                              'adc-1':7}]
         
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
@@ -364,7 +371,7 @@ class TestParseIOData(unittest.TestCase):
                              'dio-7':True,
                              'adc-0':255}]
                              
-        results = XBee1.parse_samples(data)
+        results = self.xbee.parse_samples(data)
         
         self.assertEqual(results, expected_results)
 
