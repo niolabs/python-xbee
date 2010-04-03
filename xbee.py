@@ -410,3 +410,34 @@ class XBee(object):
             samples.append(sample)
             
         return samples
+        
+    def send(self, cmd, **kwargs):
+        """
+        send: string param=binary data ... -> None
+        
+        When send is called with the proper arguments, an API command
+        will be written to the serial port for this XBee device
+        containing the proper instructions and data.
+        
+        This method must be called with named arguments in accordance
+        with the api_command specification. Arguments matching all 
+        field names other than those in reserved_names (like 'id' and
+        'order') should be given, unless they are of variable length 
+        (of 'None' in the specification. Those are optional).
+        """
+        # Pass through the keyword arguments
+        self.write_frame(self.build_command(cmd, **kwargs))
+        
+        
+    def wait_read_frame(self):
+        """
+        wait_read_frame: None -> frame info dictionary
+        
+        wait_read_frame calls XBee.wait_for_frame() and waits until a
+        valid frame appears on the serial port. Once it receives a frame,
+        wait_read_frame attempts to parse the data contained within it
+        and returns the resulting dictionary
+        """
+        
+        frame_data = self.wait_for_frame()
+        return self.split_response(frame_data)
