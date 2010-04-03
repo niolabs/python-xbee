@@ -303,7 +303,7 @@ class TestNotImplementedFeatures(unittest.TestCase):
         """
         try:
             cmd = self.xbee.at
-        except ValueError:
+        except NotImplementedError:
             pass
         else:
             self.fail("Shorthand call on XBee base class should raise NotImplementedError")
