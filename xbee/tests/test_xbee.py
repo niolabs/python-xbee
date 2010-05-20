@@ -8,7 +8,7 @@ pmalmsten@gmail.com
 Tests the XBee superclass module for XBee API conformance.
 """
 import unittest
-from xbee import XBee
+from xbee.base import XBee
 
 class FakeDevice:
     """

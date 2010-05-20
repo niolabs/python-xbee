@@ -8,8 +8,8 @@ pmalmsten@gmail.com
 Tests the XBee Series 1 class for XBee API compliance
 """
 import unittest
-from test_xbee import FakeDevice, FakeReadDevice
-from xbee1 import XBee1
+from xbee.tests.test_xbee import FakeDevice, FakeReadDevice
+from xbee.xbee1 import XBee1
 
 class InitXBee(unittest.TestCase):
     def setUp(self):

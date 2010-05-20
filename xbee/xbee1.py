@@ -8,7 +8,7 @@ pmalmsten@gmail.com
 This module implements an XBee Series 1 driver.
 """
 import struct
-from xbee import XBee
+from base import XBee
 
 class XBee1(XBee):
     """
