@@ -11,7 +11,7 @@ on ADC0 and a digital output on DIO1. It will then read voltage
 measurements and write an active-low result to the remote DIO1 pin.
 """
 
-from xbee.xbee1 import XBee1
+from xbee import XBee1
 import serial
 
 ser = serial.Serial('/dev/ttyUSB0', 9600)

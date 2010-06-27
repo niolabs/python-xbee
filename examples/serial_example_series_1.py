@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from xbee1 import XBee1
+from xbee import XBee1
 import serial
 
 """

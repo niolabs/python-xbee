@@ -10,7 +10,7 @@ This example continuously reads the serial port and processes IO data
 received from a remote XBee.
 """
 
-from xbee1 import XBee1
+from xbee import XBee1
 import serial
 
 PORT = '/dev/ttyUSB0'

@@ -10,7 +10,7 @@ This module will communicate with a remote XBee device in order to
 implement a simple alarm clock with bed occupancy detection.
 """
 import serial
-from xbee.xbee1 import XBee1
+from xbee import XBee1
 
 class DataSource(object):
     """
