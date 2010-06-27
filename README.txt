@@ -60,5 +60,5 @@ Paul Malmsten <pmalmsten@gmail.com>
 Special Thanks
 ==================
 
-Amit Synderman
+Amit Synderman,
 Marco Sangalli
