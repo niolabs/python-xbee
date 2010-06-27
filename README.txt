@@ -10,7 +10,7 @@ look like this::
     #! /usr/bin/python
     
     # Import and init a XBee Series 1 device
-    from xbee.xbee1 import XBee1
+    from xbee import XBee1
     import serial
 
     ser = serial.Serial('/dev/ttyUSB0', 9600)
@@ -34,8 +34,7 @@ Series 1
 ---------
 
 To use this library with an XBee Series 1 device, import the class
-XBee1 from xbee.xbee1, and call its constructor with a serial port
-object.
+XBee1 and call its constructor with a serial port object.
 
 In order to send commands via the API, call a method with the same
 name as the command which you would like to send with words separated
@@ -45,8 +44,7 @@ remote_at().
 The arguments to be given to each method depend upon the command to be 
 sent. For more information concerning the names of the arguments which
 are expected and the proper data types for each argument, consult the
-API manual for the XBee Series 1 device, or consult the source code to
-this library.
+API manual for the XBee Series 1 device, or consult the source code.
 
 Series 2
 -----------

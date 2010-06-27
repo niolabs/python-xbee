@@ -1,1 +1,1 @@
-v0.1.0, 5/20/10 -- Initial Release
+v1.5.0, 6/27/10 -- Initial Packaging. Fully restructured into a unified API with tests.

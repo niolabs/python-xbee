@@ -1,2 +1,4 @@
 include *.txt
 recursive-include docs *.txt
+recursive-include examples *.txt *.py
+recursive-include scripts *.py

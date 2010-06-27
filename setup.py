@@ -2,13 +2,13 @@ from distutils.core import setup
 
 setup(
     name='XBee',
-    version='0.1.0',
+    version='1.5.0',
     author='Paul Malmsten',
     author_email='pmalmsten@gmail.com',
-    packages=['xbee', 'xbee.test'],
+    packages=['xbee', 'xbee.tests'],
     scripts=[],
-    url='http://bombadier.homeftp.net/hg/python-xbee-clean',
+    url='http://code.google.com/p/python-xbee/',
     license='LICENSE.txt',
-    description='XBee API communication library',
+    description='Python tools for working with XBee radios',
     long_description=open('README.txt').read(),
 )
