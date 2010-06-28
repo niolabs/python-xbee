@@ -9,75 +9,7 @@ Tests the XBee superclass module for XBee API conformance.
 """
 import unittest
 from xbee.base import XBee
-
-class FakeDevice:
-    """
-    Represents a fake serial port for testing purposes
-    """
-    def __init__(self):
-        self.data = ''
-    
-    def write(self, data):
-        """
-        Writes data to the fake port for later evaluation
-        """
-        self.data = data
-        
-class FakeReadDevice:
-    """
-    Represents a fake serial port which can be read from in a similar
-    fashion to the real thing
-    """
-    
-    def __init__(self, data):
-        self.data = data
-        self.read_index = 0
-        
-    def read(self, length=1):
-        """
-        Read the indicated number of bytes from the port
-        """
-        # If too many bytes would be read, raise exception
-        if self.read_index + length > len(self.data):
-            raise ValueError("Not enough bytes exist!")
-        
-        read_data = self.data[self.read_index:self.read_index + length]
-        self.read_index += length
-        
-        return read_data
-        
-class TestFakeReadDevice(unittest.TestCase):
-    """
-    FakeReadDevice class should work as intended to emluate a serial 
-    port
-    """
-    def setUp(self):
-        """
-        Create a fake read device for each test
-        """
-        self.device = FakeReadDevice("test")
-    
-    def test_read_single_byte(self):
-        """
-        reading one byte at a time should work as expected
-        """
-        self.assertEqual(self.device.read(), 't')
-        self.assertEqual(self.device.read(), 'e')
-        self.assertEqual(self.device.read(), 's')
-        self.assertEqual(self.device.read(), 't')
-        
-    def test_read_multiple_bytes(self):
-        """
-        reading multiple bytes at a time should work as expected
-        """
-        self.assertEqual(self.device.read(3), 'tes')
-        self.assertEqual(self.device.read(), 't')
-        
-    def test_read_too_many(self):
-        """
-        attempting to read too many bytes should raise an exception
-        """
-        self.assertRaises(ValueError, self.device.read, 5)
+from Fake import FakeDevice, FakeReadDevice
 
 class TestChecksumming(unittest.TestCase):
     """
