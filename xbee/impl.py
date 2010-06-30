@@ -1,18 +1,18 @@
 """
-xbee1.py
+impl.py
 
 By Paul Malmsten, 2010
 Inspired by code written by Amit Synderman and Marco Sangalli
 pmalmsten@gmail.com
 
-This module implements an XBee Series 1 driver.
+This module implements an XBee Series 1/Series 2 driver.
 """
 import struct
 from xbee.base import XBeeBase
 
 class XBee(XBeeBase):
     """
-    Provides an implementation of the XBee API for Series 1 modules
+    Provides an implementation of the XBee API for Series 1/2 modules
     with recent firmware.
     
     Commands may be sent to a device by instansiating this class with

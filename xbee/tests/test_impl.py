@@ -5,16 +5,16 @@ test_xbee1.py
 By Paul Malmsten, 2010
 pmalmsten@gmail.com
 
-Tests the XBee Series 1 class for XBee API compliance
+Tests the XBee Series 1/2 implementation class for XBee API compliance
 """
 import unittest
 from Fake import FakeDevice, FakeReadDevice
-from xbee import XBee
+from xbee.impl import XBee
 
 class InitXBee(unittest.TestCase):
     def setUp(self):
         """
-        Initialize XBee1 object
+        Initialize XBee object
         """
         self.xbee = XBee(None)
 
@@ -159,7 +159,7 @@ class TestSplitResponse(InitXBee):
         
 class TestParseIOData(InitXBee):
     """
-    XBee1 class should properly parse IO data received from an XBee device
+    XBee class should properly parse IO data received from an XBee device
     """
     
     def test_parse_single_dio(self):
@@ -377,7 +377,7 @@ class TestParseIOData(InitXBee):
 
 class TestWriteToDevice(unittest.TestCase):
     """
-    XBee1 class should properly write binary data in a valid API
+    XBee class should properly write binary data in a valid API
     frame to a given serial device, including a valid command packet.
     """
     
@@ -467,7 +467,7 @@ class TestSendShorthand(unittest.TestCase):
 
 class TestReadFromDevice(unittest.TestCase):
     """
-    XBee1 class should properly read and parse binary data from a serial 
+    XBee class should properly read and parse binary data from a serial 
     port device.
     """
     def test_read_at(self):
@@ -501,7 +501,7 @@ class TestReadFromDevice(unittest.TestCase):
         
     def test_read_io_data(self):
         """
-        XBee1 class should properly read and parse incoming IO data
+        XBee class should properly read and parse incoming IO data
         """
         ## Build IO data
         # One sample, ADC 0 enabled
