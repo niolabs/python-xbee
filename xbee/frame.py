@@ -6,6 +6,7 @@ pmalmsten@gmail.com
 
 Represents an API frame for communicating with an XBee
 """
+import struct
 
 class APIFrame:
     def __init__(self, data):
@@ -33,7 +34,7 @@ class APIFrame:
 
     def verify(self, chksum):
         """
-        verify_checksum: binary data, 1 byte -> boolean
+        verify_checksum: 1 byte -> boolean
         
         verify_checksum checksums the given binary, unescaped data given
         to it, and determines whether the result is correct. The result
@@ -53,3 +54,13 @@ class APIFrame:
         
         # Check result
         return total == 0xFF
+
+    def len_bytes(self):
+        """
+        len_data: None -> (MSB, LSB) 16-bit integer length, two bytes
+        
+        len_bytes counts the number of bytes to be sent and encodes the data
+        length in two bytes, big-endian (most significant first).
+        """
+        count = len(self.data)
+        return struct.pack("> h", count)

@@ -73,35 +73,35 @@ class TestChecksumming(unittest.TestCase):
         """
         self.assertTrue(APIFrame('\x88DMY\x01').verify('\x8c'))
         
-#class TestLenBytes(unittest.TestCase):
-    #"""
-    #XBee class must properly encode the length of the data to be
-    #sent to the XBee
-    #"""    
-    #def test_single_byte(self):
-        #"""
-        #run len_bytes on a single byte
-        #"""
-        #msb, lsb = XBee.len_bytes('\x00')
-        #self.assertEqual(msb, '\x00')
-        #self.assertEqual(lsb, '\x01')
+class TestLenBytes(unittest.TestCase):
+    """
+    XBee class must properly encode the length of the data to be
+    sent to the XBee
+    """    
+    def test_single_byte(self):
+        """
+        run len_bytes on a single byte
+        """
+        msb, lsb = APIFrame('\x00').len_bytes()
+        self.assertEqual(msb, '\x00')
+        self.assertEqual(lsb, '\x01')
         
-    #def test_few_bytes(self):
-        #"""
-        #run len_bytes on a few bytes
-        #"""
-        #msb, lsb = XBee.len_bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-        #self.assertEqual(msb, '\x00')
-        #self.assertEqual(lsb, '\x09')
+    def test_few_bytes(self):
+        """
+        run len_bytes on a few bytes
+        """
+        msb, lsb = APIFrame('\x00\x00\x00\x00\x00\x00\x00\x00\x00').len_bytes()
+        self.assertEqual(msb, '\x00')
+        self.assertEqual(lsb, '\x09')
         
-    #def test_many_bytes(self):
-        #"""
-        #run len_bytes on many bytes
-        #"""
-        #data = '\x00' * 300
-        #msb, lsb = XBee.len_bytes(data)
-        #self.assertEqual(msb, '\x01')
-        #self.assertEqual(lsb, ',')
+    def test_many_bytes(self):
+        """
+        run len_bytes on many bytes
+        """
+        data = '\x00' * 300
+        msb, lsb = APIFrame(data).len_bytes()
+        self.assertEqual(msb, '\x01')
+        self.assertEqual(lsb, ',')
 
 #class TestAPIFrameGeneration(unittest.TestCase):
     #"""
