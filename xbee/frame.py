@@ -30,3 +30,26 @@ class APIFrame:
         
         # Subtract from 0xFF
         return chr(0xFF - total)
+
+    def verify(self, chksum):
+        """
+        verify_checksum: binary data, 1 byte -> boolean
+        
+        verify_checksum checksums the given binary, unescaped data given
+        to it, and determines whether the result is correct. The result
+        should be 0xFF.
+        """
+        total = 0
+        
+        # Add together all bytes
+        for byte in self.data:
+            total += ord(byte)
+            
+        # Add checksum too
+        total += ord(chksum)
+        
+        # Only keep low bits
+        total &= 0xFF
+        
+        # Check result
+        return total == 0xFF
