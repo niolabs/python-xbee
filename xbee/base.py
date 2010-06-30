@@ -124,7 +124,8 @@ class XBeeBase(object):
                     % (field['name'], field['len']))
         
             # Add the data to the packet, if it has been specified
-            # Otherwise, the parameter was of variable length, and not given
+            # Otherwise, the parameter was of variable length, and not 
+            #  given
             if data:
                 packet += data
                 
@@ -262,8 +263,8 @@ class XBeeBase(object):
                            "adc-0":100"}, ...]
                            
         parse_samples reads binary data from an XBee device in the IO
-        data format specified by the API. It will then return a dictionary
-        indicating the status of each enabled IO port.
+        data format specified by the API. It will then return a 
+        dictionary indicating the status of each enabled IO port.
         """
         
         ## Parse and store header information

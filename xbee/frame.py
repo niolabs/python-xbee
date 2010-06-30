@@ -9,6 +9,11 @@ Represents an API frame for communicating with an XBee
 import struct
 
 class APIFrame:
+    """
+    Represents a frame of data to be sent to or which was received 
+    from an XBee device
+    """
+    
     START_BYTE = '\x7E'
     
     def __init__(self, data):
@@ -18,9 +23,9 @@ class APIFrame:
         """
         checksum: None -> single checksum byte
         
-        checksum adds all bytes of the binary, unescaped data in the frame, 
-        saves the last byte of the result, and subtracts it from 0xFF. The
-        final result is the checksum
+        checksum adds all bytes of the binary, unescaped data in the 
+        frame, saves the last byte of the result, and subtracts it from 
+        0xFF. The final result is the checksum
         """
         total = 0
         
@@ -61,8 +66,8 @@ class APIFrame:
         """
         len_data: None -> (MSB, LSB) 16-bit integer length, two bytes
         
-        len_bytes counts the number of bytes to be sent and encodes the data
-        length in two bytes, big-endian (most significant first).
+        len_bytes counts the number of bytes to be sent and encodes the 
+        data length in two bytes, big-endian (most significant first).
         """
         count = len(self.data)
         return struct.pack("> h", count)
@@ -77,7 +82,10 @@ class APIFrame:
         # start is one byte long, length is two bytes
         # data is n bytes long (indicated by length)
         # chksum is one byte long
-        return APIFrame.START_BYTE + self.len_bytes() + self.data + self.checksum()
+        return APIFrame.START_BYTE + \
+                self.len_bytes() + \
+                self.data + \
+                self.checksum()
         
     @staticmethod
     def parse(raw_data):

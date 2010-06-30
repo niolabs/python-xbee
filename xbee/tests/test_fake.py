@@ -8,7 +8,7 @@ pmalmsten@gmail.com
 Tests fake device objects for proper functionality.
 """
 import unittest
-from Fake import FakeReadDevice
+from xbee.tests.Fake import FakeReadDevice
 
 class TestFakeReadDevice(unittest.TestCase):
     """

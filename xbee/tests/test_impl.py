@@ -8,10 +8,13 @@ pmalmsten@gmail.com
 Tests the XBee Series 1/2 implementation class for XBee API compliance
 """
 import unittest
-from Fake import FakeDevice, FakeReadDevice
+from xbee.tests.Fake import FakeDevice, FakeReadDevice
 from xbee.impl import XBee
 
 class InitXBee(unittest.TestCase):
+    """
+    Base initalization class
+    """
     def setUp(self):
         """
         Initialize XBee object
@@ -35,11 +38,14 @@ class TestBuildCommand(InitXBee):
             return
     
         # No exception? Fail.
-        self.fail("An exception was not raised with improper data supplied")
+        self.fail(
+            "An exception was not raised with improper data supplied"
+        )
         
     def test_build_at_data_len_mismatch(self):
         """
-        if data of incorrect length is provided, an exception should be raised
+        if data of incorrect length is provided, an exception should be 
+        raised
         """
         try:
             self.xbee.build_command("at", frame_id="AB", command="MY")
@@ -48,7 +54,9 @@ class TestBuildCommand(InitXBee):
             return
     
         # No exception? Fail.
-        self.fail("An exception was not raised with improper data length")
+        self.fail(
+            "An exception was not raised with improper data length"
+        )
         
     def test_build_at(self):
         """
@@ -58,7 +66,11 @@ class TestBuildCommand(InitXBee):
         
         at_command = "MY"
         frame = chr(43)
-        data = self.xbee.build_command("at", frame_id=frame, command=at_command) 
+        data = self.xbee.build_command(
+            "at", 
+            frame_id=frame, 
+            command=at_command
+        ) 
 
         expected_data = '\x08+MY'
         self.assertEqual(data, expected_data)
@@ -66,8 +78,8 @@ class TestBuildCommand(InitXBee):
     def test_build_at_with_default(self):
         """
         build_command should build a valid at command packet which has
-        no parameter data to be saved and no frame specified (the default
-        value of \x00 should be used)
+        no parameter data to be saved and no frame specified (the 
+        default value of \x00 should be used)
         """
         
         at_command = "MY"
@@ -83,8 +95,8 @@ class TestSplitResponse(InitXBee):
     
     def test_unrecognized_response(self):
         """
-        if a response begins with an unrecognized id byte, split_response
-        should raise an exception
+        if a response begins with an unrecognized id byte, 
+        split_response should raise an exception
         """
         data = '\x23\x00\x00\x00'
         
@@ -159,7 +171,8 @@ class TestSplitResponse(InitXBee):
         
 class TestParseIOData(InitXBee):
     """
-    XBee class should properly parse IO data received from an XBee device
+    XBee class should properly parse IO data received from an XBee 
+    device
     """
     
     def test_parse_single_dio(self):
@@ -191,7 +204,8 @@ class TestParseIOData(InitXBee):
     def test_parse_single_dio_again(self):
         """
         parse_samples should properly parse a packet containing a single 
-        sample of only digital io data, which alternates between on and off
+        sample of only digital io data, which alternates between on and 
+        off
         """
         # One sample, ADC disabled and DIO8 enabled, DIO 0-7 enabled
         header = '\x01\x01\xFF'
@@ -217,8 +231,8 @@ class TestParseIOData(InitXBee):
     def test_parse_single_dio_subset(self):
         """
         parse_samples should properly parse a packet containing a single 
-        sample of only digital io data for only a subset of the available
-        pins
+        sample of only digital io data for only a subset of the 
+        available pins
         """
         # One sample, ADC disabled
         # DIO 1,3,5,7 enabled
@@ -240,8 +254,8 @@ class TestParseIOData(InitXBee):
     def test_parse_single_dio_subset_again(self):
         """
         parse_samples should properly parse a packet containing a single 
-        sample of only digital io data for only a subset of the available
-        pins
+        sample of only digital io data for only a subset of the 
+        available pins
         """
         # One sample, ADC disabled
         # DIO 0 enabled
@@ -408,7 +422,12 @@ class TestWriteToDevice(unittest.TestCase):
         xbee = XBee(serial_port)
         
         # Send an AT command
-        xbee.send('at', frame_id='A', command='MY', parameter='\x00\x00')
+        xbee.send(
+            'at', 
+            frame_id='A', 
+            command='MY', 
+            parameter='\x00\x00'
+        )
         
         # Expect a full packet to be written to the device
         expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
@@ -453,13 +472,13 @@ class TestSendShorthand(unittest.TestCase):
         
     def test_shorthand_disabled(self):
         """
-        When shorthand is disabled, any attempt at calling a non-existant
-        attribute should raise AttributeError
+        When shorthand is disabled, any attempt at calling a 
+        non-existant attribute should raise AttributeError
         """
         self.xbee = XBee(self.ser, shorthand=False)
         
         try:
-            cmd = self.xbee.at
+            self.xbee.at
         except AttributeError:
             pass
         else:
@@ -488,7 +507,9 @@ class TestReadFromDevice(unittest.TestCase):
         """
         read and parse an AT command with a parameter
         """
-        device = FakeReadDevice('\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c')
+        device = FakeReadDevice(
+            '\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c'
+        )
         xbee = XBee(device)
         
         info = xbee.wait_read_frame()
@@ -517,7 +538,9 @@ class TestReadFromDevice(unittest.TestCase):
         # RX frame data
         rx_io_resp = '\x83\x00\x01\x28\x00'
     
-        device = FakeReadDevice('\x7E\x00\x0C'+ rx_io_resp + data + '\xfd')
+        device = FakeReadDevice(
+            '\x7E\x00\x0C'+ rx_io_resp + data + '\xfd'
+        )
         xbee = XBee(device)
         
         #pdb.set_trace()

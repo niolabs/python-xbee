@@ -9,7 +9,7 @@ Tests the XBeeBase superclass module for XBee API conformance.
 """
 import unittest
 from xbee.base import XBeeBase
-from Fake import FakeDevice, FakeReadDevice
+from xbee.tests.Fake import FakeDevice, FakeReadDevice
 
 class TestWriteToDevice(unittest.TestCase):
     """
@@ -103,7 +103,7 @@ class TestNotImplementedFeatures(unittest.TestCase):
         Shorthand calls should raise NotImplementedError
         """
         try:
-            cmd = self.xbee.at
+            self.xbee.at
         except NotImplementedError:
             pass
         else:

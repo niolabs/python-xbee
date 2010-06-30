@@ -9,7 +9,6 @@ Tests frame module for proper behavior
 """
 import unittest
 from xbee.frame import APIFrame
-from Fake import FakeDevice, FakeReadDevice
 
 class TestAPIFrameGeneration(unittest.TestCase):
     """
