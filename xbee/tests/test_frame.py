@@ -103,21 +103,21 @@ class TestLenBytes(unittest.TestCase):
         self.assertEqual(msb, '\x01')
         self.assertEqual(lsb, ',')
 
-#class TestAPIFrameGeneration(unittest.TestCase):
-    #"""
-    #XBee class must be able to create a valid API frame given binary
-    #data, in byte string form.
-    #"""
-    #def test_single_byte(self):
-        #"""
-        #create a frame containing a single byte
-        #"""
-        #data = '\x00'
-        ## start byte, two length bytes, data byte, checksum
-        #expected_frame = '\x7E\x00\x01\x00\xFF'
+class TestAPIFrameGeneration(unittest.TestCase):
+    """
+    XBee class must be able to create a valid API frame given binary
+    data, in byte string form.
+    """
+    def test_single_byte(self):
+        """
+        create a frame containing a single byte
+        """
+        data = '\x00'
+        # start byte, two length bytes, data byte, checksum
+        expected_frame = '\x7E\x00\x01\x00\xFF'
         
-        #frame = XBee.fill_frame(data)
-        #self.assertEqual(frame, expected_frame)
+        frame = APIFrame(data).output()
+        self.assertEqual(frame, expected_frame)
         
 #class TestAPIFrameParsing(unittest.TestCase):
     #"""

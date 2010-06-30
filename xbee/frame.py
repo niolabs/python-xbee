@@ -9,6 +9,8 @@ Represents an API frame for communicating with an XBee
 import struct
 
 class APIFrame:
+    START_BYTE = '\x7E'
+    
     def __init__(self, data):
         self.data = data
         
@@ -64,3 +66,15 @@ class APIFrame:
         """
         count = len(self.data)
         return struct.pack("> h", count)
+        
+    def output(self):
+        """
+        output: None -> valid API frame (binary data)
+        
+        output will produce a valid API frame for transmission to an 
+        XBee module.
+        """
+        # start is one byte long, length is two bytes
+        # data is n bytes long (indicated by length)
+        # chksum is one byte long
+        return APIFrame.START_BYTE + self.len_bytes() + self.data + self.checksum()
