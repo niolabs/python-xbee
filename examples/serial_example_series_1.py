@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from xbee import XBee1
+from xbee import XBee
 import serial
 
 """
@@ -22,7 +22,7 @@ def main():
         ser = serial.Serial('/dev/ttyUSB0', 9600)
         
         # Create XBee Series 1 object
-        xbee = XBee1(ser)
+        xbee = XBee(ser)
         
         
         # Send AT packet
