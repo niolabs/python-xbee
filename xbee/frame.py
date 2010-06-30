@@ -36,11 +36,11 @@ class APIFrame:
 
     def verify(self, chksum):
         """
-        verify_checksum: 1 byte -> boolean
+        verify: 1 byte -> boolean
         
-        verify_checksum checksums the given binary, unescaped data given
-        to it, and determines whether the result is correct. The result
-        should be 0xFF.
+        verify checksums the frame, adds the expected checksum, and 
+        determines whether the result is correct. The result should 
+        be 0xFF.
         """
         total = 0
         
