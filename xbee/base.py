@@ -12,123 +12,26 @@ Series 2 modules. This class should be subclassed in order to provide
 series-specific functionality.
 """
 import struct
+from xbee.frame import APIFrame
 
 class XBee(object):
     """
     Abstract base class providing basic API frame generation, validation,
     and data extraction methods for XBee modules
     """
-    
-    START_BYTE = '\x7E'
                        
     def __init__(self, ser, shorthand=True):
         self.serial = ser
         self.shorthand = shorthand
-          
-    @staticmethod
-    def checksum(data):
+        
+    def write(self, data):
         """
-        checksum: binary data -> single checksum byte
-        
-        checksum adds all bytes of binary, unescaped data presented to it, 
-        saves the last byte of the result, and subtracts it from 0xFF. The
-        final result is the checksum
-        """
-        total = 0
-        
-        # Add together all bytes
-        for byte in data:
-            total += ord(byte)
-            
-        # Only keep the last byte
-        total = total & 0xFF
-        
-        # Subtract from 0xFF
-        return chr(0xFF - total)
-        
-    @staticmethod
-    def verify_checksum(data, chksum):
-        """
-        verify_checksum: binary data, 1 byte -> boolean
-        
-        verify_checksum checksums the given binary, unescaped data given
-        to it, and determines whether the result is correct. The result
-        should be 0xFF.
-        """
-        total = 0
-        
-        # Add together all bytes
-        for byte in data:
-            total += ord(byte)
-            
-        # Add checksum too
-        total += ord(chksum)
-        
-        # Only keep low bits
-        total &= 0xFF
-        
-        # Check result
-        return total == 0xFF
-        
-    @staticmethod
-    def len_bytes(data):
-        """
-        len_data: binary data -> (MSB, LSB) 16-bit integer length, two bytes
-        
-        len_bytes counts the number of bytes to be sent and encodes the data
-        length in two bytes, big-endian (most significant first).
-        """
-        count = len(data)
-        return struct.pack("> h", count)
-        
-    @staticmethod
-    def fill_frame(data):
-        """
-        fill_frame: binary data -> valid API frame (binary data)
-        
-        Given the data required to fill an API frame, fill_frame will
-        generate all other data as required and produce a valid API
-        frame for transmission to an XBee module.
-        """
-        # start is one byte long, length is two bytes
-        # data is n bytes long (indicated by length)
-        # chksum is one byte long
-        return XBee.START_BYTE + XBee.len_bytes(data) + data + XBee.checksum(data)
-        
-    @staticmethod
-    def empty_frame(frame):
-        """
-        empty_frame: valid API frame (binary data) -> binary data
-        
-        Given a valid API frame, empty_frame extracts the data contained
-        inside it and verifies it against its checksum
-        """
-        # First two bytes are the length of the data
-        raw_len = frame[1:3]
-        
-        # Unpack it
-        data_len = struct.unpack("> h", raw_len)[0]
-        
-        # Read the data
-        data = frame[3:3 + data_len]
-        chksum = frame[-1]
-        
-        # Checksum check
-        if not XBee.verify_checksum(data, chksum):
-            raise ValueError("Invalid checksum on given frame")
-            
-        # If the result is valid, return it
-        return data
-        
-        
-    def write_frame(self, data):
-        """
-        write_frame: binary data -> None
+        write: binary data -> None
         
         Packages the given binary data in an API frame and writes the 
         result to the serial port
         """
-        self.serial.write(XBee.fill_frame(data))
+        self.serial.write(APIFrame(data).output())
         
     def wait_for_frame(self):
         """
@@ -149,7 +52,7 @@ class XBee(object):
                 byte = self.serial.read()
                 
                 # If a start byte is found, swich states
-                if byte == XBee.START_BYTE:
+                if byte == APIFrame.START_BYTE:
                     data += byte
                     state = PARSING
             else:
@@ -167,7 +70,7 @@ class XBee(object):
                     
                     try:
                         # Try to parse and return result
-                        return XBee.empty_frame(data)
+                        return APIFrame.parse(data)
                     except ValueError:
                         # Bad frame, so restart
                         data = ''
@@ -433,7 +336,7 @@ class XBee(object):
         (of 'None' in the specification. Those are optional).
         """
         # Pass through the keyword arguments
-        self.write_frame(self.build_command(cmd, **kwargs))
+        self.write(self.build_command(cmd, **kwargs))
         
         
     def wait_read_frame(self):
@@ -446,8 +349,8 @@ class XBee(object):
         and returns the resulting dictionary
         """
         
-        frame_data = self.wait_for_frame()
-        return self.split_response(frame_data)
+        frame = self.wait_for_frame()
+        return self.split_response(frame.data)
         
     def __getattr__(self, name):
         """

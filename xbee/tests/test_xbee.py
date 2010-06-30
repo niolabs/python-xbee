@@ -11,137 +11,6 @@ import unittest
 from xbee.base import XBee
 from Fake import FakeDevice, FakeReadDevice
 
-class TestChecksumming(unittest.TestCase):
-    """
-    XBee class must properly generate and verify checksums for binary
-    data sent to and received from an XBee device
-    """
-    def setUp(self):
-        """
-        Factor out common data among most tests
-        """
-        self.data1 = '\x00'
-        self.data2 = '\x36'
-        self.data3 = '\x01\x01\x01\x01\x01'
-        self.chksum1 = '\xff'
-        self.chksum2 = '\xc9'
-        self.chksum3 = '\xFA'
-        
-    def test_checksum(self):
-        """
-        checksum a simple byte
-        """
-        chksum = XBee.checksum(self.data1)
-        self.assertEqual(chksum, self.chksum1)
-        
-    def test_checksum_again(self):
-        """
-        checksum a different byte
-        """
-        chksum = XBee.checksum(self.data2)
-        self.assertEqual(chksum, self.chksum2)
-        
-    def test_checksum_multibyte(self):
-        """
-        checksum more than one byte
-        """
-        chksum = XBee.checksum(self.data3)
-        self.assertEqual(chksum, self.chksum3)
-        
-    def test_verify_checksum(self):
-        """
-        verify_checksum a single byte
-        """
-        self.assertTrue(XBee.verify_checksum(self.data1, self.chksum1))
-        
-    def test_verify_checksum_again(self):
-        """
-        verify_checksum a different byte
-        """
-        self.assertTrue(XBee.verify_checksum(self.data2, self.chksum2))
-        
-    def test_verify_checksum_multibyte(self):
-        """
-        verify_checksum multiple bytes
-        """
-        self.assertTrue(XBee.verify_checksum(self.data3, self.chksum3))
-        
-    def test_verify_checksum_uses_low_bits(self):
-        """
-        verify_checksum should only use the low bits of the 
-        byte summing process for verification
-        """
-        self.assertTrue(XBee.verify_checksum('\x88DMY\x01', '\x8c'))
-        
-class TestLenBytes(unittest.TestCase):
-    """
-    XBee class must properly encode the length of the data to be
-    sent to the XBee
-    """    
-    def test_single_byte(self):
-        """
-        run len_bytes on a single byte
-        """
-        msb, lsb = XBee.len_bytes('\x00')
-        self.assertEqual(msb, '\x00')
-        self.assertEqual(lsb, '\x01')
-        
-    def test_few_bytes(self):
-        """
-        run len_bytes on a few bytes
-        """
-        msb, lsb = XBee.len_bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-        self.assertEqual(msb, '\x00')
-        self.assertEqual(lsb, '\x09')
-        
-    def test_many_bytes(self):
-        """
-        run len_bytes on many bytes
-        """
-        data = '\x00' * 300
-        msb, lsb = XBee.len_bytes(data)
-        self.assertEqual(msb, '\x01')
-        self.assertEqual(lsb, ',')
-
-class TestAPIFrameGeneration(unittest.TestCase):
-    """
-    XBee class must be able to create a valid API frame given binary
-    data, in byte string form.
-    """
-    def test_single_byte(self):
-        """
-        create a frame containing a single byte
-        """
-        data = '\x00'
-        # start byte, two length bytes, data byte, checksum
-        expected_frame = '\x7E\x00\x01\x00\xFF'
-        
-        frame = XBee.fill_frame(data)
-        self.assertEqual(frame, expected_frame)
-        
-class TestAPIFrameParsing(unittest.TestCase):
-    """
-    XBee class must be able to read and validate the data contained
-    by a valid API frame.
-    """
-    
-    def test_single_byte(self):
-        """
-        read a frame containing a single byte
-        """
-        frame = '\x7E\x00\x01\x00\xFF'
-        expected_data = '\x00'
-        
-        data = XBee.empty_frame(frame)
-        self.assertEqual(data, expected_data)
-        
-    def test_invalid_checksum(self):
-        """
-        when an invalid frame is read, an exception must be raised
-        """
-        frame = '\x7E\x00\x01\x00\xF6'
-        self.assertRaises(ValueError, XBee.empty_frame, frame)
-
 class TestWriteToDevice(unittest.TestCase):
     """
     XBee class should properly write binary data in a valid API
@@ -156,7 +25,7 @@ class TestWriteToDevice(unittest.TestCase):
         device = FakeDevice()
         
         xbee = XBee(device)
-        xbee.write_frame('\x00')
+        xbee.write('\x00')
         
         # Check resuting state of fake device
         expected_frame = '\x7E\x00\x01\x00\xFF'
@@ -170,7 +39,7 @@ class TestWriteToDevice(unittest.TestCase):
         device = FakeDevice()
         
         xbee = XBee(device)
-        xbee.write_frame('\x00\x01\x02')
+        xbee.write('\x00\x01\x02')
         
         # Check resuting state of fake device
         expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
@@ -188,8 +57,8 @@ class TestReadFromDevice(unittest.TestCase):
         device = FakeReadDevice('\x7E\x00\x01\x00\xFF')
         xbee = XBee(device)
         
-        data = xbee.wait_for_frame()
-        self.assertEqual(data, '\x00')
+        frame = xbee.wait_for_frame()
+        self.assertEqual(frame.data, '\x00')
         
     def test_read_invalid_followed_by_valid(self):
         """
@@ -199,8 +68,8 @@ class TestReadFromDevice(unittest.TestCase):
             '\x7E\x00\x01\x00\xFA' + '\x7E\x00\x01\x05\xFA')
         xbee = XBee(device)
         
-        data = xbee.wait_for_frame()
-        self.assertEqual(data, '\x05')
+        frame = xbee.wait_for_frame()
+        self.assertEqual(frame.data, '\x05')
         
 class TestNotImplementedFeatures(unittest.TestCase):
     """
