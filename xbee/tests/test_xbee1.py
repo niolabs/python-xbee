@@ -9,14 +9,14 @@ Tests the XBee Series 1 class for XBee API compliance
 """
 import unittest
 from Fake import FakeDevice, FakeReadDevice
-from xbee import XBee1
+from xbee import XBee
 
 class InitXBee(unittest.TestCase):
     def setUp(self):
         """
         Initialize XBee1 object
         """
-        self.xbee = XBee1(None)
+        self.xbee = XBee(None)
 
 class TestBuildCommand(InitXBee):
     """
@@ -388,7 +388,7 @@ class TestWriteToDevice(unittest.TestCase):
         """
         
         serial_port = FakeDevice()
-        xbee = XBee1(serial_port)
+        xbee = XBee(serial_port)
         
         # Send an AT command
         xbee.send('at', frame_id='A', command='MY')
@@ -405,7 +405,7 @@ class TestWriteToDevice(unittest.TestCase):
         """
         
         serial_port = FakeDevice()
-        xbee = XBee1(serial_port)
+        xbee = XBee(serial_port)
         
         # Send an AT command
         xbee.send('at', frame_id='A', command='MY', parameter='\x00\x00')
@@ -425,7 +425,7 @@ class TestSendShorthand(unittest.TestCase):
         Prepare a fake device to read from
         """
         self.ser = FakeDevice()
-        self.xbee = XBee1(self.ser)
+        self.xbee = XBee(self.ser)
     
     def test_send_at_command(self):
         """
@@ -456,7 +456,7 @@ class TestSendShorthand(unittest.TestCase):
         When shorthand is disabled, any attempt at calling a non-existant
         attribute should raise AttributeError
         """
-        self.xbee = XBee1(self.ser, shorthand=False)
+        self.xbee = XBee(self.ser, shorthand=False)
         
         try:
             cmd = self.xbee.at
@@ -475,7 +475,7 @@ class TestReadFromDevice(unittest.TestCase):
         read and parse a parameterless AT command
         """
         device = FakeReadDevice('\x7E\x00\x05\x88DMY\x01\x8c')
-        xbee = XBee1(device)
+        xbee = XBee(device)
         
         info = xbee.wait_read_frame()
         expected_info = {'id':'at_response',
@@ -489,7 +489,7 @@ class TestReadFromDevice(unittest.TestCase):
         read and parse an AT command with a parameter
         """
         device = FakeReadDevice('\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c')
-        xbee = XBee1(device)
+        xbee = XBee(device)
         
         info = xbee.wait_read_frame()
         expected_info = {'id':'at_response',
@@ -518,7 +518,7 @@ class TestReadFromDevice(unittest.TestCase):
         rx_io_resp = '\x83\x00\x01\x28\x00'
     
         device = FakeReadDevice('\x7E\x00\x0C'+ rx_io_resp + data + '\xfd')
-        xbee = XBee1(device)
+        xbee = XBee(device)
         
         #pdb.set_trace()
         info = xbee.wait_read_frame()

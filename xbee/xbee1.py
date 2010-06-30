@@ -10,7 +10,7 @@ This module implements an XBee Series 1 driver.
 import struct
 from xbee.base import XBeeBase
 
-class XBee1(XBeeBase):
+class XBee(XBeeBase):
     """
     Provides an implementation of the XBee API for Series 1 modules
     with recent firmware.
@@ -128,4 +128,4 @@ class XBee1(XBeeBase):
     
     def __init__(self, *args, **kwargs):
         # Call the super class constructor to save the serial port
-        super(XBee1, self).__init__(*args, **kwargs)
+        super(XBee, self).__init__(*args, **kwargs)
