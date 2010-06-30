@@ -119,25 +119,25 @@ class TestAPIFrameGeneration(unittest.TestCase):
         frame = APIFrame(data).output()
         self.assertEqual(frame, expected_frame)
         
-#class TestAPIFrameParsing(unittest.TestCase):
-    #"""
-    #XBee class must be able to read and validate the data contained
-    #by a valid API frame.
-    #"""
+class TestAPIFrameParsing(unittest.TestCase):
+    """
+    XBee class must be able to read and validate the data contained
+    by a valid API frame.
+    """
     
-    #def test_single_byte(self):
-        #"""
-        #read a frame containing a single byte
-        #"""
-        #frame = '\x7E\x00\x01\x00\xFF'
-        #expected_data = '\x00'
+    def test_single_byte(self):
+        """
+        read a frame containing a single byte
+        """
+        frame = '\x7E\x00\x01\x00\xFF'
+        expected_data = '\x00'
         
-        #data = XBee.empty_frame(frame)
-        #self.assertEqual(data, expected_data)
+        data = APIFrame.parse(frame).data
+        self.assertEqual(data, expected_data)
         
-    #def test_invalid_checksum(self):
-        #"""
-        #when an invalid frame is read, an exception must be raised
-        #"""
-        #frame = '\x7E\x00\x01\x00\xF6'
-        #self.assertRaises(ValueError, XBee.empty_frame, frame)
+    def test_invalid_checksum(self):
+        """
+        when an invalid frame is read, an exception must be raised
+        """
+        frame = '\x7E\x00\x01\x00\xF6'
+        self.assertRaises(ValueError, APIFrame.parse, frame)

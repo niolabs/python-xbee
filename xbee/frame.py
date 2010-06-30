@@ -78,3 +78,29 @@ class APIFrame:
         # data is n bytes long (indicated by length)
         # chksum is one byte long
         return APIFrame.START_BYTE + self.len_bytes() + self.data + self.checksum()
+        
+    @staticmethod
+    def parse(raw_data):
+        """
+        parse: valid API frame (binary data) -> binary data
+        
+        Given a valid API frame, empty_frame extracts the data contained
+        inside it and verifies it against its checksum
+        """
+        # First two bytes are the length of the data
+        raw_len = raw_data[1:3]
+        
+        # Unpack it
+        data_len = struct.unpack("> h", raw_len)[0]
+        
+        # Read the data
+        data = raw_data[3:3 + data_len]
+        chksum = raw_data[-1]
+        
+        # Checksum check
+        frame = APIFrame(data)
+        if not frame.verify(chksum):
+            raise ValueError("Invalid checksum on given frame")
+            
+        # If the result is valid, return it
+        return frame
