@@ -1,6 +1,6 @@
 #! /usr/bin/python
 """
-test_xbee.py
+Fake.py
 
 By Paul Malmsten, 2010
 pmalmsten@gmail.com
