@@ -8,9 +8,9 @@ pmalmsten@gmail.com
 This module implements an XBee Series 1 driver.
 """
 import struct
-from base import XBee
+from xbee.base import XBeeBase
 
-class XBee1(XBee):
+class XBee1(XBeeBase):
     """
     Provides an implementation of the XBee API for Series 1 modules
     with recent firmware.

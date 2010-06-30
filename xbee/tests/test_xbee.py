@@ -5,15 +5,15 @@ test_xbee.py
 By Paul Malmsten, 2010
 pmalmsten@gmail.com
 
-Tests the XBee superclass module for XBee API conformance.
+Tests the XBeeBase superclass module for XBee API conformance.
 """
 import unittest
-from xbee.base import XBee
+from xbee.base import XBeeBase
 from Fake import FakeDevice, FakeReadDevice
 
 class TestWriteToDevice(unittest.TestCase):
     """
-    XBee class should properly write binary data in a valid API
+    XBeeBase class should properly write binary data in a valid API
     frame to a given serial device.
     """
     
@@ -24,7 +24,7 @@ class TestWriteToDevice(unittest.TestCase):
         """
         device = FakeDevice()
         
-        xbee = XBee(device)
+        xbee = XBeeBase(device)
         xbee.write('\x00')
         
         # Check resuting state of fake device
@@ -38,7 +38,7 @@ class TestWriteToDevice(unittest.TestCase):
         """
         device = FakeDevice()
         
-        xbee = XBee(device)
+        xbee = XBeeBase(device)
         xbee.write('\x00\x01\x02')
         
         # Check resuting state of fake device
@@ -47,7 +47,7 @@ class TestWriteToDevice(unittest.TestCase):
         
 class TestReadFromDevice(unittest.TestCase):
     """
-    XBee class should properly read and extract data from a valid
+    XBeeBase class should properly read and extract data from a valid
     API frame
     """
     def test_read(self):
@@ -55,7 +55,7 @@ class TestReadFromDevice(unittest.TestCase):
         wait_for_frame should properly read a frame of data
         """
         device = FakeReadDevice('\x7E\x00\x01\x00\xFF')
-        xbee = XBee(device)
+        xbee = XBeeBase(device)
         
         frame = xbee.wait_for_frame()
         self.assertEqual(frame.data, '\x00')
@@ -66,14 +66,14 @@ class TestReadFromDevice(unittest.TestCase):
         """
         device = FakeReadDevice(
             '\x7E\x00\x01\x00\xFA' + '\x7E\x00\x01\x05\xFA')
-        xbee = XBee(device)
+        xbee = XBeeBase(device)
         
         frame = xbee.wait_for_frame()
         self.assertEqual(frame.data, '\x05')
         
 class TestNotImplementedFeatures(unittest.TestCase):
     """
-    In order to properly use the XBee class for most situations,
+    In order to properly use the XBeeBase class for most situations,
     it must be subclassed with the proper attributes definined. If
     this is not the case, then a NotImplemented exception should be
     raised as appropriate.
@@ -81,10 +81,10 @@ class TestNotImplementedFeatures(unittest.TestCase):
     
     def setUp(self):
         """
-        Set up a base class XBee object which does not have api_commands
-        or api_responses defined
+        Set up a base class XBeeBase object which does not have 
+        api_commands or api_responses defined
         """
-        self.xbee = XBee(None)
+        self.xbee = XBeeBase(None)
     
     def test_build_command(self):
         """
@@ -107,7 +107,7 @@ class TestNotImplementedFeatures(unittest.TestCase):
         except NotImplementedError:
             pass
         else:
-            self.fail("Shorthand call on XBee base class should raise NotImplementedError")
+            self.fail("Shorthand call on XBeeBase base class should raise NotImplementedError")
         
 if __name__ == '__main__':
     unittest.main()

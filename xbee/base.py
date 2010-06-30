@@ -14,7 +14,7 @@ series-specific functionality.
 import struct
 from xbee.frame import APIFrame
 
-class XBee(object):
+class XBeeBase(object):
     """
     Abstract base class providing basic API frame generation, validation,
     and data extraction methods for XBee modules
@@ -195,7 +195,7 @@ class XBee(object):
         # If so, process the sample data
         if 'parse_as_io_samples' in packet:
             field_to_process = packet['parse_as_io_samples']
-            info[field_to_process] = XBee.parse_samples(
+            info[field_to_process] = XBeeBase.parse_samples(
                                         info[field_to_process])
             
         return info
@@ -267,7 +267,7 @@ class XBee(object):
         """
         
         ## Parse and store header information
-        header_data = XBee.parse_samples_header(data)
+        header_data = XBeeBase.parse_samples_header(data)
         len_samples, dio_enabled, adc_enabled = header_data
         
         samples = []
