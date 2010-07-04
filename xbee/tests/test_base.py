@@ -124,7 +124,7 @@ class TestAsyncCallback(unittest.TestCase):
     
     def setUp(self):
         self.xbee = None
-        self.serial = FakeReadDevice([])
+        self.serial = FakeReadDevice([], silent_on_empty=True)
         self.callback = lambda data: None
     
     def test_provide_callback(self):
