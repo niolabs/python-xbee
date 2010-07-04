@@ -11,18 +11,23 @@ This class defines data and methods common to both the Xbee Series 1 and
 Series 2 modules. This class should be subclassed in order to provide
 series-specific functionality.
 """
-import struct
+import struct, threading
 from xbee.frame import APIFrame
 
-class XBeeBase(object):
+class XBeeBase(threading.Thread):
     """
     Abstract base class providing basic API frame generation, validation,
     and data extraction methods for XBee modules
     """
                        
-    def __init__(self, ser, shorthand=True):
+    def __init__(self, ser, shorthand=True, callback=None):
         self.serial = ser
         self.shorthand = shorthand
+        
+        if callback:
+            super(XBeeBase, self).__init__()
+            self.callback = callback
+            self.start()
         
     def write(self, data):
         """
@@ -33,6 +38,10 @@ class XBeeBase(object):
         """
         self.serial.write(APIFrame(data).output())
         
+    def run(self):
+        while True:
+            self.callback(self.wait_read_frame())
+    
     def wait_for_frame(self):
         """
         wait_for_frame: None -> binary data
