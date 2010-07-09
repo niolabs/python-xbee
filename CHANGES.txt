@@ -1,0 +1,25 @@
+v1.5.0, 6/27/10 -- Initial Packaging. Fully restructured into a unified API with tests.
+v1.7.0  6/29/10 -- Now supports both Series 1 and Series 2 modules 
+                   (the API turned out to be the same). Additionally:
+                   * API frame logic was split into its own class, APIFrame
+                   * XBee renamed to XBeeBase
+                   * XBee1 renamed to XBee
+                   * Tests updated to reflect changes; API frame tests
+                     moved to test_frame.py, now test APIFrame instead of
+                     XBee base class
+                   * Test files renamed appropriately
+                   * PyLint score improved
+                   * Various docstring updates
+                   * Updated example code to reflect changes
+v1.8.0  7/8/10  -- Implemented threading support
+                   * If a callback method is given to the XBeeBase constructor,
+                     a new thread will automatically be spawned. This thread
+                     will read from the serial port and call the given callback
+                     method whenever a valid data packet arrives.
+                   * XBeeBase.halt() was added. This method ensures the proper
+                     shutdown of a separate thread if one has been spawned.
+                     This method must be called before closing the serial
+                     port used by an XBee instance in order to prevent
+                     improper use of the serial port.
+                  
+
