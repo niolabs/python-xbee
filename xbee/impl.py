@@ -91,6 +91,14 @@ class XBee(XBeeBase):
                              {'name':'rssi',        'len':1},
                              {'name':'options',     'len':1},
                              {'name':'rf_data',     'len':None}]},
+                     "\x82":
+                        {'name':'rx_io_data_long_addr',
+                         'structure':
+                            [{'name':'source_addr_long','len':8},
+                             {'name':'rssi',            'len':1},
+                             {'name':'options',         'len':1},
+                             {'name':'samples',         'len':None}],
+                         'parse_as_io_samples':'samples'},
                      "\x83":
                         {'name':'rx_io_data',
                          'structure':

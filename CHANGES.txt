@@ -11,6 +11,10 @@ v1.7.0  6/29/10 -- Now supports both Series 1 and Series 2 modules
                    * PyLint score improved
                    * Various docstring updates
                    * Updated example code to reflect changes
+v1.7.1 7/7/2010 -- Bug fix: Now supports receiving I/O data with 64-bit addressing
+                   * Previously, an exception was raised when a packet with ID 0x82
+                   * arrived, which contains I/O samples with a 64-bit source address
+                   * This has been fixed.
 v1.8.0  7/8/10  -- Implemented threading support
                    * If a callback method is given to the XBeeBase constructor,
                      a new thread will automatically be spawned. This thread
@@ -21,5 +25,3 @@ v1.8.0  7/8/10  -- Implemented threading support
                      This method must be called before closing the serial
                      port used by an XBee instance in order to prevent
                      improper use of the serial port.
-                  
-
