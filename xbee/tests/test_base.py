@@ -108,6 +108,30 @@ class TestNotImplementedFeatures(unittest.TestCase):
             pass
         else:
             self.fail("Shorthand call on XBeeBase base class should raise NotImplementedError")
+            
+class TestAsyncCallback(unittest.TestCase):
+    """
+    XBeeBase constructor should accept an optional callback function 
+    argument. When provided, this will put the module into a threaded
+    mode, in which it will call the provided function with any API
+    frame data received.
+    
+    As it would be very difficult to sanely test an asynchonous callback
+    routine with a synchronous test process, proper callback behavior
+    is not tested automatically at this time. Theoretically, the
+    callback implementation logic is simple, but use it at your own risk.
+    """
+    
+    def setUp(self):
+        self.xbee = None
+        self.serial = FakeReadDevice([], silent_on_empty=True)
+        self.callback = lambda data: None
+    
+    def test_provide_callback(self):
+        """
+        XBeeBase constructor should accept a callback function
+        """
+        self.xbee = XBeeBase(self.serial, callback=self.callback)
         
 if __name__ == '__main__':
     unittest.main()

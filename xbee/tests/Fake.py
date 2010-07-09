@@ -7,6 +7,7 @@ pmalmsten@gmail.com
 
 Provides fake device objects for other unit tests.
 """
+import sys
 
 class FakeDevice:
     """
@@ -27,9 +28,10 @@ class FakeReadDevice:
     fashion to the real thing
     """
     
-    def __init__(self, data):
+    def __init__(self, data, silent_on_empty=False):
         self.data = data
         self.read_index = 0
+        self.silent_on_empty = silent_on_empty
         
     def read(self, length=1):
         """
@@ -37,7 +39,10 @@ class FakeReadDevice:
         """
         # If too many bytes would be read, raise exception
         if self.read_index + length > len(self.data):
-            raise ValueError("Not enough bytes exist!")
+            if self.silent_on_empty:
+                sys.exit(0)
+            else:
+                raise ValueError("Not enough bytes exist!")
         
         read_data = self.data[self.read_index:self.read_index + length]
         self.read_index += length
