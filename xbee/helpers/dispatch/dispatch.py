@@ -13,6 +13,7 @@ from xbee import XBee
 
 class Dispatch(object):
     def __init__(self, ser=None, xbee=None):
+        self.xbee = None
         if xbee:
             self.xbee = xbee
         elif ser:
@@ -64,7 +65,7 @@ class Dispatch(object):
         dispatch: XBee data dict -> None
         
         When called, dispatch checks the given packet against each 
-        registered callback method and call each callback whose filter 
+        registered callback method and calls each callback whose filter 
         function returns true.
         """
         for handler in self.handlers:

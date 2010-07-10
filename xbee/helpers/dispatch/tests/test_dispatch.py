@@ -72,3 +72,27 @@ class TestDispatch(unittest.TestCase):
         """
         self.dispatch.register("test", None, None)
         self.assertRaises(ValueError, self.dispatch.register, "test", None, None)
+        
+        
+class TestHeadlessDispatch(unittest.TestCase):
+    """
+    Tests Dispatch functionality when it is not constructed with a serial
+    port or an XBee
+    """
+    def setUp(self):
+        self.headless = Dispatch()
+    
+    def test_dispatch_can_be_created(self):
+        """
+        A user may construct a Dispatch with neither a serial port nor
+        an XBee. This allows one to configure an XBee to asynchronously
+        call dispatch() whenever a packet arrives.
+        """
+        pass
+        
+    def test_run_raises_exception(self):
+        """
+        A ValueError must be raised by a headless Dispatch instance if
+        a user attempts to call run().
+        """
+        self.assertRaises(ValueError, self.headless.run)
