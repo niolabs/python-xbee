@@ -43,19 +43,26 @@ class Dispatch(object):
         """
         run: boolean -> None
         
-        run will read from the associated XBee device until a packet
-        arrives. When one does, it will check it against each registered
-        callback method and call each callback whose filter function
-        returns true.
+        run will read and dispatch any packet which arrives from the 
+        XBee device
         """
         
         while True:
-            packet = self.xbee.wait_read_frame()
-            for handler in self.handlers:
-                if handler['filter'](packet):
-                    # Call the handler method with its associated
-                    # name and the packet which passed its filter check
-                    handler['callback'](handler['name'], packet)
+            self.dispatch(self.xbee.wait_read_frame())
                     
             if oneshot:
                 break
+    
+    def dispatch(self, packet):
+        """
+        dispatch: XBee data dict -> None
+        
+        When called, dispatch checks the given packet against each 
+        registered callback method and call each callback whose filter 
+        function returns true.
+        """
+        for handler in self.handlers:
+            if handler['filter'](packet):
+                # Call the handler method with its associated
+                # name and the packet which passed its filter check
+                handler['callback'](handler['name'], packet)
