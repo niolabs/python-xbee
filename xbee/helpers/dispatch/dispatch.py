@@ -17,8 +17,6 @@ class Dispatch(object):
             self.xbee = xbee
         elif ser:
             self.xbee = XBee(ser)
-        else:
-            raise ValueError("Either a serial port or an XBee must be provided to construct a Dispatch")
             
         self.handlers = []
             
@@ -46,6 +44,8 @@ class Dispatch(object):
         run will read and dispatch any packet which arrives from the 
         XBee device
         """
+        if not self.xbee:
+            raise ValueError("Either a serial port or an XBee must be provided to __init__ to execute run()")
         
         while True:
             self.dispatch(self.xbee.wait_read_frame())
