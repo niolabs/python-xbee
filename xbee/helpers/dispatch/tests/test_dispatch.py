@@ -64,3 +64,11 @@ class TestDispatch(unittest.TestCase):
             if not callback.called:
                 self.fail("All callback methods should be called")
         
+    def test_callback_name_collisions_raise_valueerror(self):
+        """
+        If a call to register() results in attempting to register a
+        callback with the same name as another callback should result
+        in a ValueError exception being raised.
+        """
+        self.dispatch.register("test", None, None)
+        self.assertRaises(ValueError, self.dispatch.register, "test", None, None)

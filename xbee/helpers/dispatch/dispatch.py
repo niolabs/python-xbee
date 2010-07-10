@@ -19,6 +19,7 @@ class Dispatch(object):
             self.xbee = XBee(ser)
             
         self.handlers = []
+        self.names = set()
             
     def register(self, name, callback, filter):
         """
@@ -31,11 +32,16 @@ class Dispatch(object):
         method will be called with its associated name string and the packet
         which triggered the call.
         """
+        if name in self.names:
+            raise ValueError("A callback has already been registered with the name '%s'" % name)
+        
         self.handlers.append(
             {'name':name,
              'callback':callback,
              'filter':filter}
         )
+        
+        self.names.add(name)
         
     def run(self, oneshot=False):
         """
