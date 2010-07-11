@@ -43,13 +43,13 @@ class TestCommand(Command):
                 )
     
     def show_warning(self, lines):
-        print "#######################################################"
-        print "# WARNING"
+        print >> sys.stderr, "#######################################################"
+        print >> sys.stderr, "# WARNING"
         
         for line in lines:
-            print "# ", line
+            print >> sys.stderr, "# ", line
             
-        print "#######################################################"
+        print >> sys.stderr, "#######################################################"
         
 class build_py(_build_py):
     """
