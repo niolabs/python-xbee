@@ -1,5 +1,5 @@
 from distutils.core import setup
-from distutils_extensions import TestCommand
+from distutils_extensions import TestCommand, build_py
 
 setup(
     name='XBee',
@@ -14,5 +14,5 @@ setup(
     long_description=open('README.txt').read(),
     requires=['serial'],
     provides=['xbee','xbee.tests'],
-    cmdclass={'test':TestCommand}
+    cmdclass={'test':TestCommand, 'build_py':build_py}
 )

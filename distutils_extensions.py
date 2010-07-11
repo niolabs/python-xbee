@@ -2,12 +2,12 @@
 distutils_extensions.py
 
 By Paul Malmsten, 2010
-Inspired by code written by Amit Synderman and Marco Sangalli
 pmalmsten@gmail.com
 
 Provides distutils extension code for running tests
 """
 from distutils.core import Command
+from distutils.command.build_py import build_py as _build_py
 import sys
 
 class TestCommand(Command):
@@ -26,17 +26,20 @@ class TestCommand(Command):
             import nose
             
             if not nose.run(argv=['nosetests']):
-                self.show_warning(
-                    ["An automated test has failed! Please report this",
-                     "failure to the project owner. Use at your own risk!"]
-                )
+                message = ["An automated test has failed! Please report this",
+                           "failure to a project member. Use at your own risk!"]
+                     
+                if self.strict:
+                    message.append("strict mode is on (see setup.cfg) - setup will now exit")
+                           
+                self.show_warning(message)
                 
                 if self.strict:
                     sys.exit(1)
         except ImportError:
             self.show_warning(
                     ["Automated tests have been skipped (install nose and run",
-                     "'python setup.py test' to manually run the tests)"]
+                     "'python setup.py test' to run the tests)"]
                 )
     
     def show_warning(self, lines):
@@ -47,3 +50,12 @@ class TestCommand(Command):
             print "# ", line
             
         print "#######################################################"
+        
+class build_py(_build_py):
+    """
+    Automatically runs tests during build
+    """
+    
+    def run(self):
+        self.run_command('test')
+        _build_py.run(self)
