@@ -1,4 +1,5 @@
 from distutils.core import setup
+from distutils_extensions import TestCommand
 
 setup(
     name='XBee',
@@ -12,5 +13,6 @@ setup(
     description='Python tools for working with XBee radios',
     long_description=open('README.txt').read(),
     requires=['serial'],
-    provides=['xbee','xbee.tests']
+    provides=['xbee','xbee.tests'],
+    cmdclass={'test':TestCommand}
 )
