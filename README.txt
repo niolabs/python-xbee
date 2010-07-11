@@ -27,6 +27,30 @@ look like this::
       command='WR')
       
       
+Installation
+============
+
+Extract the source code to your computer, then run the following command
+in the root of the source tree::
+
+    python setup.py install
+    
+This will automatically test and install the package for you. 
+
+Additionally, one may run this package's automated tests at any time
+by executing::
+
+    python setup.py test
+
+If a Test Fails
+---------------
+
+If an automated test fails, the installation will be halted to prevent 
+one from using a potentially broken build. 
+
+In this event, one may comment out the 'strict' flag in setup.cfg in 
+order to force the installation to proceed. Do so at your own risk.
+
 Usage
 ============
 

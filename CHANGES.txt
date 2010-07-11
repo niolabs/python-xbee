@@ -25,3 +25,13 @@ v1.8.0  7/8/10  -- Implemented threading support
                      This method must be called before closing the serial
                      port used by an XBee instance in order to prevent
                      improper use of the serial port.
+v1.9.0  7/10/10 -- Implemented Dispatch helper as xbee.helpers.dispatch
+                   * Dispatch allows one to filter incoming packets
+                     between one or more handler functions. This simplifies
+                     application logic which must handle more than one
+                     packet type.
+                   Automated tests are now run as a part of the build process
+                   * nose must be installed for this feature to operate.
+                     If it is not installed, the tests will be skipped
+                     and a warning will be generated.
+                   * A 'test' command has been added to setup.py
