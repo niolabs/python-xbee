@@ -19,6 +19,17 @@ and allows a developer to send and receive the
 information they desire without dealing with the
 raw communication details.
 
+Usage
+-----
+
+.. warning::
+   
+   In order to use an XBee device with this library, API mode
+   must be enabled. For instructions about how to do this, see
+   the documentation for your XBee device.
+
+
+
 API
 ----
 
