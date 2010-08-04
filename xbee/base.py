@@ -24,13 +24,13 @@ class XBeeBase(threading.Thread):
     """
                        
     def __init__(self, ser, shorthand=True, callback=None):
+        super(XBeeBase, self).__init__()
         self.serial = ser
         self.shorthand = shorthand
         self._callback = None
         self._thread_continue = False
         
         if callback:
-            super(XBeeBase, self).__init__()
             self._callback = callback
             self._thread_continue = True
             self._thread_quit = threading.Event()
