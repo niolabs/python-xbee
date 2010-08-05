@@ -16,7 +16,7 @@ class FakeDevice:
     def __init__(self):
         self.data = ''
     
-    def write(self, data):
+    def _write(self, data):
         """
         Writes data to the fake port for later evaluation
         """

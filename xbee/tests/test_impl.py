@@ -23,7 +23,7 @@ class InitXBee(unittest.TestCase):
 
 class TestBuildCommand(InitXBee):
     """
-    build_command should properly build a command packet
+    _build_command should properly build a command packet
     """
     
     def test_build_at_data_mismatch(self):
@@ -32,7 +32,7 @@ class TestBuildCommand(InitXBee):
         be raised.
         """
         try:
-            self.xbee.build_command("at")
+            self.xbee._build_command("at")
         except KeyError:
             # Test passes
             return
@@ -48,7 +48,7 @@ class TestBuildCommand(InitXBee):
         raised
         """
         try:
-            self.xbee.build_command("at", frame_id="AB", command="MY")
+            self.xbee._build_command("at", frame_id="AB", command="MY")
         except ValueError:
             # Test passes
             return
@@ -60,13 +60,13 @@ class TestBuildCommand(InitXBee):
         
     def test_build_at(self):
         """
-        build_command should build a valid at command packet which has
+        _build_command should build a valid at command packet which has
         no parameter data to be saved
         """
         
         at_command = "MY"
         frame = chr(43)
-        data = self.xbee.build_command(
+        data = self.xbee._build_command(
             "at", 
             frame_id=frame, 
             command=at_command
@@ -77,31 +77,31 @@ class TestBuildCommand(InitXBee):
         
     def test_build_at_with_default(self):
         """
-        build_command should build a valid at command packet which has
+        _build_command should build a valid at command packet which has
         no parameter data to be saved and no frame specified (the 
         default value of \x00 should be used)
         """
         
         at_command = "MY"
-        data = self.xbee.build_command("at", command=at_command) 
+        data = self.xbee._build_command("at", command=at_command) 
 
         expected_data = '\x08\x00MY'
         self.assertEqual(data, expected_data)
         
 class TestSplitResponse(InitXBee):
     """
-    split_response should properly split a response packet
+    _split_response should properly split a response packet
     """
     
     def test_unrecognized_response(self):
         """
         if a response begins with an unrecognized id byte, 
-        split_response should raise an exception
+        _split_response should raise an exception
         """
         data = '\x23\x00\x00\x00'
         
         try:
-            self.xbee.split_response(data)
+            self.xbee._split_response(data)
         except KeyError:
             # Passes
             return
@@ -112,28 +112,28 @@ class TestSplitResponse(InitXBee):
     def test_bad_data_long(self):
         """
         if a response doesn't match the specification's layout, 
-        split_response should raise an exception
+        _split_response should raise an exception
         """
         # Over length
         data = '\x8a\x00\x00\x00'
-        self.assertRaises(ValueError, self.xbee.split_response, data)
+        self.assertRaises(ValueError, self.xbee._split_response, data)
         
     def test_bad_data_short(self):
         """
         if a response doesn't match the specification's layout, 
-        split_response should raise an exception
+        _split_response should raise an exception
         """
         # Under length
         data = '\x8a'
-        self.assertRaises(ValueError, self.xbee.split_response, data)
+        self.assertRaises(ValueError, self.xbee._split_response, data)
     
     def test_split_status_response(self):
         """
-        split_response should properly split a status response packet
+        _split_response should properly split a status response packet
         """
         data = '\x8a\x01'
         
-        info = self.xbee.split_response(data)
+        info = self.xbee._split_response(data)
         expected_info = {'id':'status',
                          'status':'\x01'}
         
@@ -141,12 +141,12 @@ class TestSplitResponse(InitXBee):
         
     def test_split_short_at_response(self):
         """
-        split_response should properly split an at_response packet which
+        _split_response should properly split an at_response packet which
         has no parameter data
         """
         
         data = '\x88DMY\x01'
-        info = self.xbee.split_response(data)
+        info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
@@ -155,12 +155,12 @@ class TestSplitResponse(InitXBee):
         
     def test_split_at_resp_with_param(self):
         """
-        split_response should properly split an at_response packet which
+        _split_response should properly split an at_response packet which
         has parameter data
         """
         
         data = '\x88DMY\x01ABCDEF'
-        info = self.xbee.split_response(data)
+        info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
@@ -177,7 +177,7 @@ class TestParseIOData(InitXBee):
     
     def test_parse_single_dio(self):
         """
-        parse_samples should properly parse a packet containing a single 
+        _parse_samples should properly parse a packet containing a single 
         sample of only digital io data
         """
         # One sample, ADC disabled and DIO8 enabled, DIO 0-7 enabled
@@ -197,13 +197,13 @@ class TestParseIOData(InitXBee):
                              'dio-7':True,
                              'dio-8':True}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_single_dio_again(self):
         """
-        parse_samples should properly parse a packet containing a single 
+        _parse_samples should properly parse a packet containing a single 
         sample of only digital io data, which alternates between on and 
         off
         """
@@ -224,13 +224,13 @@ class TestParseIOData(InitXBee):
                              'dio-7':True,
                              'dio-8':False}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_single_dio_subset(self):
         """
-        parse_samples should properly parse a packet containing a single 
+        _parse_samples should properly parse a packet containing a single 
         sample of only digital io data for only a subset of the 
         available pins
         """
@@ -247,13 +247,13 @@ class TestParseIOData(InitXBee):
                              'dio-5':True,
                              'dio-7':True}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_single_dio_subset_again(self):
         """
-        parse_samples should properly parse a packet containing a single 
+        _parse_samples should properly parse a packet containing a single 
         sample of only digital io data for only a subset of the 
         available pins
         """
@@ -267,13 +267,13 @@ class TestParseIOData(InitXBee):
         
         expected_results = [{'dio-0':False}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_multiple_dio_subset(self):
         """
-        parse_samples should properly parse a packet containing two 
+        _parse_samples should properly parse a packet containing two 
         samples of only digital io data for one dio line
         """
         # Two samples, ADC disabled
@@ -287,13 +287,13 @@ class TestParseIOData(InitXBee):
         expected_results = [{'dio-0':False},
                             {'dio-0':True}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_multiple_dio(self):
         """
-        parse_samples should properly parse a packet containing three 
+        _parse_samples should properly parse a packet containing three 
         samples of only digital io data
         """
         # Three samples, ADC disabled and DIO8 enabled, DIO 0-7 enabled
@@ -334,13 +334,13 @@ class TestParseIOData(InitXBee):
                              'dio-7':False,
                              'dio-8':False}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_multiple_adc_subset(self):
         """
-        parse_samples should parse a data packet containing multiple
+        _parse_samples should parse a data packet containing multiple
         samples of adc data from multiple pins in the proper order
         """
         # One sample, ADC 0,1 enabled
@@ -360,13 +360,13 @@ class TestParseIOData(InitXBee):
                             {'adc-0':5,
                              'adc-1':7}]
         
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
         
     def test_parse_single_dio_adc_subset(self):
         """
-        parse_samples should properly parse a packet containing a single 
+        _parse_samples should properly parse a packet containing a single 
         sample of digital and analog io data for only a subset of the 
         available pins
         """
@@ -385,7 +385,7 @@ class TestParseIOData(InitXBee):
                              'dio-7':True,
                              'adc-0':255}]
                              
-        results = self.xbee.parse_samples(data)
+        results = self.xbee._parse_samples(data)
         
         self.assertEqual(results, expected_results)
 

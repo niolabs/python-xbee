@@ -13,19 +13,19 @@ from xbee.tests.Fake import FakeDevice, FakeReadDevice
 
 class TestWriteToDevice(unittest.TestCase):
     """
-    XBeeBase class should properly write binary data in a valid API
+    XBeeBase class should properly._write binary data in a valid API
     frame to a given serial device.
     """
     
     def test_write(self):
         """
-        write method should write the expected data to the serial
+        _write method should write the expected data to the serial
         device
         """
         device = FakeDevice()
         
         xbee = XBeeBase(device)
-        xbee.write('\x00')
+        xbee._write('\x00')
         
         # Check resuting state of fake device
         expected_frame = '\x7E\x00\x01\x00\xFF'
@@ -33,13 +33,13 @@ class TestWriteToDevice(unittest.TestCase):
         
     def test_write_again(self):
         """
-        write method should write the expected data to the serial
+        _write method should write the expected data to the serial
         device
         """
         device = FakeDevice()
         
         xbee = XBeeBase(device)
-        xbee.write('\x00\x01\x02')
+        xbee._write('\x00\x01\x02')
         
         # Check resuting state of fake device
         expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
@@ -88,15 +88,15 @@ class TestNotImplementedFeatures(unittest.TestCase):
     
     def test_build_command(self):
         """
-        build_command should raise NotImplemented
+        _build_command should raise NotImplemented
         """
-        self.assertRaises(NotImplementedError, self.xbee.build_command, "at")
+        self.assertRaises(NotImplementedError, self.xbee._build_command, "at")
         
     def test_split_response(self):
         """
         split_command should raise NotImplemented
         """
-        self.assertRaises(NotImplementedError, self.xbee.split_response, "\00")
+        self.assertRaises(NotImplementedError, self.xbee._split_response, "\00")
         
     def test_shorthand(self):
         """

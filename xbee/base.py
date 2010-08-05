@@ -56,14 +56,14 @@ class XBeeBase(threading.Thread):
             self._thread_continue = False
             self._thread_quit.wait()
         
-    def write(self, data):
+    def _write(self, data):
         """
-        write: binary data -> None
+        _write: binary data -> None
         
-        Packages the given binary data in an API frame and writes the 
+        Packages the given binary data in an API frame and _writes the 
         result to the serial port
         """
-        self.serial.write(APIFrame(data).output())
+        self.serial._write(APIFrame(data).output())
         
     def run(self):
         """
@@ -133,11 +133,11 @@ class XBeeBase(threading.Thread):
                         data = ''
                         state = WAITING
                         
-    def build_command(self, cmd, **kwargs):
+    def _build_command(self, cmd, **kwargs):
         """
-        build_command: string (binary data) ... -> binary data
+        _build_command: string (binary data) ... -> binary data
         
-        build_command will construct a command packet according to the
+        _build_command will construct a command packet according to the
         specified command's specification in api_commands. It will expect
         named arguments for all fields other than those with a default 
         value or a length of 'None'.
@@ -188,13 +188,13 @@ class XBeeBase(threading.Thread):
                 
         return packet
     
-    def split_response(self, data):
+    def _split_response(self, data):
         """
-        split_response: binary data -> {'id':str,
+        _split_response: binary data -> {'id':str,
                                         'param':binary data,
                                         ...}
                                         
-        split_response takes a data packet received from an XBee device
+        _split_response takes a data packet received from an XBee device
         and converts it into a dictionary. This dictionary provides
         names for each segment of binary data as specified in the 
         api_responses spec.
@@ -253,18 +253,18 @@ class XBeeBase(threading.Thread):
         # If so, process the sample data
         if 'parse_as_io_samples' in packet:
             field_to_process = packet['parse_as_io_samples']
-            info[field_to_process] = XBeeBase.parse_samples(
+            info[field_to_process] = XBeeBase._parse_samples(
                                         info[field_to_process])
             
         return info
         
     @staticmethod
-    def parse_samples_header(data):
+    def _parse_samples_header(data):
         """
-        parse_samples_header: binary data in XBee IO data format ->
+        _parse_samples_header: binary data in XBee IO data format ->
                         (int, [int ...], [int ...])
                         
-        parse_samples_header will read the first three bytes of the 
+        _parse_samples_header will read the first three bytes of the 
         binary data given and will return the number of samples which
         follow, a list of enabled digital inputs and a list of enabled
         analog inputs
@@ -312,20 +312,20 @@ class XBeeBase(threading.Thread):
         return (len_samples, dio_enabled, adc_enabled)
         
     @staticmethod
-    def parse_samples(data):
+    def _parse_samples(data):
         """
-        parse_samples: binary data in XBee IO data format ->
+        _parse_samples: binary data in XBee IO data format ->
                         [ {"dio-0":True,
                            "dio-1":False,
                            "adc-0":100"}, ...]
                            
-        parse_samples reads binary data from an XBee device in the IO
+        _parse_samples reads binary data from an XBee device in the IO
         data format specified by the API. It will then return a 
         dictionary indicating the status of each enabled IO port.
         """
         
         ## Parse and store header information
-        header_data = XBeeBase.parse_samples_header(data)
+        header_data = XBeeBase._parse_samples_header(data)
         len_samples, dio_enabled, adc_enabled = header_data
         
         samples = []
@@ -394,7 +394,7 @@ class XBeeBase(threading.Thread):
         (of 'None' in the specification. Those are optional).
         """
         # Pass through the keyword arguments
-        self.write(self.build_command(cmd, **kwargs))
+        self._write(self._build_command(cmd, **kwargs))
         
         
     def wait_read_frame(self):
@@ -408,7 +408,7 @@ class XBeeBase(threading.Thread):
         """
         
         frame = self.wait_for_frame()
-        return self.split_response(frame.data)
+        return self._split_response(frame.data)
         
     def __getattr__(self, name):
         """
