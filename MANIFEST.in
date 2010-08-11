@@ -1,4 +1,6 @@
 include *.txt
-recursive-include docs *.txt
+include *.py
+recursive-include docs *.*
 recursive-include examples *.txt *.py
 recursive-include scripts *.py
+global-exclude *.swp

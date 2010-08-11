@@ -51,27 +51,14 @@ one from using a potentially broken build.
 In this event, one may comment out the 'strict' flag in setup.cfg in 
 order to force the installation to proceed. Do so at your own risk.
 
-Usage
-============
+Documentation
+=============
 
-Series 1, Series 2
-------------------
-
-To use this library with an XBee device, import the class
-XBee and call its constructor with a serial port object.
-
-In order to send commands via the API, call a method with the same
-name as the command which you would like to send with words separated
-by _'s. For example, to send a Remote AT command, one would call 
-remote_at().
-
-The arguments to be given to each method depend upon the command to be 
-sent. For more information concerning the names of the arguments which
-are expected and the proper data types for each argument, consult the
-API manual for your XBee device, or consult the source code.
+Open the file docs/build/html/index.html in your web browser of choice
+to view the documentation for this package.
 
 Caveats
----------
+=======
 
 Escaped API operation has not been implemented at this time.
 
