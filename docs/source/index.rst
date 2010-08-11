@@ -28,8 +28,6 @@ Usage
    must be enabled. For instructions about how to do this, see
    the documentation for your XBee device.
 
-
-
 API
 ----
 

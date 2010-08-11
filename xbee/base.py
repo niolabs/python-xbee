@@ -79,11 +79,11 @@ class XBeeBase(threading.Thread):
                 break
         self._thread_quit.set()
     
-    def wait_for_frame(self):
+    def _wait_for_frame(self):
         """
-        wait_for_frame: None -> binary data
+        _wait_for_frame: None -> binary data
         
-        wait_for_frame will read from the serial port until a valid
+        _wait_for_frame will read from the serial port until a valid
         API frame arrives. It will then return the binary data
         contained within the frame.
 
@@ -401,13 +401,13 @@ class XBeeBase(threading.Thread):
         """
         wait_read_frame: None -> frame info dictionary
         
-        wait_read_frame calls XBee.wait_for_frame() and waits until a
+        wait_read_frame calls XBee._wait_for_frame() and waits until a
         valid frame appears on the serial port. Once it receives a frame,
         wait_read_frame attempts to parse the data contained within it
         and returns the resulting dictionary
         """
         
-        frame = self.wait_for_frame()
+        frame = self._wait_for_frame()
         return self._split_response(frame.data)
         
     def __getattr__(self, name):

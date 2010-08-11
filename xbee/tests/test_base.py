@@ -52,23 +52,23 @@ class TestReadFromDevice(unittest.TestCase):
     """
     def test_read(self):
         """
-        wait_for_frame should properly read a frame of data
+        _wait_for_frame should properly read a frame of data
         """
         device = FakeReadDevice('\x7E\x00\x01\x00\xFF')
         xbee = XBeeBase(device)
         
-        frame = xbee.wait_for_frame()
+        frame = xbee._wait_for_frame()
         self.assertEqual(frame.data, '\x00')
         
     def test_read_invalid_followed_by_valid(self):
         """
-        wait_for_frame should skip invalid data
+        _wait_for_frame should skip invalid data
         """
         device = FakeReadDevice(
             '\x7E\x00\x01\x00\xFA' + '\x7E\x00\x01\x05\xFA')
         xbee = XBeeBase(device)
         
-        frame = xbee.wait_for_frame()
+        frame = xbee._wait_for_frame()
         self.assertEqual(frame.data, '\x05')
         
 class TestNotImplementedFeatures(unittest.TestCase):
