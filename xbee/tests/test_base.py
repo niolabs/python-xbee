@@ -137,5 +137,21 @@ class TestAsyncCallback(unittest.TestCase):
         """
         self.xbee = XBeeBase(self.serial, callback=self.callback)
         
+class TestInitialization(unittest.TestCase):
+    """
+    Ensures that XBeeBase objects are properly constructed
+    """
+
+    def setUp(self):
+        self.base = XBeeBase(None)
+
+    def test_thread_always_initialized(self):
+        """
+        Even when a callback method is not supplied to the XBeeBase
+        constructor, it must be properly initalized as a
+        threading.Thread object
+        """
+        self.assertFalse(self.base.is_alive())
+
 if __name__ == '__main__':
     unittest.main()
