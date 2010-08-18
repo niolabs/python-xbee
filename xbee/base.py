@@ -60,10 +60,10 @@ class XBeeBase(threading.Thread):
         """
         _write: binary data -> None
         
-        Packages the given binary data in an API frame and _writes the 
+        Packages the given binary data in an API frame and writes the 
         result to the serial port
         """
-        self.serial._write(APIFrame(data).output())
+        self.serial.write(APIFrame(data).output())
         
     def run(self):
         """
