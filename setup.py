@@ -11,7 +11,7 @@ packages=[
 
 setup(
     name='XBee',
-    version='1.9.1',
+    version='1.9.2',
     author='Paul Malmsten',
     author_email='pmalmsten@gmail.com',
     packages=packages,
