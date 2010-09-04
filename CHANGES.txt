@@ -42,3 +42,5 @@ v1.9.1  8/11/10 -- Added support for I/O sample data packet with 64-bit
                    Added initial documentation.
                    Properly included distutils_extensions.py in source
                      distribution archives
+v1.9.2  8/19/10 -- Fixed bug where _write() call on a serial object
+                     should have been write()
