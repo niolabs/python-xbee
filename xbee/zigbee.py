@@ -159,7 +159,3 @@ class ZigBee(XBeeBase):
     def __init__(self, *args, **kwargs):
         # Call the super class constructor to save the serial port
         super(ZigBee, self).__init__(*args, **kwargs)
-
-    def __del__(self):
-        # Call the super class destructor to safely shutdown
-        super(ZigBee, self).__del__()

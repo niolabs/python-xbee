@@ -37,14 +37,6 @@ class XBeeBase(threading.Thread):
             self._thread_quit = threading.Event()
             self.start()
 
-    def __del__(self):
-        """
-        In the event that this instance is garbage collected before
-        its associated serial port is closed, ensure safe thread
-        shutdown.
-        """
-        self.halt()
-
     def halt(self):
         """
         halt: None -> None
@@ -422,6 +414,7 @@ class XBeeBase(threading.Thread):
         the arguments will be automatically sent to an appropriate
         send() call
         """
+
         # If api_commands is not defined, raise NotImplementedError\
         #  If its not defined, _getattr__ will be called with its name
         if name == 'api_commands':

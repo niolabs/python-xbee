@@ -84,6 +84,18 @@ class TestReadFromDevice(unittest.TestCase):
         
         frame = xbee._wait_for_frame()
         self.assertEqual(frame.data, '\x05')
+
+    def test_read_escaped(self):
+        """
+        _wait_for_frame should properly read a frame of data
+        Verify that API mode 2 escaped bytes are read correctly
+        """
+        device = FakeReadDevice('\x7E\x00\x04\x7D\x5E\x7D\x5D\x7D\x31\x7D\x33\xE0')
+
+        xbee = XBeeBase(device,escaped=True)
+        
+        frame = xbee._wait_for_frame()
+        self.assertEqual(frame.data, '\x7E\x7D\x11\x13')
         
 class TestNotImplementedFeatures(unittest.TestCase):
     """

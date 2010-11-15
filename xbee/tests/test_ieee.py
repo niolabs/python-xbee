@@ -543,7 +543,6 @@ class TestReadFromDevice(unittest.TestCase):
         )
         xbee = XBee(device)
         
-        #pdb.set_trace()
         info = xbee.wait_read_frame()
         expected_info = {'id':'rx_io_data',
                          'source_addr':'\x00\x01',
