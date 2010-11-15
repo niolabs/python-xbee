@@ -20,9 +20,11 @@ class APIFrame:
     XOFF_BYTE = '\x13'
     ESCAPE_BYTES = (START_BYTE, ESCAPE_BYTE, XON_BYTE, XOFF_BYTE)
     
-    def __init__(self, data, escaped=False):
+    def __init__(self, data='', escaped=False):
         self.data = data
+        self.raw_data = ''
         self.escaped = escaped
+        self._unescape_next_byte = False
         
     def checksum(self):
         """
@@ -89,8 +91,12 @@ class APIFrame:
         # chksum is one byte long
         data = self.len_bytes() + self.data + self.checksum()
 
+        # Only run the escaoe process if it hasn't been already
+        if self.escaped and len(self.raw_data) < 1:
+            self.raw_data = APIFrame.escape(data)
+
         if self.escaped:
-            data = APIFrame.escape(data)
+            data = self.raw_data
 
         # Never escape start byte
         return APIFrame.START_BYTE + data
@@ -113,29 +119,61 @@ class APIFrame:
                 escaped_data += byte
         
         return escaped_data
-        
-    @staticmethod
-    def parse(raw_data):
+
+    def fill(self, byte):
         """
-        parse: valid API frame (binary data) -> binary data
+        fill: byte -> None
+
+        Adds the given raw byte to this APIFrame. If this APIFrame is marked
+        as escaped and this byte is an escape byte, the next byte in a call
+        to fill() will be unescaped.
+        """
+
+        if self._unescape_next_byte:
+            byte = chr(ord(byte) ^ 0x20) 
+            self._unescape_next_byte = False
+        elif self.escaped and byte == APIFrame.ESCAPE_BYTE:
+            self._unescape_next_byte = True
+            return
+
+        self.raw_data += byte
+
+    def remaining_bytes(self):
+        remaining = 3
+
+        if len(self.raw_data) >= 3:
+            # First two bytes are the length of the data
+            raw_len = self.raw_data[1:3]
+            data_len = struct.unpack("> h", raw_len)[0]
+
+            remaining += data_len
+
+            # Don't forget the checksum
+            remaining += 1
+
+        return remaining - len(self.raw_data)
         
-        Given a valid API frame, empty_frame extracts the data contained
+    def parse(self):
+        """
+        parse: None -> None
+        
+        Given a valid API frame, parse extracts the data contained
         inside it and verifies it against its checksum
         """
+        if len(self.raw_data) < 3:
+            ValueError("parse() may only be called on a frame containing at least 3 bytes of raw data (see fill())")
+
         # First two bytes are the length of the data
-        raw_len = raw_data[1:3]
+        raw_len = self.raw_data[1:3]
         
         # Unpack it
         data_len = struct.unpack("> h", raw_len)[0]
         
         # Read the data
-        data = raw_data[3:3 + data_len]
-        chksum = raw_data[-1]
-        
+        data = self.raw_data[3:3 + data_len]
+        chksum = self.raw_data[-1]
+
         # Checksum check
-        frame = APIFrame(data)
-        if not frame.verify(chksum):
-            raise ValueError("Invalid checksum on given frame")
-            
-        # If the result is valid, return it
-        return frame
+        self.data = data
+        if not self.verify(chksum):
+            raise ValueError("Invalid checksum")

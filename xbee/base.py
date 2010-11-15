@@ -93,14 +93,9 @@ class XBeeBase(threading.Thread):
         and self.thread_continue is set to False, the thread will
         exit by raising a ThreadQuitException.
         """
-        WAITING = 0
-        PARSING = 1
-        
-        data = ''
-        state = WAITING
+        frame = APIFrame(escaped=self._escaped)
         
         while True:
-            if state == WAITING:
                 if self._callback and not self._thread_continue:
                     raise ThreadQuitException
 
@@ -109,31 +104,22 @@ class XBeeBase(threading.Thread):
                     continue
                 
                 byte = self.serial.read()
-                
-                # If a start byte is found, swich states
-                if byte == APIFrame.START_BYTE:
-                    data += byte
-                    state = PARSING
-            else:
+
+                if byte != APIFrame.START_BYTE:
+                    continue
+
                 # Save all following bytes
-                data += self.serial.read()
-                
-                if len(data) == 3:
-                    # We have the length bytes of the data
-                    # Now, wait for the rest to appear
-                    data_len = struct.unpack("> h", data[1:3])[0]
-                    
-                    # Wait for the expected number of bytes to appear
-                    # Grab the checksum too
-                    data += self.serial.read(data_len + 1)
-                    
-                    try:
-                        # Try to parse and return result
-                        return APIFrame.parse(data)
-                    except ValueError:
-                        # Bad frame, so restart
-                        data = ''
-                        state = WAITING
+                frame.fill(byte)
+                while(frame.remaining_bytes() > 0):
+                    frame.fill(self.serial.read())
+
+                try:
+                    # Try to parse and return result
+                    frame.parse()
+                    return frame
+                except ValueError:
+                    # Bad frame, so restart
+                    frame = APIFrame(escaped=self._escaped)
                         
     def _build_command(self, cmd, **kwargs):
         """
