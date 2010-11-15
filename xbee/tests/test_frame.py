@@ -48,3 +48,17 @@ class TestAPIFrameParsing(unittest.TestCase):
         """
         frame = '\x7E\x00\x01\x00\xF6'
         self.assertRaises(ValueError, APIFrame.parse, frame)
+
+class TestEscapedOutput(unittest.TestCase):
+    """
+    APIFrame class must properly escape data
+    """
+
+    def test_escape_method(self):
+        """
+        APIFrame.escape() must work as expected
+        """
+        test_data = APIFrame.START_BYTE
+        new_data = APIFrame.escape(test_data)
+        self.assertEqual(new_data, APIFrame.ESCAPE_BYTE + '\x5e')
+

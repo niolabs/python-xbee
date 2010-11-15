@@ -15,9 +15,14 @@ class APIFrame:
     """
     
     START_BYTE = '\x7E'
+    ESCAPE_BYTE = '\x7D'
+    XON_BYTE = '\x11'
+    XOFF_BYTE = '\x13'
+    ESCAPE_BYTES = (START_BYTE, ESCAPE_BYTE, XON_BYTE, XOFF_BYTE)
     
-    def __init__(self, data):
+    def __init__(self, data, escaped=False):
         self.data = data
+        self.escaped = escaped
         
     def checksum(self):
         """
@@ -82,10 +87,32 @@ class APIFrame:
         # start is one byte long, length is two bytes
         # data is n bytes long (indicated by length)
         # chksum is one byte long
-        return APIFrame.START_BYTE + \
-                self.len_bytes() + \
-                self.data + \
-                self.checksum()
+        data = self.len_bytes() + self.data + self.checksum()
+
+        if self.escaped:
+            data = APIFrame.escape(data)
+
+        # Never escape start byte
+        return APIFrame.START_BYTE + data
+
+    @staticmethod
+    def escape(data):
+        """
+        escape: byte string -> byte string
+
+        When a 'special' byte is encountered in the given data string,
+        it is preceded by an escape byte and XORed with 0x20.
+        """
+
+        escaped_data = ""
+        for byte in data:
+            if byte in APIFrame.ESCAPE_BYTES:
+                escaped_data += APIFrame.ESCAPE_BYTE
+                escaped_data += chr(0x20 ^ ord(byte))
+            else:
+                escaped_data += byte
+        
+        return escaped_data
         
     @staticmethod
     def parse(raw_data):

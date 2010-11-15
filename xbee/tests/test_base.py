@@ -44,6 +44,20 @@ class TestWriteToDevice(unittest.TestCase):
         # Check resuting state of fake device
         expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
         self.assertEqual(device.data, expected_frame)
+
+    def test_write_escaped(self):
+        """
+        _write method should write the expected data to the serial
+        device
+        """
+        device = FakeDevice()
+        
+        xbee = XBeeBase(device,escaped=True)
+        xbee._write('\x7E\x01\x7D\x11\x13')
+        
+        # Check resuting state of fake device
+        expected_frame = '\x7E\x00\x05\x7D\x5E\x01\x7D\x5D\x7D\x31\x7D\x33\xDF'
+        self.assertEqual(device.data, expected_frame)
         
 class TestReadFromDevice(unittest.TestCase):
     """

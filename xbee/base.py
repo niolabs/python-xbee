@@ -23,12 +23,13 @@ class XBeeBase(threading.Thread):
     and data extraction methods for XBee modules
     """
                        
-    def __init__(self, ser, shorthand=True, callback=None):
+    def __init__(self, ser, shorthand=True, callback=None, escaped=False):
         super(XBeeBase, self).__init__()
         self.serial = ser
         self.shorthand = shorthand
         self._callback = None
         self._thread_continue = False
+        self._escaped = escaped  
         
         if callback:
             self._callback = callback
@@ -63,7 +64,8 @@ class XBeeBase(threading.Thread):
         Packages the given binary data in an API frame and writes the 
         result to the serial port
         """
-        self.serial.write(APIFrame(data).output())
+        frame = APIFrame(data, self._escaped).output()
+        self.serial.write(frame)
         
     def run(self):
         """
