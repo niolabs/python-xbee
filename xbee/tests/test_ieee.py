@@ -9,7 +9,7 @@ Tests the XBee (IEEE 802.15.4) implementation class for XBee API compliance
 """
 import unittest
 from xbee.tests.Fake import FakeDevice, FakeReadDevice
-from xbee.IEEE import XBee
+from xbee.ieee import XBee
 
 class InitXBee(unittest.TestCase):
     """
