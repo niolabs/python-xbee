@@ -29,4 +29,43 @@ class TestZigBee(unittest.TestCase):
         data = self.zigbee._split_response(node_identifier)
 
         self.assertEqual(data['node_id'], expected_data)
-         
+
+    def test_split_node_identification_identifier(self):
+            data = '\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaa\x20\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
+            info = self.zigbee._split_response(data)
+            expected_info = {
+                'id': 'node_id_indicator',
+                'sender_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'sender_addr': '\x7d\x84',
+                'options': '\x02',
+                'source_addr': '\x7d\x84',
+                'source_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'node_id': ' ',
+                'parent_source_addr': '\xff\xfe',
+                'device_type': '\x01',
+                'source_event': '\x01',
+                'digi_profile_id': '\xc1\x05',
+                'manufacturer_id': '\x10\x1e',
+            }
+            
+            self.assertEqual(info, expected_info)
+            
+    def test_split_node_identification_identifier2(self):
+            data = '\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaaCoordinator\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
+            info = self.zigbee._split_response(data)
+            expected_info = {
+                'id': 'node_id_indicator',
+                'sender_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'sender_addr': '\x7d\x84',
+                'options': '\x02',
+                'source_addr': '\x7d\x84',
+                'source_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'node_id': 'Coordinator',
+                'parent_source_addr': '\xff\xfe',
+                'device_type': '\x01',
+                'source_event': '\x01',
+                'digi_profile_id': '\xc1\x05',
+                'manufacturer_id': '\x10\x1e',
+            }
+            
+            self.assertEqual(info, expected_info)
