@@ -200,34 +200,29 @@ class XBeeBase(threading.Thread):
         
         # Parse the packet in the order specified
         for field in packet_spec:
-    
-            # Skip zero bytes by default
-            bytes_to_skip = 0
-            
-            # Take field length and store in a variable in case we have to temporarily modify it
-            # during null terminated string length discovery below
-            field_len = field['len']
-            
-            # If len is 0, look for a null terminated string and set len to length of string
-            if field_len == 0:
-                # Set bytes_to_skip to 1 so we drop the null termination byte
-                bytes_to_skip = 1
-                i = index
-                while data[i] != '\x00':
-                    field_len += 1
-                    i += 1
-            
-            # Store the number of bytes specified
-            # If the data field has no length specified, store any
-            #  leftover bytes and quit
-            if field_len is not None:
+            if field['len'] == 'null_terminated':
+                field_data = ''
+                
+                while data[index] != '\x00':
+                    field_data += data[index]
+                    index += 1
+                
+                index += 1
+                info[field['name']] = field_data
+            elif field['len'] is not None:
+                # Store the number of bytes specified
+
                 # Are we trying to read beyond the last data element?
-                if index + field_len > len(data):
+                if index + field['len'] > len(data):
                     raise ValueError(
                         "Response packet was shorter than expected")
                 
-                field_data = data[index:index + field_len]
+                field_data = data[index:index + field['len']]
                 info[field['name']] = field_data
+                               
+                index += field['len']
+            # If the data field has no length specified, store any
+            #  leftover bytes and quit
             else:
                 field_data = data[index:]
                 
@@ -237,9 +232,6 @@ class XBeeBase(threading.Thread):
                     info[field['name']] = field_data
                     index += len(field_data)
                 break
-            
-            # Move the index
-            index += (field_len + bytes_to_skip)
             
         # If there are more bytes than expected, raise an exception
         if index < len(data):
@@ -257,60 +249,47 @@ class XBeeBase(threading.Thread):
         return info
         
     @staticmethod
-    def _parse_samples_header(data):
+    def _parse_samples_header(io_bytes):
         """
         _parse_samples_header: binary data in XBee IO data format ->
-                        (int, [int ...], [int ...])
+                        (int, [int ...], [int ...], int, int)
                         
         _parse_samples_header will read the first three bytes of the 
         binary data given and will return the number of samples which
-        follow, a list of enabled digital inputs and a list of enabled
-        analog inputs
+        follow, a list of enabled digital inputs, a list of enabled
+        analog inputs, the dio_mask, and the size of the header in bytes
         """
+        header_size = 3
         
-        ## Parse the header, bytes 0-2
-        dio_enabled = []
-        adc_enabled = []
+        # number of samples (always 1?) is the first byte
+        sample_count = ord(io_bytes[0])
         
-        # First byte: number of samples
-        len_raw = data[0]
-        len_samples = ord(len_raw)
+        # part of byte 1 and byte 2 are the DIO mask ( 9 bits )
+        dio_mask = (ord(io_bytes[1]) << 8 | ord(io_bytes[2])) & 0x01FF
         
-        # Second-third bytes: enabled pin flags
-        sources_raw = data[1:3]
+        # upper 7 bits of byte 1 is the AIO mask
+        aio_mask = (ord(io_bytes[1]) & 0xFE) >> 1
         
-        # In order to put the io line names in list positions which
-        # match their number (for ease of traversal), the second byte
-        # will be read first
-        byte_2_data = ord(sources_raw[1])
+        # sorted lists of enabled channels; value is position of bit in mask
+        dio_chans = []
+        aio_chans = []
         
-        # Check each flag
-        #  DIO lines 0-7
-        i = 1
-        for dio in range(0, 8):
-            if byte_2_data & i:
-                dio_enabled.append(dio)
-            i *= 2
+        for i in range(0,9):
+            if dio_mask & (1 << i):
+                dio_chans.append(i)
+        
+        dio_chans.sort()
+        
+        for i in range(0,7):
+            if aio_mask & (1 << i):
+                aio_chans.append(i)
+        
+        aio_chans.sort()
             
-        # Byte 1
-        byte_1_data = ord(sources_raw[0])
-        
-        # Grab DIO8 first
-        if byte_1_data & 1:
-            dio_enabled.append(8)
-        
-        # Check each flag (after the first)
-        #  ADC lines 0-5
-        i = 2
-        for adc in range(0, 6):
-            if byte_1_data & i:
-                adc_enabled.append(adc)
-            i *= 2
-            
-        return (len_samples, dio_enabled, adc_enabled)
+        return (sample_count, dio_chans, aio_chans, dio_mask, header_size)
         
     @staticmethod
-    def _parse_samples(data):
+    def _parse_samples(io_bytes):
         """
         _parse_samples: binary data in XBee IO data format ->
                         [ {"dio-0":True,
@@ -321,60 +300,34 @@ class XBeeBase(threading.Thread):
         data format specified by the API. It will then return a 
         dictionary indicating the status of each enabled IO port.
         """
-        
-        ## Parse and store header information
-        header_data = XBeeBase._parse_samples_header(data)
-        len_samples, dio_enabled, adc_enabled = header_data
+
+        sample_count, dio_chans, aio_chans, dio_mask, header_size = \
+            XBeeBase._parse_samples_header(io_bytes)
         
         samples = []
         
-        ## Parse the samples
-        # Start at byte 3
-        byte_pos = 3
+        # split the sample data into a list, so it can be pop()'d
+        sample_bytes = [ord(c) for c in io_bytes[header_size:]]
         
-        for i in range(0, len_samples):
-            sample = {}
+        # repeat for every sample provided
+        for sample_ind in range(0, sample_count):
+            tmp_samples = {}
             
-            # If one or more DIO lines are set, the first two bytes
-            # contain their values
-            if dio_enabled:
-                # Get two bytes
-                values = data[byte_pos:byte_pos + 2]
+            if dio_chans:
+                # we have digital data
+                digital_data_set = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0))
+                digital_values = dio_mask & digital_data_set
                 
-                # Read and store values for all enabled DIO lines
-                for dio in dio_enabled:
-                    # Second byte contains values for 0-7
-                    # If we want number 8, switch to the first byte, and
-                    #  move back to the beginning
-                    if dio > 7:
-                        sample["dio-%d" % dio] = True if ord(values[0]) & 2 ** (dio - 8) else False
-                    else:
-                        sample["dio-%d" % dio] = True if ord(values[1]) & 2 ** dio else False
-                
-                # Move the starting position for the next new byte
-                byte_pos += 2
-                
-            # If one or more ADC lines are set, the remaining bytes, in
-            # pairs, represent their values, MSB first.
-            if adc_enabled:
-                for adc in adc_enabled:
-                    # Analog reading stored in two bytes
-                    value_raw = data[byte_pos:byte_pos + 2]
-                    
-                    # Unpack the bits
-                    value = struct.unpack("> h", value_raw)[0]
-                    
-                    # Only 10 bits are meaningful
-                    value &= 0x3FF
-                    
-                    # Save the result
-                    sample["adc-%d" % adc] = value
-                    
-                    # Move the starting position for the next new byte
-                    byte_pos += 2
-                
-            samples.append(sample)
+                for i in dio_chans:
+                    tmp_samples['dio-%d' % i] = True if (digital_values >> i) & 1 else False
+                        
+            for i in aio_chans:
+                # only first 10 bits are significant
+                analog_sample = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0)) & 0x03FF
+                tmp_samples['adc-%d' % i] = analog_sample
             
+            samples.append(tmp_samples)
+        
         return samples
         
     def send(self, cmd, **kwargs):
