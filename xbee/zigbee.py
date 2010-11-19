@@ -160,8 +160,7 @@ class ZigBee(XBeeBase):
         # Call the super class constructor to save the serial port
         super(ZigBee, self).__init__(*args, **kwargs)
 
-    @staticmethod
-    def _parse_samples_header(io_bytes):
+    def _parse_samples_header(self, io_bytes):
         """
         _parse_samples_header: binary data in XBee ZB IO data format ->
                         (int, [int ...], [int ...], int, int)

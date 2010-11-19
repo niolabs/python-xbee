@@ -69,3 +69,20 @@ class TestZigBee(unittest.TestCase):
             }
             
             self.assertEqual(info, expected_info)
+
+class TestParseZigBeeIOData(unittest.TestCase):
+    """
+    Test parsing ZigBee specific IO data
+    """
+
+    def setUp(self):
+        self.zigbee = ZigBee(None)
+
+    def test_parse_dio_adc(self):
+            data = '\x01\x08\x00\x0e\x08\x00\x00\x00\x02P\x02\x06'
+            expected_results = [{'dio-11': True,
+                                 'adc-1': 0,
+                                 'adc-2': 592,
+                                 'adc-3': 518}]
+            results = self.zigbee._parse_samples(data)
+            self.assertEqual(results, expected_results)

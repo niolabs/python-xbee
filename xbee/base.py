@@ -243,13 +243,12 @@ class XBeeBase(threading.Thread):
         # If so, process the sample data
         if 'parse_as_io_samples' in packet:
             field_to_process = packet['parse_as_io_samples']
-            info[field_to_process] = XBeeBase._parse_samples(
+            info[field_to_process] = self._parse_samples(
                                         info[field_to_process])
             
         return info
         
-    @staticmethod
-    def _parse_samples_header(io_bytes):
+    def _parse_samples_header(self, io_bytes):
         """
         _parse_samples_header: binary data in XBee IO data format ->
                         (int, [int ...], [int ...], int, int)
@@ -288,8 +287,7 @@ class XBeeBase(threading.Thread):
             
         return (sample_count, dio_chans, aio_chans, dio_mask, header_size)
         
-    @staticmethod
-    def _parse_samples(io_bytes):
+    def _parse_samples(self, io_bytes):
         """
         _parse_samples: binary data in XBee IO data format ->
                         [ {"dio-0":True,
@@ -302,7 +300,7 @@ class XBeeBase(threading.Thread):
         """
 
         sample_count, dio_chans, aio_chans, dio_mask, header_size = \
-            XBeeBase._parse_samples_header(io_bytes)
+            self._parse_samples_header(io_bytes)
         
         samples = []
         
