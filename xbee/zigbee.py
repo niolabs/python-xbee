@@ -148,7 +148,7 @@ class ZigBee(XBeeBase):
                              {'name':'options',         'len':1},
                              {'name':'source_addr',     'len':2},
                              {'name':'source_addr_long','len':8},
-                             {'name':'node_id',         'len':0},
+                             {'name':'node_id',         'len':'null_terminated'},
                              {'name':'parent_source_addr','len':2},
                              {'name':'device_type',     'len':1},
                              {'name':'source_event',    'len':1},
@@ -159,3 +159,45 @@ class ZigBee(XBeeBase):
     def __init__(self, *args, **kwargs):
         # Call the super class constructor to save the serial port
         super(ZigBee, self).__init__(*args, **kwargs)
+
+    def _parse_samples_header(self, io_bytes):
+        """
+        _parse_samples_header: binary data in XBee ZB IO data format ->
+                        (int, [int ...], [int ...], int, int)
+                        
+        _parse_samples_header will read the first three bytes of the 
+        binary data given and will return the number of samples which
+        follow, a list of enabled digital inputs, a list of enabled
+        analog inputs, the dio_mask, and the size of the header in bytes
+
+        _parse_samples_header is overloaded here to support the additional
+        IO lines offered by the XBee ZB
+        """
+        header_size = 4
+
+        # number of samples (always 1?) is the first byte
+        sample_count = ord(io_bytes[0])
+        
+        # bytes 1 and 2 are the DIO mask; bits 9 and 8 aren't used
+        dio_mask = (ord(io_bytes[1]) << 8 | ord(io_bytes[2])) & 0x0E7F
+        
+        # byte 3 is the AIO mask
+        aio_mask = ord(io_bytes[3])
+        
+        # sorted lists of enabled channels; value is position of bit in mask
+        dio_chans = []
+        aio_chans = []
+        
+        for i in range(0,13):
+            if dio_mask & (1 << i):
+                dio_chans.append(i)
+        
+        dio_chans.sort()
+        
+        for i in range(0,8):
+            if aio_mask & (1 << i):
+                aio_chans.append(i)
+        
+        aio_chans.sort()
+        
+        return (sample_count, dio_chans, aio_chans, dio_mask, header_size)
