@@ -10,10 +10,14 @@ look like this::
     #! /usr/bin/python
     
     # Import and init an XBee device
-    from xbee import XBee
+    from xbee import XBee,ZigBee
     import serial
 
     ser = serial.Serial('/dev/ttyUSB0', 9600)
+
+    # Use an XBee 802.15.4 device
+    # To use with an XBee ZigBee device, replace with:
+    #xbee = ZigBee(ser)
     xbee = XBee(ser)
     
     # Set remote DIO pin 2 to low (mode 4)
@@ -54,29 +58,32 @@ order to force the installation to proceed. Do so at your own risk.
 Documentation
 =============
 
-Open the file docs/build/html/index.html in your web browser of choice
-to view the documentation for this package.
+See the python-xbee project on Google Code (https://code.google.com/p/python-xbee/downloads/list)
+for the latest documentation. 
+    
+To build the documentation yourself, ensure that Sphynx (http://sphinx.pocoo.org/)
+is installed. Then cd into the docs folder, and run 'make html'. The documentation can then be opened in
+any modern web browser at docs/build/html/index.html.
 
-Caveats
-=======
-
-Escaped API operation has not been implemented at this time.
+For more information about building or modifying this project's documentation, see
+the documentation for the Sphinx project.
 
 Dependencies
 ============
 
 PySerial
 
-Additional Dependencies (for running tests):
+Additional Dependencies
 --------------------------------------------
 
-Nose
+To run automated tests: Nose (https://code.google.com/p/python-nose/)
+To build the documentation: Sphinx (http://sphinx.pocoo.org/)
 
 XBee Firmware
 -------------
 
 Please ensure that your XBee device is programmed with the latest firmware
-provided by Digi. Using old firmware revisions is not supported and
+provided by Digi. Using an old firmware revision is not supported and
 may result in unspecified behavior.
 
 Contributors
@@ -84,6 +91,7 @@ Contributors
 
 Paul Malmsten <pmalmsten@gmail.com>
 Greg Rapp <gdrapp@gmail.com>
+Brian <blalor@bravo5.org>
 
 Special Thanks
 ==================
