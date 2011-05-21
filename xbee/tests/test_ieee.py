@@ -108,6 +108,24 @@ class TestSplitResponse(InitXBee):
             
         # Test Fails
         self.fail()
+        
+    def test_transmit_packet_received(self):
+        """
+        if a response begins with an ID that is unrecognized as a response
+        ID but is a valid transmission ID, show a helpful error indicating 
+        that a device may be in command mode.
+        """
+        from xbee.base import CommandFrameException
+        data = '\x01\x00\x00\x00'
+        
+        try:
+            self.xbee._split_response(data)
+        except CommandFrameException:
+			# Passes
+            return
+            
+        # Test Fails
+        self.fail()
     
     def test_bad_data_long(self):
         """

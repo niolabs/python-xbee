@@ -16,6 +16,9 @@ from xbee.frame import APIFrame
 
 class ThreadQuitException(Exception):
     pass
+    
+class CommandFrameException(KeyError):
+	pass
 
 class XBeeBase(threading.Thread):
     """
@@ -208,6 +211,12 @@ class XBeeBase(threading.Thread):
         except AttributeError:
             raise NotImplementedError("API response specifications could not be found; use a derived class which defines 'api_responses'.")
         except KeyError:
+			# Check to see if this ID can be found among transmittible packets
+            for cmd_name, cmd in self.api_commands.items():
+                if cmd[0]['default'] == data[0]:
+                    raise CommandFrameException("Incoming frame with id %s looks like a command frame of type '%s' (these should not be received). Are you sure your devices are in API mode?"
+							% (data[0], cmd_name))
+			
             raise KeyError(
                 "Unrecognized response packet with id byte %s"
                 % data[0])
