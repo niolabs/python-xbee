@@ -65,8 +65,8 @@ class ZigBee(XBeeBase):
                          {'name':'dest_addr',       'len':2,        'default':None},
                          {'name':'src_endpoint',    'len':1,        'default':None},
                          {'name':'dest_endpoint',   'len':1,        'default':None},
-                         {'name':'cluster',         'len':1,        'default':None},
-                         {'name':'profile',         'len':1,        'default':None},
+                         {'name':'cluster',         'len':2,        'default':None},
+                         {'name':'profile',         'len':2,        'default':None},
                          {'name':'broadcast_radius','len':1,        'default':'\x00'},
                          {'name':'options',         'len':1,        'default':'\x00'},
                          {'name':'data',            'len':None,     'default':None}]
