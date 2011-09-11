@@ -22,50 +22,50 @@ class TestZigBee(unittest.TestCase):
         Packets with null-terminated fields
         should be properly parsed
         """
-        expected_data = '\x01\x02\x03\x04'
-        terminator = '\x00'
-        node_identifier = '\x95' + '\x00' * 21 + expected_data + terminator + '\x00' * 8
+        expected_data = b'\x01\x02\x03\x04'
+        terminator = b'\x00'
+        node_identifier = b'\x95' + b'\x00' * 21 + expected_data + terminator + b'\x00' * 8
 
         data = self.zigbee._split_response(node_identifier)
 
         self.assertEqual(data['node_id'], expected_data)
 
     def test_split_node_identification_identifier(self):
-            data = '\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaa\x20\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
+            data = b'\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaa\x20\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
             info = self.zigbee._split_response(data)
             expected_info = {
                 'id': 'node_id_indicator',
-                'sender_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
-                'sender_addr': '\x7d\x84',
-                'options': '\x02',
-                'source_addr': '\x7d\x84',
-                'source_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
-                'node_id': ' ',
-                'parent_source_addr': '\xff\xfe',
-                'device_type': '\x01',
-                'source_event': '\x01',
-                'digi_profile_id': '\xc1\x05',
-                'manufacturer_id': '\x10\x1e',
+                'sender_addr_long': b'\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'sender_addr': b'\x7d\x84',
+                'options': b'\x02',
+                'source_addr': b'\x7d\x84',
+                'source_addr_long': b'\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'node_id': b' ',
+                'parent_source_addr': b'\xff\xfe',
+                'device_type': b'\x01',
+                'source_event': b'\x01',
+                'digi_profile_id': b'\xc1\x05',
+                'manufacturer_id': b'\x10\x1e',
             }
             
             self.assertEqual(info, expected_info)
             
     def test_split_node_identification_identifier2(self):
-            data = '\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaaCoordinator\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
+            data = b'\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaaCoordinator\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
             info = self.zigbee._split_response(data)
             expected_info = {
                 'id': 'node_id_indicator',
-                'sender_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
-                'sender_addr': '\x7d\x84',
-                'options': '\x02',
-                'source_addr': '\x7d\x84',
-                'source_addr_long': '\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'sender_addr_long': b'\x00\x13\xa2\x00\x40\x52\x2b\xaa',
+                'sender_addr': b'\x7d\x84',
+                'options': b'\x02',
+                'source_addr': b'\x7d\x84',
+                'source_addr_long': b'\x00\x13\xa2\x00\x40\x52\x2b\xaa',
                 'node_id': 'Coordinator',
-                'parent_source_addr': '\xff\xfe',
-                'device_type': '\x01',
-                'source_event': '\x01',
-                'digi_profile_id': '\xc1\x05',
-                'manufacturer_id': '\x10\x1e',
+                'parent_source_addr': b'\xff\xfe',
+                'device_type': b'\x01',
+                'source_event': b'\x01',
+                'digi_profile_id': b'\xc1\x05',
+                'manufacturer_id': b'\x10\x1e',
             }
             
             self.assertEqual(info, expected_info)
@@ -79,7 +79,7 @@ class TestParseZigBeeIOData(unittest.TestCase):
         self.zigbee = ZigBee(None)
 
     def test_parse_dio_adc(self):
-            data = '\x01\x08\x00\x0e\x08\x00\x00\x00\x02P\x02\x06'
+            data = b'\x01\x08\x00\x0e\x08\x00\x00\x00\x02P\x02\x06'
             expected_results = [{'dio-11': True,
                                  'adc-1': 0,
                                  'adc-2': 592,
