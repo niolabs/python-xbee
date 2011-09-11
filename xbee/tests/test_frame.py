@@ -9,6 +9,7 @@ Tests frame module for proper behavior
 """
 import unittest
 from xbee.frame import APIFrame
+from xbee.python2to3 import byteToInt, intToByte
 
 class TestAPIFrameGeneration(unittest.TestCase):
     """
@@ -60,7 +61,7 @@ class TestAPIFrameParsing(unittest.TestCase):
         expected_data = b'\x00'
         
         for byte in frame:
-            api_frame.fill(byte)
+            api_frame.fill(intToByte(byteToInt(byte)))
         api_frame.parse()
 
         self.assertEqual(api_frame.data, expected_data)
@@ -73,7 +74,7 @@ class TestAPIFrameParsing(unittest.TestCase):
         frame = b'\x7E\x00\x01\x00\xF6'
         
         for byte in frame:
-            api_frame.fill(byte)
+            api_frame.fill(intToByte(byteToInt(byte)))
 
         self.assertRaises(ValueError, api_frame.parse)
 

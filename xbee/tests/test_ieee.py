@@ -10,6 +10,7 @@ Tests the XBee (IEEE 802.15.4) implementation class for XBee API compliance
 import unittest
 from xbee.tests.Fake import FakeDevice, FakeReadDevice
 from xbee.ieee import XBee
+from xbee.python2to3 import byteToInt, intToByte, stringToBytes
 
 class InitXBee(unittest.TestCase):
     """
@@ -64,8 +65,8 @@ class TestBuildCommand(InitXBee):
         no parameter data to be saved
         """
         
-        at_command = "MY"
-        frame = chr(43)
+        at_command = stringToBytes("MY")
+        frame = intToByte(43)
         data = self.xbee._build_command(
             "at", 
             frame_id=frame, 
@@ -82,7 +83,7 @@ class TestBuildCommand(InitXBee):
         default value of \x00 should be used)
         """
         
-        at_command = "MY"
+        at_command = stringToBytes("MY")
         data = self.xbee._build_command("at", command=at_command) 
 
         expected_data = b'\x08\x00MY'
@@ -423,7 +424,7 @@ class TestWriteToDevice(unittest.TestCase):
         xbee = XBee(serial_port)
         
         # Send an AT command
-        xbee.send('at', frame_id='A', command='MY')
+        xbee.send('at', frame_id=stringToBytes('A'), command=stringToBytes('MY'))
         
         # Expect a full packet to be written to the device
         expected_data = b'\x7E\x00\x04\x08AMY\x10'
@@ -442,8 +443,8 @@ class TestWriteToDevice(unittest.TestCase):
         # Send an AT command
         xbee.send(
             'at', 
-            frame_id='A', 
-            command='MY', 
+            frame_id=stringToBytes('A'), 
+            command=stringToBytes('MY'), 
             parameter=b'\x00\x00'
         )
         
@@ -469,7 +470,7 @@ class TestSendShorthand(unittest.TestCase):
         Send an AT command with a shorthand call
         """
         # Send an AT command
-        self.xbee.at(frame_id='A', command='MY')
+        self.xbee.at(frame_id=stringToBytes('A'), command=stringToBytes('MY'))
         
         # Expect a full packet to be written to the device
         expected_data = b'\x7E\x00\x04\x08AMY\x10'
@@ -482,7 +483,7 @@ class TestSendShorthand(unittest.TestCase):
         """
         
         # Send an AT command
-        self.xbee.at(frame_id='A', command='MY', parameter=b'\x00\x00')
+        self.xbee.at(frame_id=stringToBytes('A'), command=stringToBytes('MY'), parameter=b'\x00\x00')
         
         # Expect a full packet to be written to the device
         expected_data = b'\x7E\x00\x06\x08AMY\x00\x00\x10'

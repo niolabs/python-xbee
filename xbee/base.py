@@ -13,6 +13,7 @@ series-specific functionality.
 """
 import struct, threading, time
 from xbee.frame import APIFrame
+from xbee.python2to3 import byteToInt, intToByte
 
 class ThreadQuitException(Exception):
     pass
@@ -205,7 +206,7 @@ class XBeeBase(threading.Thread):
         """
         # Fetch the first byte, identify the packet
         # If the spec doesn't exist, raise exception
-        packet_id = data[0]
+        packet_id = data[0:1]
         try:
             packet = self.api_responses[packet_id]
         except AttributeError:
@@ -213,13 +214,12 @@ class XBeeBase(threading.Thread):
         except KeyError:
 			# Check to see if this ID can be found among transmittible packets
             for cmd_name, cmd in list(self.api_commands.items()):
-                if cmd[0]['default'] == data[0]:
+                if cmd[0]['default'] == data[0:1]:
                     raise CommandFrameException("Incoming frame with id %s looks like a command frame of type '%s' (these should not be received). Are you sure your devices are in API mode?"
 							% (data[0], cmd_name))
 			
             raise KeyError(
-                "Unrecognized response packet with id byte %s"
-                % data[0])
+                "Unrecognized response packet with id byte {0}".format(data[0]))
         
         # Current byte index in the data stream
         index = 1
@@ -233,8 +233,8 @@ class XBeeBase(threading.Thread):
             if field['len'] == 'null_terminated':
                 field_data = b''
                 
-                while data[index] != b'\x00':
-                    field_data += data[index]
+                while data[index:index+1] != b'\x00':
+                    field_data += data[index:index+1]
                     index += 1
                 
                 index += 1
@@ -291,13 +291,13 @@ class XBeeBase(threading.Thread):
         header_size = 3
         
         # number of samples (always 1?) is the first byte
-        sample_count = ord(io_bytes[0])
+        sample_count = byteToInt(io_bytes[0])
         
         # part of byte 1 and byte 2 are the DIO mask ( 9 bits )
-        dio_mask = (ord(io_bytes[1]) << 8 | ord(io_bytes[2])) & 0x01FF
+        dio_mask = (byteToInt(io_bytes[1]) << 8 | byteToInt(io_bytes[2])) & 0x01FF
         
         # upper 7 bits of byte 1 is the AIO mask
-        aio_mask = (ord(io_bytes[1]) & 0xFE) >> 1
+        aio_mask = (byteToInt(io_bytes[1]) & 0xFE) >> 1
         
         # sorted lists of enabled channels; value is position of bit in mask
         dio_chans = []
@@ -335,7 +335,7 @@ class XBeeBase(threading.Thread):
         samples = []
         
         # split the sample data into a list, so it can be pop()'d
-        sample_bytes = [ord(c) for c in io_bytes[header_size:]]
+        sample_bytes = [byteToInt(c) for c in io_bytes[header_size:]]
         
         # repeat for every sample provided
         for sample_ind in range(0, sample_count):
