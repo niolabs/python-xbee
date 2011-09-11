@@ -112,9 +112,8 @@ class APIFrame:
 
         escaped_data = b""
         for byte in data:
-            if byte in APIFrame.ESCAPE_BYTES:
+            if intToByte(byteToInt(byte)) in APIFrame.ESCAPE_BYTES:
                 escaped_data += APIFrame.ESCAPE_BYTE
-                
                 escaped_data += intToByte(0x20 ^ byteToInt(byte))
             else:
                 escaped_data += intToByte(byteToInt(byte))
