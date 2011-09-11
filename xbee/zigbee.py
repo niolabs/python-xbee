@@ -10,6 +10,7 @@ This module implements an XBee ZB (ZigBee) API library.
 """
 import struct
 from xbee.base import XBeeBase
+from xbee.python2to3 import byteToInt, intToByte
 
 class ZigBee(XBeeBase):
     """
@@ -176,13 +177,13 @@ class ZigBee(XBeeBase):
         header_size = 4
 
         # number of samples (always 1?) is the first byte
-        sample_count = ord(io_bytes[0])
+        sample_count = byteToInt(io_bytes[0])
         
         # bytes 1 and 2 are the DIO mask; bits 9 and 8 aren't used
-        dio_mask = (ord(io_bytes[1]) << 8 | ord(io_bytes[2])) & 0x0E7F
+        dio_mask = (byteToInt(io_bytes[1]) << 8 | byteToInt(io_bytes[2])) & 0x0E7F
         
         # byte 3 is the AIO mask
-        aio_mask = ord(io_bytes[3])
+        aio_mask = byteToInt(io_bytes[3])
         
         # sorted lists of enabled channels; value is position of bit in mask
         dio_chans = []

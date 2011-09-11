@@ -7,6 +7,7 @@ pmalmsten@gmail.com
 Represents an API frame for communicating with an XBee
 """
 import struct
+from xbee.python2to3 import byteToInt, intToByte
 
 class APIFrame:
     """
@@ -38,22 +39,12 @@ class APIFrame:
         
         # Add together all bytes
         for byte in self.data:
-            if hasattr(byte, 'encode'):
-                # Python 2.X
-                total += ord(byte)
-            else:
-                # Python 3.X
-                total += byte
+            total += byteToInt(byte)
             
         # Only keep the last byte
         total = total & 0xFF
         
-        # Subtract from 0xFF
-        if hasattr(bytes(), 'encode'):
-            # Python 2.X
-            return chr(0xFF - total)
-        else:
-            return bytes([0xFF - total])
+        return intToByte(0xFF - total)
 
     def verify(self, chksum):
         """
@@ -67,20 +58,10 @@ class APIFrame:
         
         # Add together all bytes
         for byte in self.data:
-            if hasattr(byte, 'encode'):
-                # Python 2.X
-                total += ord(byte)
-            else:
-                # Python 3.X
-                total += byte
+            total += byteToInt(byte)
                 
         # Add checksum too
-        if hasattr(chksum, 'encode'):
-            # Python 2.x
-            total += ord(chksum)
-        else:
-            # Python 3.x
-            total += chksum
+        total += byteToInt(chksum)
         
         # Only keep low bits
         total &= 0xFF
@@ -96,7 +77,7 @@ class APIFrame:
         data length in two bytes, big-endian (most significant first).
         """
         count = len(self.data)
-        return bytes(struct.pack("> h", count))
+        return struct.pack("> h", count)
         
     def output(self):
         """
@@ -134,19 +115,9 @@ class APIFrame:
             if byte in APIFrame.ESCAPE_BYTES:
                 escaped_data += APIFrame.ESCAPE_BYTE
                 
-                if hasattr(byte, 'encode'):
-                    # Python 2.X in use
-                    escaped_data += chr(0x20 ^ ord(byte))
-                else:
-                    # Python 3.X in use
-                    escaped_data += bytes([0x20 ^ byte])
+                escaped_data += intToByte(0x20 ^ byteToInt(byte))
             else:
-                if hasattr(byte, 'encode'):
-                    # Python 2.X
-                    escaped_data += byte
-                else:
-                    # Python 3.X
-                    escaped_data += bytes([byte])
+                escaped_data += intToByte(byteToInt(byte))
                     
         return escaped_data
 
@@ -160,22 +131,13 @@ class APIFrame:
         """
 
         if self._unescape_next_byte:
-            if hasattr(byte, 'encode'):
-                # Python 2.X
-                byte = chr(ord(byte) ^ 0x20) 
-            else:
-                # Python 3.X
-                byte = byte ^ 0x20
+            byte = intToByte(byteToInt(byte) ^ 0x20)
             self._unescape_next_byte = False
         elif self.escaped and byte == APIFrame.ESCAPE_BYTE:
             self._unescape_next_byte = True
             return
 
-        if hasattr(byte, 'encode'):
-            # Python 2.X
-            self.raw_data += byte
-        else:
-            self.raw_data += bytes([byte])
+        self.raw_data += intToByte(byteToInt(byte))
 
     def remaining_bytes(self):
         remaining = 3
