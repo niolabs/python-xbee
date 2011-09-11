@@ -167,8 +167,8 @@ class TestSplitResponse(InitXBee):
         data = b'\x88DMY\x01'
         info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
-                         'frame_id':'D',
-                         'command':'MY',
+                         'frame_id':b'D',
+                         'command':b'MY',
                          'status':b'\x01'}
         self.assertEqual(info, expected_info)
         
@@ -181,10 +181,10 @@ class TestSplitResponse(InitXBee):
         data = b'\x88DMY\x01ABCDEF'
         info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
-                         'frame_id':'D',
-                         'command':'MY',
+                         'frame_id':b'D',
+                         'command':b'MY',
                          'status':b'\x01',
-                         'parameter':'ABCDEF'}
+                         'parameter':b'ABCDEF'}
         self.assertEqual(info, expected_info)
         
         
@@ -517,8 +517,8 @@ class TestReadFromDevice(unittest.TestCase):
         
         info = xbee.wait_read_frame()
         expected_info = {'id':'at_response',
-                         'frame_id':'D',
-                         'command':'MY',
+                         'frame_id':b'D',
+                         'command':b'MY',
                          'status':b'\x01'}
         self.assertEqual(info, expected_info)
         
@@ -533,8 +533,8 @@ class TestReadFromDevice(unittest.TestCase):
         
         info = xbee.wait_read_frame()
         expected_info = {'id':'at_response',
-                         'frame_id':'D',
-                         'command':'MY',
+                         'frame_id':b'D',
+                         'command':b'MY',
                          'status':b'\x01',
                          'parameter':b'\x00\x00\x00'}
         self.assertEqual(info, expected_info)

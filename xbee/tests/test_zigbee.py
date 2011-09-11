@@ -60,7 +60,7 @@ class TestZigBee(unittest.TestCase):
                 'options': b'\x02',
                 'source_addr': b'\x7d\x84',
                 'source_addr_long': b'\x00\x13\xa2\x00\x40\x52\x2b\xaa',
-                'node_id': 'Coordinator',
+                'node_id': b'Coordinator',
                 'parent_source_addr': b'\xff\xfe',
                 'device_type': b'\x01',
                 'source_event': b'\x01',
