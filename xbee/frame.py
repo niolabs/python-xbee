@@ -150,13 +150,17 @@ class APIFrame:
                 byte = chr(ord(byte) ^ 0x20) 
             else:
                 # Python 3.X
-                byte = bytes([byte ^ 0x20])
+                byte = byte ^ 0x20
             self._unescape_next_byte = False
         elif self.escaped and byte == APIFrame.ESCAPE_BYTE:
             self._unescape_next_byte = True
             return
 
-        self.raw_data += byte
+        if hasattr(byte, 'encode'):
+            # Python 2.X
+            self.raw_data += byte
+        else:
+            self.raw_data += bytes([byte])
 
     def remaining_bytes(self):
         remaining = 3
