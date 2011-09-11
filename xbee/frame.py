@@ -14,15 +14,15 @@ class APIFrame:
     from an XBee device
     """
     
-    START_BYTE = '\x7E'
-    ESCAPE_BYTE = '\x7D'
-    XON_BYTE = '\x11'
-    XOFF_BYTE = '\x13'
+    START_BYTE = b'\x7E'
+    ESCAPE_BYTE = b'\x7D'
+    XON_BYTE = b'\x11'
+    XOFF_BYTE = b'\x13'
     ESCAPE_BYTES = (START_BYTE, ESCAPE_BYTE, XON_BYTE, XOFF_BYTE)
     
-    def __init__(self, data='', escaped=False):
+    def __init__(self, data=b'', escaped=False):
         self.data = data
-        self.raw_data = ''
+        self.raw_data = b''
         self.escaped = escaped
         self._unescape_next_byte = False
         
@@ -44,7 +44,7 @@ class APIFrame:
         total = total & 0xFF
         
         # Subtract from 0xFF
-        return chr(0xFF - total)
+        return bytes(chr(0xFF - total))
 
     def verify(self, chksum):
         """
@@ -77,7 +77,7 @@ class APIFrame:
         data length in two bytes, big-endian (most significant first).
         """
         count = len(self.data)
-        return struct.pack("> h", count)
+        return bytes(struct.pack("> h", count))
         
     def output(self):
         """
@@ -110,11 +110,17 @@ class APIFrame:
         it is preceded by an escape byte and XORed with 0x20.
         """
 
-        escaped_data = ""
+        escaped_data = b""
         for byte in data:
             if byte in APIFrame.ESCAPE_BYTES:
                 escaped_data += APIFrame.ESCAPE_BYTE
-                escaped_data += chr(0x20 ^ ord(byte))
+                
+                if hasattr(byte, 'encode'):
+                    # Python 2.X in use
+                    escaped_data += chr(0x20 ^ ord(byte))
+                else:
+                    # Python 3.X in use
+                    escaped_data += bytes([0x20 ^ byte])
             else:
                 escaped_data += byte
         
@@ -130,7 +136,12 @@ class APIFrame:
         """
 
         if self._unescape_next_byte:
-            byte = chr(ord(byte) ^ 0x20) 
+            if hasattr(byte, 'encode'):
+                # Python 2.X
+                byte = chr(ord(byte) ^ 0x20) 
+            else:
+                # Python 3.X
+                byte = bytes([byte ^ 0x20])
             self._unescape_next_byte = False
         elif self.escaped and byte == APIFrame.ESCAPE_BYTE:
             self._unescape_next_byte = True
