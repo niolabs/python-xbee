@@ -67,10 +67,20 @@ class APIFrame:
         
         # Add together all bytes
         for byte in self.data:
-            total += ord(byte)
-            
+            if hasattr(byte, 'encode'):
+                # Python 2.X
+                total += ord(byte)
+            else:
+                # Python 3.X
+                total += byte
+                
         # Add checksum too
-        total += ord(chksum)
+        if hasattr(chksum, 'encode'):
+            # Python 2.x
+            total += ord(chksum)
+        else:
+            # Python 3.x
+            total += chksum
         
         # Only keep low bits
         total &= 0xFF
