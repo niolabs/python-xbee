@@ -49,7 +49,11 @@ class APIFrame:
         total = total & 0xFF
         
         # Subtract from 0xFF
-        return bytes(chr(0xFF - total))
+        if hasattr(bytes(), 'encode'):
+            # Python 2.X
+            return chr(0xFF - total)
+        else:
+            return bytes([0xFF - total])
 
     def verify(self, chksum):
         """
