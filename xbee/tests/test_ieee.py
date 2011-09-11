@@ -72,7 +72,7 @@ class TestBuildCommand(InitXBee):
             command=at_command
         ) 
 
-        expected_data = '\x08+MY'
+        expected_data = b'\x08+MY'
         self.assertEqual(data, expected_data)
         
     def test_build_at_with_default(self):
@@ -85,7 +85,7 @@ class TestBuildCommand(InitXBee):
         at_command = "MY"
         data = self.xbee._build_command("at", command=at_command) 
 
-        expected_data = '\x08\x00MY'
+        expected_data = b'\x08\x00MY'
         self.assertEqual(data, expected_data)
         
 class TestSplitResponse(InitXBee):
@@ -98,7 +98,7 @@ class TestSplitResponse(InitXBee):
         if a response begins with an unrecognized id byte, 
         _split_response should raise an exception
         """
-        data = '\x23\x00\x00\x00'
+        data = b'\x23\x00\x00\x00'
         
         try:
             self.xbee._split_response(data)
@@ -116,7 +116,7 @@ class TestSplitResponse(InitXBee):
         that a device may be in command mode.
         """
         from xbee.base import CommandFrameException
-        data = '\x01\x00\x00\x00'
+        data = b'\x01\x00\x00\x00'
         
         try:
             self.xbee._split_response(data)
@@ -133,7 +133,7 @@ class TestSplitResponse(InitXBee):
         _split_response should raise an exception
         """
         # Over length
-        data = '\x8a\x00\x00\x00'
+        data = b'\x8a\x00\x00\x00'
         self.assertRaises(ValueError, self.xbee._split_response, data)
         
     def test_bad_data_short(self):
@@ -142,18 +142,18 @@ class TestSplitResponse(InitXBee):
         _split_response should raise an exception
         """
         # Under length
-        data = '\x8a'
+        data = b'\x8a'
         self.assertRaises(ValueError, self.xbee._split_response, data)
     
     def test_split_status_response(self):
         """
         _split_response should properly split a status response packet
         """
-        data = '\x8a\x01'
+        data = b'\x8a\x01'
         
         info = self.xbee._split_response(data)
         expected_info = {'id':'status',
-                         'status':'\x01'}
+                         'status':b'\x01'}
         
         self.assertEqual(info, expected_info)
         
@@ -163,12 +163,12 @@ class TestSplitResponse(InitXBee):
         has no parameter data
         """
         
-        data = '\x88DMY\x01'
+        data = b'\x88DMY\x01'
         info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
-                         'status':'\x01'}
+                         'status':b'\x01'}
         self.assertEqual(info, expected_info)
         
     def test_split_at_resp_with_param(self):
@@ -177,12 +177,12 @@ class TestSplitResponse(InitXBee):
         has parameter data
         """
         
-        data = '\x88DMY\x01ABCDEF'
+        data = b'\x88DMY\x01ABCDEF'
         info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
-                         'status':'\x01',
+                         'status':b'\x01',
                          'parameter':'ABCDEF'}
         self.assertEqual(info, expected_info)
         
@@ -199,10 +199,10 @@ class TestParseIOData(InitXBee):
         sample of only digital io data
         """
         # One sample, ADC disabled and DIO8 enabled, DIO 0-7 enabled
-        header = '\x01\x01\xFF'
+        header = b'\x01\x01\xFF'
         
         # First 7 bits ignored, DIO8 high, DIO 0-7 high
-        sample = '\x01\xFF'
+        sample = b'\x01\xFF'
         data = header + sample
         
         expected_results = [{'dio-0':True,
@@ -226,10 +226,10 @@ class TestParseIOData(InitXBee):
         off
         """
         # One sample, ADC disabled and DIO8 enabled, DIO 0-7 enabled
-        header = '\x01\x01\xFF'
+        header = b'\x01\x01\xFF'
         
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
-        sample = '\x00\xAA'
+        sample = b'\x00\xAA'
         data = header + sample
         
         expected_results = [{'dio-0':False,
@@ -254,10 +254,10 @@ class TestParseIOData(InitXBee):
         """
         # One sample, ADC disabled
         # DIO 1,3,5,7 enabled
-        header = '\x01\x00\xAA'
+        header = b'\x01\x00\xAA'
         
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
-        sample = '\x00\xAA'
+        sample = b'\x00\xAA'
         data = header + sample
         
         expected_results = [{'dio-1':True,
@@ -277,10 +277,10 @@ class TestParseIOData(InitXBee):
         """
         # One sample, ADC disabled
         # DIO 0 enabled
-        header = '\x01\x00\x01'
+        header = b'\x01\x00\x01'
         
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
-        sample = '\x00\xAA'
+        sample = b'\x00\xAA'
         data = header + sample
         
         expected_results = [{'dio-0':False}]
@@ -296,10 +296,10 @@ class TestParseIOData(InitXBee):
         """
         # Two samples, ADC disabled
         # DIO 0 enabled
-        header = '\x02\x00\x01'
+        header = b'\x02\x00\x01'
         
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
-        sample = '\x00\xAA' + '\x00\x01'
+        sample = b'\x00\xAA' + b'\x00\x01'
         data = header + sample
         
         expected_results = [{'dio-0':False},
@@ -315,13 +315,13 @@ class TestParseIOData(InitXBee):
         samples of only digital io data
         """
         # Three samples, ADC disabled and DIO8 enabled, DIO 0-7 enabled
-        header = '\x03\x01\xFF'
+        header = b'\x03\x01\xFF'
         
         # First 7 bits ignored
         # First sample: all bits on
         # Second sample: alternating bits on
         # Third sample: all bits off
-        sample = '\x01\xFF' + '\x00\xAA' + '\x00\x00'
+        sample = b'\x01\xFF' + b'\x00\xAA' + b'\x00\x00'
         data = header + sample
         
         expected_results = [{'dio-0':True,
@@ -363,14 +363,14 @@ class TestParseIOData(InitXBee):
         """
         # One sample, ADC 0,1 enabled
         # DIO disabled
-        header = '\x02\x06\x00'
+        header = b'\x02\x06\x00'
         
         # No dio data
         # ADC0 value of 0
         # ADC1 value of 255
         # ADC0 value of 5
         # ADC1 value of 7
-        sample = '\x00\x00' + '\x00\xFF' + '\x00\x05' + '\x00\x07'
+        sample = b'\x00\x00' + b'\x00\xFF' + b'\x00\x05' + b'\x00\x07'
         data = header + sample
         
         expected_results = [{'adc-0':0,
@@ -390,11 +390,11 @@ class TestParseIOData(InitXBee):
         """
         # One sample, ADC 0 enabled
         # DIO 1,3,5,7 enabled
-        header = '\x01\x02\xAA'
+        header = b'\x01\x02\xAA'
         
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
         # ADC0 value of 255
-        sample = '\x00\xAA\x00\xFF'
+        sample = b'\x00\xAA\x00\xFF'
         data = header + sample
         
         expected_results = [{'dio-1':True,
@@ -426,7 +426,7 @@ class TestWriteToDevice(unittest.TestCase):
         xbee.send('at', frame_id='A', command='MY')
         
         # Expect a full packet to be written to the device
-        expected_data = '\x7E\x00\x04\x08AMY\x10'
+        expected_data = b'\x7E\x00\x04\x08AMY\x10'
         self.assertEqual(serial_port.data, expected_data)
         
         
@@ -444,11 +444,11 @@ class TestWriteToDevice(unittest.TestCase):
             'at', 
             frame_id='A', 
             command='MY', 
-            parameter='\x00\x00'
+            parameter=b'\x00\x00'
         )
         
         # Expect a full packet to be written to the device
-        expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
+        expected_data = b'\x7E\x00\x06\x08AMY\x00\x00\x10'
         self.assertEqual(serial_port.data, expected_data)
         
 class TestSendShorthand(unittest.TestCase):
@@ -472,7 +472,7 @@ class TestSendShorthand(unittest.TestCase):
         self.xbee.at(frame_id='A', command='MY')
         
         # Expect a full packet to be written to the device
-        expected_data = '\x7E\x00\x04\x08AMY\x10'
+        expected_data = b'\x7E\x00\x04\x08AMY\x10'
         self.assertEqual(self.ser.data, expected_data)
         
     def test_send_at_command_with_param(self):
@@ -482,10 +482,10 @@ class TestSendShorthand(unittest.TestCase):
         """
         
         # Send an AT command
-        self.xbee.at(frame_id='A', command='MY', parameter='\x00\x00')
+        self.xbee.at(frame_id='A', command='MY', parameter=b'\x00\x00')
         
         # Expect a full packet to be written to the device
-        expected_data = '\x7E\x00\x06\x08AMY\x00\x00\x10'
+        expected_data = b'\x7E\x00\x06\x08AMY\x00\x00\x10'
         self.assertEqual(self.ser.data, expected_data)
         
     def test_shorthand_disabled(self):
@@ -511,14 +511,14 @@ class TestReadFromDevice(unittest.TestCase):
         """
         read and parse a parameterless AT command
         """
-        device = FakeReadDevice('\x7E\x00\x05\x88DMY\x01\x8c')
+        device = FakeReadDevice(b'\x7E\x00\x05\x88DMY\x01\x8c')
         xbee = XBee(device)
         
         info = xbee.wait_read_frame()
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
-                         'status':'\x01'}
+                         'status':b'\x01'}
         self.assertEqual(info, expected_info)
         
     def test_read_at_params(self):
@@ -526,7 +526,7 @@ class TestReadFromDevice(unittest.TestCase):
         read and parse an AT command with a parameter
         """
         device = FakeReadDevice(
-            '\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c'
+            b'\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c'
         )
         xbee = XBee(device)
         
@@ -534,8 +534,8 @@ class TestReadFromDevice(unittest.TestCase):
         expected_info = {'id':'at_response',
                          'frame_id':'D',
                          'command':'MY',
-                         'status':'\x01',
-                         'parameter':'\x00\x00\x00'}
+                         'status':b'\x01',
+                         'parameter':b'\x00\x00\x00'}
         self.assertEqual(info, expected_info)
         
     def test_read_io_data(self):
@@ -545,27 +545,27 @@ class TestReadFromDevice(unittest.TestCase):
         ## Build IO data
         # One sample, ADC 0 enabled
         # DIO 1,3,5,7 enabled
-        header = '\x01\x02\xAA'
+        header = b'\x01\x02\xAA'
         
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
         # ADC0 value of 255
-        sample = '\x00\xAA\x00\xFF'
+        sample = b'\x00\xAA\x00\xFF'
         data = header + sample
         
         ## Wrap data in frame
         # RX frame data
-        rx_io_resp = '\x83\x00\x01\x28\x00'
+        rx_io_resp = b'\x83\x00\x01\x28\x00'
     
         device = FakeReadDevice(
-            '\x7E\x00\x0C'+ rx_io_resp + data + '\xfd'
+            b'\x7E\x00\x0C'+ rx_io_resp + data + b'\xfd'
         )
         xbee = XBee(device)
         
         info = xbee.wait_read_frame()
         expected_info = {'id':'rx_io_data',
-                         'source_addr':'\x00\x01',
-                         'rssi':'\x28',
-                         'options':'\x00',
+                         'source_addr':b'\x00\x01',
+                         'rssi':b'\x28',
+                         'options':b'\x00',
                          'samples': [{'dio-1':True,
                                       'dio-3':True,
                                       'dio-5':True,

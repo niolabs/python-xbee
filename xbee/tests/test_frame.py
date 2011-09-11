@@ -19,9 +19,9 @@ class TestAPIFrameGeneration(unittest.TestCase):
         """
         create a frame containing a single byte
         """
-        data = '\x00'
+        data = b'\x00'
         # start byte, two length bytes, data byte, checksum
-        expected_frame = '\x7E\x00\x01\x00\xFF'
+        expected_frame = b'\x7E\x00\x01\x00\xFF'
         
         frame = APIFrame(data).output()
         self.assertEqual(frame, expected_frame)
@@ -39,7 +39,7 @@ class TestAPIFrameParsing(unittest.TestCase):
         """
         api_frame = APIFrame()
 
-        frame = '\x7E\x00\x04\x00\x00\x00\x00\xFF'
+        frame = b'\x7E\x00\x04\x00\x00\x00\x00\xFF'
         self.assertEqual(api_frame.remaining_bytes(), 3)
         api_frame.fill(frame[0])
         self.assertEqual(api_frame.remaining_bytes(), 2)
@@ -56,8 +56,8 @@ class TestAPIFrameParsing(unittest.TestCase):
         """
         api_frame = APIFrame()
 
-        frame = '\x7E\x00\x01\x00\xFF'
-        expected_data = '\x00'
+        frame = b'\x7E\x00\x01\x00\xFF'
+        expected_data = b'\x00'
         
         for byte in frame:
             api_frame.fill(byte)
@@ -70,7 +70,7 @@ class TestAPIFrameParsing(unittest.TestCase):
         when an invalid frame is read, an exception must be raised
         """
         api_frame = APIFrame()
-        frame = '\x7E\x00\x01\x00\xF6'
+        frame = b'\x7E\x00\x01\x00\xF6'
         
         for byte in frame:
             api_frame.fill(byte)
@@ -88,4 +88,4 @@ class TestEscapedOutput(unittest.TestCase):
         """
         test_data = APIFrame.START_BYTE
         new_data = APIFrame.escape(test_data)
-        self.assertEqual(new_data, APIFrame.ESCAPE_BYTE + '\x5e')
+        self.assertEqual(new_data, APIFrame.ESCAPE_BYTE + b'\x5e')

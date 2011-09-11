@@ -14,7 +14,7 @@ class FakeDevice:
     Represents a fake serial port for testing purposes
     """
     def __init__(self):
-        self.data = ''
+        self.data = b''
     
     def write(self, data):
         """

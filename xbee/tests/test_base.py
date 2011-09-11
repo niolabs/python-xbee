@@ -25,10 +25,10 @@ class TestWriteToDevice(unittest.TestCase):
         device = FakeDevice()
         
         xbee = XBeeBase(device)
-        xbee._write('\x00')
+        xbee._write(b'\x00')
         
         # Check resuting state of fake device
-        expected_frame = '\x7E\x00\x01\x00\xFF'
+        expected_frame = b'\x7E\x00\x01\x00\xFF'
         self.assertEqual(device.data, expected_frame)
         
     def test_write_again(self):
@@ -39,10 +39,10 @@ class TestWriteToDevice(unittest.TestCase):
         device = FakeDevice()
         
         xbee = XBeeBase(device)
-        xbee._write('\x00\x01\x02')
+        xbee._write(b'\x00\x01\x02')
         
         # Check resuting state of fake device
-        expected_frame = '\x7E\x00\x03\x00\x01\x02\xFC'
+        expected_frame = b'\x7E\x00\x03\x00\x01\x02\xFC'
         self.assertEqual(device.data, expected_frame)
 
     def test_write_escaped(self):
@@ -53,10 +53,10 @@ class TestWriteToDevice(unittest.TestCase):
         device = FakeDevice()
         
         xbee = XBeeBase(device,escaped=True)
-        xbee._write('\x7E\x01\x7D\x11\x13')
+        xbee._write(b'\x7E\x01\x7D\x11\x13')
         
         # Check resuting state of fake device
-        expected_frame = '\x7E\x00\x05\x7D\x5E\x01\x7D\x5D\x7D\x31\x7D\x33\xDF'
+        expected_frame = b'\x7E\x00\x05\x7D\x5E\x01\x7D\x5D\x7D\x31\x7D\x33\xDF'
         self.assertEqual(device.data, expected_frame)
         
 class TestReadFromDevice(unittest.TestCase):
@@ -68,34 +68,34 @@ class TestReadFromDevice(unittest.TestCase):
         """
         _wait_for_frame should properly read a frame of data
         """
-        device = FakeReadDevice('\x7E\x00\x01\x00\xFF')
+        device = FakeReadDevice(b'\x7E\x00\x01\x00\xFF')
         xbee = XBeeBase(device)
         
         frame = xbee._wait_for_frame()
-        self.assertEqual(frame.data, '\x00')
+        self.assertEqual(frame.data, b'\x00')
         
     def test_read_invalid_followed_by_valid(self):
         """
         _wait_for_frame should skip invalid data
         """
         device = FakeReadDevice(
-            '\x7E\x00\x01\x00\xFA' + '\x7E\x00\x01\x05\xFA')
+            b'\x7E\x00\x01\x00\xFA' + b'\x7E\x00\x01\x05\xFA')
         xbee = XBeeBase(device)
         
         frame = xbee._wait_for_frame()
-        self.assertEqual(frame.data, '\x05')
+        self.assertEqual(frame.data, b'\x05')
 
     def test_read_escaped(self):
         """
         _wait_for_frame should properly read a frame of data
         Verify that API mode 2 escaped bytes are read correctly
         """
-        device = FakeReadDevice('\x7E\x00\x04\x7D\x5E\x7D\x5D\x7D\x31\x7D\x33\xE0')
+        device = FakeReadDevice(b'\x7E\x00\x04\x7D\x5E\x7D\x5D\x7D\x31\x7D\x33\xE0')
 
         xbee = XBeeBase(device,escaped=True)
         
         frame = xbee._wait_for_frame()
-        self.assertEqual(frame.data, '\x7E\x7D\x11\x13')
+        self.assertEqual(frame.data, b'\x7E\x7D\x11\x13')
         
 class TestNotImplementedFeatures(unittest.TestCase):
     """
@@ -122,7 +122,7 @@ class TestNotImplementedFeatures(unittest.TestCase):
         """
         split_command should raise NotImplemented
         """
-        self.assertRaises(NotImplementedError, self.xbee._split_response, "\00")
+        self.assertRaises(NotImplementedError, self.xbee._split_response, b"\x00")
         
     def test_shorthand(self):
         """
