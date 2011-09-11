@@ -32,43 +32,43 @@ class ZigBee(XBeeBase):
     #         ...
     #         }
     api_commands = {"at":
-                        [{'name':'id',        'len':1,      'default':'\x08'},
-                         {'name':'frame_id',  'len':1,      'default':'\x01'},
+                        [{'name':'id',        'len':1,      'default':b'\x08'},
+                         {'name':'frame_id',  'len':1,      'default':b'\x01'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
                     "queued_at":
-                        [{'name':'id',        'len':1,      'default':'\x09'},
-                         {'name':'frame_id',  'len':1,      'default':'\x01'},
+                        [{'name':'id',        'len':1,      'default':b'\x09'},
+                         {'name':'frame_id',  'len':1,      'default':b'\x01'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
                     "remote_at":
-                        [{'name':'id',              'len':1,        'default':'\x17'},
-                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                        [{'name':'id',              'len':1,        'default':b'\x17'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
                          # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)},
-                         {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'},
-                         {'name':'options',         'len':1,        'default':'\x02'},
+                         {'name':'dest_addr_long',  'len':8,        'default':bytes([struct.pack('>Q', 0)])},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
+                         {'name':'options',         'len':1,        'default':b'\x02'},
                          {'name':'command',         'len':2,        'default':None},
                          {'name':'parameter',       'len':None,     'default':None}],
                     "tx":
-                        [{'name':'id',              'len':1,        'default':'\x10'},
-                         {'name':'frame_id',        'len':1,        'default':'\x01'},
+                        [{'name':'id',              'len':1,        'default':b'\x10'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x01'},
                          {'name':'dest_addr_long',  'len':8,        'default':None},
                          {'name':'dest_addr',       'len':2,        'default':None},
-                         {'name':'broadcast_radius','len':1,        'default':'\x00'},
-                         {'name':'options',         'len':1,        'default':'\x00'},
+                         {'name':'broadcast_radius','len':1,        'default':b'\x00'},
+                         {'name':'options',         'len':1,        'default':b'\x00'},
                          {'name':'data',            'len':None,     'default':None}],
                     "tx_explicit":
-                        [{'name':'id',              'len':1,        'default':'\x11'},
-                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                        [{'name':'id',              'len':1,        'default':b'\x11'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
                          {'name':'dest_addr_long',  'len':8,        'default':None},
                          {'name':'dest_addr',       'len':2,        'default':None},
                          {'name':'src_endpoint',    'len':1,        'default':None},
                          {'name':'dest_endpoint',   'len':1,        'default':None},
                          {'name':'cluster',         'len':2,        'default':None},
                          {'name':'profile',         'len':2,        'default':None},
-                         {'name':'broadcast_radius','len':1,        'default':'\x00'},
-                         {'name':'options',         'len':1,        'default':'\x00'},
+                         {'name':'broadcast_radius','len':1,        'default':b'\x00'},
+                         {'name':'options',         'len':1,        'default':b'\x00'},
                          {'name':'data',            'len':None,     'default':None}]
                     }
     
@@ -86,14 +86,14 @@ class ZigBee(XBeeBase):
     #           ...
     #        }
     #
-    api_responses = {"\x90":
+    api_responses = {b"\x90":
                         {'name':'rx',
                          'structure':
                             [{'name':'source_addr_long','len':8},
                              {'name':'source_addr',     'len':2},
                              {'name':'options',         'len':1},
                              {'name':'rf_data',         'len':None}]},
-                     "\x91":
+                     b"\x91":
                         {'name':'rx_explicit',
                          'structure':
                             [{'name':'source_addr_long','len':8},
@@ -104,7 +104,7 @@ class ZigBee(XBeeBase):
                              {'name':'profile',         'len':2},
                              {'name':'options',         'len':1},
                              {'name':'rf_data',         'len':None}]},
-                     "\x92": # Checked by GDR-parse_samples_header function appears to need update to support
+                     b"\x92": # Checked by GDR-parse_samples_header function appears to need update to support
                         {'name':'rx_io_data_long_addr',
                          'structure':
                             [{'name':'source_addr_long','len':8},
@@ -112,7 +112,7 @@ class ZigBee(XBeeBase):
                              {'name':'options',         'len':1},
                              {'name':'samples',         'len':None}],
                          'parse_as_io_samples':'samples'},
-                     "\x8b":
+                     b"\x8b":
                         {'name':'tx_status',
                          'structure':
                             [{'name':'frame_id',        'len':1},
@@ -120,18 +120,18 @@ class ZigBee(XBeeBase):
                              {'name':'retries',         'len':1},
                              {'name':'deliver_status',  'len':1},
                              {'name':'discover_status', 'len':1}]},
-                     "\x8a":
+                     b"\x8a":
                         {'name':'status',
                          'structure':
                             [{'name':'status',      'len':1}]},
-                     "\x88":
+                     b"\x88":
                         {'name':'at_response',
                          'structure':
                             [{'name':'frame_id',    'len':1},
                              {'name':'command',     'len':2},
                              {'name':'status',      'len':1},
                              {'name':'parameter',   'len':None}]},
-                     "\x97": #Checked GDR (not sure about parameter, could be 4 bytes)
+                     b"\x97": #Checked GDR (not sure about parameter, could be 4 bytes)
                         {'name':'remote_at_response',
                          'structure':
                             [{'name':'frame_id',        'len':1},
@@ -140,7 +140,7 @@ class ZigBee(XBeeBase):
                              {'name':'command',         'len':2},
                              {'name':'status',          'len':1},
                              {'name':'parameter',       'len':None}]},
-                     "\x95":
+                     b"\x95":
                         {'name':'node_id_indicator',
                          'structure':
                             [{'name':'sender_addr_long','len':8},

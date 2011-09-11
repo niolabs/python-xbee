@@ -154,7 +154,7 @@ class XBeeBase(threading.Thread):
         except AttributeError:
             raise NotImplementedError("API command specifications could not be found; use a derived class which defines 'api_commands'.")
             
-        packet = ''
+        packet = b''
         
         for field in cmd_spec:
             try:
@@ -212,7 +212,7 @@ class XBeeBase(threading.Thread):
             raise NotImplementedError("API response specifications could not be found; use a derived class which defines 'api_responses'.")
         except KeyError:
 			# Check to see if this ID can be found among transmittible packets
-            for cmd_name, cmd in self.api_commands.items():
+            for cmd_name, cmd in list(self.api_commands.items()):
                 if cmd[0]['default'] == data[0]:
                     raise CommandFrameException("Incoming frame with id %s looks like a command frame of type '%s' (these should not be received). Are you sure your devices are in API mode?"
 							% (data[0], cmd_name))
@@ -231,9 +231,9 @@ class XBeeBase(threading.Thread):
         # Parse the packet in the order specified
         for field in packet_spec:
             if field['len'] == 'null_terminated':
-                field_data = ''
+                field_data = b''
                 
-                while data[index] != '\x00':
+                while data[index] != b'\x00':
                     field_data += data[index]
                     index += 1
                 
@@ -347,12 +347,12 @@ class XBeeBase(threading.Thread):
                 digital_values = dio_mask & digital_data_set
                 
                 for i in dio_chans:
-                    tmp_samples['dio-%d' % i] = True if (digital_values >> i) & 1 else False
+                    tmp_samples['dio-{0}'.format(i)] = True if (digital_values >> i) & 1 else False
                         
             for i in aio_chans:
                 # only first 10 bits are significant
                 analog_sample = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0)) & 0x03FF
-                tmp_samples['adc-%d' % i] = analog_sample
+                tmp_samples['adc-{0}'.format(i)] = analog_sample
             
             samples.append(tmp_samples)
         

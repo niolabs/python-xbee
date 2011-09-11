@@ -31,35 +31,35 @@ class XBee(XBeeBase):
     #         ...
     #         }
     api_commands = {"at":
-                        [{'name':'id',        'len':1,      'default':'\x08'},
-                         {'name':'frame_id',  'len':1,      'default':'\x00'},
+                        [{'name':'id',        'len':1,      'default':b'\x08'},
+                         {'name':'frame_id',  'len':1,      'default':b'\x00'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
                     "queued_at":
-                        [{'name':'id',        'len':1,      'default':'\x09'},
-                         {'name':'frame_id',  'len':1,      'default':'\x00'},
+                        [{'name':'id',        'len':1,      'default':b'\x09'},
+                         {'name':'frame_id',  'len':1,      'default':b'\x00'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
                     "remote_at":
-                        [{'name':'id',              'len':1,        'default':'\x17'},
-                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                        [{'name':'id',              'len':1,        'default':b'\x17'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
                          # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)},
-                         {'name':'dest_addr',       'len':2,        'default':'\xFF\xFE'},
-                         {'name':'options',         'len':1,        'default':'\x02'},
+                         {'name':'dest_addr_long',  'len':8,        'default':bytes([struct.pack('>Q', 0)])},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
+                         {'name':'options',         'len':1,        'default':b'\x02'},
                          {'name':'command',         'len':2,        'default':None},
                          {'name':'parameter',       'len':None,     'default':None}],
                     "tx_long_addr":
-                        [{'name':'id',              'len':1,        'default':'\x00'},
-                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                        [{'name':'id',              'len':1,        'default':b'\x00'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
                          {'name':'dest_addr',       'len':8,        'default':None},
-                         {'name':'options',         'len':1,        'default':'\x00'},
+                         {'name':'options',         'len':1,        'default':b'\x00'},
                          {'name':'data',            'len':None,     'default':None}],
                     "tx":
-                        [{'name':'id',              'len':1,        'default':'\x01'},
-                         {'name':'frame_id',        'len':1,        'default':'\x00'},
+                        [{'name':'id',              'len':1,        'default':b'\x01'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
                          {'name':'dest_addr',       'len':2,        'default':None},
-                         {'name':'options',         'len':1,        'default':'\x00'},
+                         {'name':'options',         'len':1,        'default':b'\x00'},
                          {'name':'data',            'len':None,     'default':None}]
                     }
     
@@ -77,21 +77,21 @@ class XBee(XBeeBase):
     #           ...
     #        }
     #
-    api_responses = {"\x80":
+    api_responses = {b"\x80":
                         {'name':'rx_long_addr',
                          'structure':
                             [{'name':'source_addr', 'len':8},
                              {'name':'rssi',        'len':1},
                              {'name':'options',     'len':1},
                              {'name':'rf_data',     'len':None}]},
-                     "\x81":
+                     b"\x81":
                         {'name':'rx',
                          'structure':
                             [{'name':'source_addr', 'len':2},
                              {'name':'rssi',        'len':1},
                              {'name':'options',     'len':1},
                              {'name':'rf_data',     'len':None}]},
-                     "\x82":
+                     b"\x82":
                         {'name':'rx_io_data_long_addr',
                          'structure':
                             [{'name':'source_addr_long','len':8},
@@ -99,7 +99,7 @@ class XBee(XBeeBase):
                              {'name':'options',         'len':1},
                              {'name':'samples',         'len':None}],
                          'parse_as_io_samples':'samples'},
-                     "\x83":
+                     b"\x83":
                         {'name':'rx_io_data',
                          'structure':
                             [{'name':'source_addr', 'len':2},
@@ -107,23 +107,23 @@ class XBee(XBeeBase):
                              {'name':'options',     'len':1},
                              {'name':'samples',     'len':None}],
                          'parse_as_io_samples':'samples'},
-                     "\x89":
+                     b"\x89":
                         {'name':'tx_status',
                          'structure':
                             [{'name':'frame_id',    'len':1},
                              {'name':'status',      'len':1}]},
-                     "\x8a":
+                     b"\x8a":
                         {'name':'status',
                          'structure':
                             [{'name':'status',      'len':1}]},
-                     "\x88":
+                     b"\x88":
                         {'name':'at_response',
                          'structure':
                             [{'name':'frame_id',    'len':1},
                              {'name':'command',     'len':2},
                              {'name':'status',      'len':1},
                              {'name':'parameter',   'len':None}]},
-                     "\x97":
+                     b"\x97":
                         {'name':'remote_at_response',
                          'structure':
                             [{'name':'frame_id',        'len':1},
