@@ -141,8 +141,13 @@ class APIFrame:
                     # Python 3.X in use
                     escaped_data += bytes([0x20 ^ byte])
             else:
-                escaped_data += byte
-        
+                if hasattr(byte, 'encode'):
+                    # Python 2.X
+                    escaped_data += byte
+                else:
+                    # Python 3.X
+                    escaped_data += bytes([byte])
+                    
         return escaped_data
 
     def fill(self, byte):
