@@ -9,7 +9,7 @@ Provides fake device objects for other unit tests.
 """
 import sys
 
-class FakeDevice:
+class FakeDevice(object):
     """
     Represents a fake serial port for testing purposes
     """
@@ -22,7 +22,7 @@ class FakeDevice:
         """
         self.data = data
         
-class FakeReadDevice:
+class FakeReadDevice(object):
     """
     Represents a fake serial port which can be read from in a similar
     fashion to the real thing

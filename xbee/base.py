@@ -125,10 +125,15 @@ class XBeeBase(threading.Thread):
                 if byte != APIFrame.START_BYTE:
                     continue
 
-                # Save all following bytes
-                frame.fill(byte)
+                # Save all following bytes, if they are not empty
+                if len(byte) == 1:
+					frame.fill(byte)
+					
                 while(frame.remaining_bytes() > 0):
-                    frame.fill(self.serial.read())
+					byte = self.serial.read()
+					
+					if len(byte) == 1:
+						frame.fill(byte)
 
                 try:
                     # Try to parse and return result

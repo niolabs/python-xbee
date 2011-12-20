@@ -7,7 +7,7 @@ pmalmsten@gmail.com
 
 Tests the XBee (IEEE 802.15.4) implementation class for XBee API compliance
 """
-import unittest
+import unittest, sys, traceback
 from xbee.tests.Fake import FakeDevice, FakeReadDevice
 from xbee.ieee import XBee
 from xbee.python2to3 import byteToInt, intToByte, stringToBytes
@@ -574,7 +574,40 @@ class TestReadFromDevice(unittest.TestCase):
                                       'adc-0':255}]
                         }
         self.assertEqual(info, expected_info)
-                    
+        
+    def test_read_empty_string(self):
+        """
+        Reading an empty string must not cause a crash
+        
+        Occasionally, the serial port fails to read properly, and returns
+        an empty string. In this event, we must not crash.
+        """
+        
+        class BadReadDevice(FakeReadDevice):
+            def __init__(self, bad_read_index, data):
+                self.read_id = 0
+                self.bad_read_index = bad_read_index
+                super(BadReadDevice, self).__init__(data)
+            
+            def inWaiting(self):
+                return 1
+                
+            def read(self):
+                if self.read_id == self.bad_read_index:
+                    self.read_id += 1
+                    return ''
+                else:
+                    self.read_id += 1
+                    return super(BadReadDevice, self).read()
+                
+        badDevice = BadReadDevice(1, b'\x7E\x00\x05\x88DMY\x01\x8c')
+        xbee = XBee(badDevice)
+        
+        try:
+            xbee.wait_read_frame()
+        except Exception:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            self.fail("".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
 
 if __name__ == '__main__':
     unittest.main()
