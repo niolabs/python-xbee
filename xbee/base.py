@@ -19,7 +19,7 @@ class ThreadQuitException(Exception):
     pass
     
 class CommandFrameException(KeyError):
-	pass
+    pass
 
 class XBeeBase(threading.Thread):
     """
@@ -127,13 +127,13 @@ class XBeeBase(threading.Thread):
 
                 # Save all following bytes, if they are not empty
                 if len(byte) == 1:
-					frame.fill(byte)
-					
+                    frame.fill(byte)
+                    
                 while(frame.remaining_bytes() > 0):
-					byte = self.serial.read()
-					
-					if len(byte) == 1:
-						frame.fill(byte)
+                    byte = self.serial.read()
+                    
+                    if len(byte) == 1:
+                        frame.fill(byte)
 
                 try:
                     # Try to parse and return result
@@ -217,12 +217,12 @@ class XBeeBase(threading.Thread):
         except AttributeError:
             raise NotImplementedError("API response specifications could not be found; use a derived class which defines 'api_responses'.")
         except KeyError:
-			# Check to see if this ID can be found among transmittible packets
+            # Check to see if this ID can be found among transmittible packets
             for cmd_name, cmd in list(self.api_commands.items()):
                 if cmd[0]['default'] == data[0:1]:
                     raise CommandFrameException("Incoming frame with id %s looks like a command frame of type '%s' (these should not be received). Are you sure your devices are in API mode?"
-							% (data[0], cmd_name))
-			
+                            % (data[0], cmd_name))
+            
             raise KeyError(
                 "Unrecognized response packet with id byte {0}".format(data[0]))
         
