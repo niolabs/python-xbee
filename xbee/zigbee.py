@@ -113,8 +113,8 @@ class ZigBee(XBeeBase):
                              {'name':'options',         'len':1},
                              {'name':'samples',         'len':None}],
                          'parsing': [('samples', 
-									  lambda xbee,original: xbee._parse_samples(original['samples'])
-									 )]},
+                                      lambda xbee,original: xbee._parse_samples(original['samples'])
+                                     )]},
                      b"\x8b":
                         {'name':'tx_status',
                          'structure':
@@ -144,7 +144,7 @@ class ZigBee(XBeeBase):
                              {'name':'status',          'len':1},
                              {'name':'parameter',       'len':None}],
                           'parsing': [('parameter',
-									   lambda self, original: self._parse_IS_at_response(original))]
+                                       lambda self, original: self._parse_IS_at_response(original))]
                              },
                      b"\x95":
                         {'name':'node_id_indicator',
@@ -163,14 +163,14 @@ class ZigBee(XBeeBase):
                      }
     
     def _parse_IS_at_response(self, packet_info):
-		"""
-		If the given packet is a successful remote AT response for an IS
-		command, parse the parameter field as IO data.
-		"""
-		if packet_info['id'] in ('at_response','remote_at_response') and packet_info['status'] == b'\x00':
-			   return self._parse_samples(packet_info['parameter'])
-		else:
-			return packet_info['parameter']
+        """
+        If the given packet is a successful remote AT response for an IS
+        command, parse the parameter field as IO data.
+        """
+        if packet_info['id'] in ('at_response','remote_at_response') and packet_info['status'] == b'\x00':
+               return self._parse_samples(packet_info['parameter'])
+        else:
+            return packet_info['parameter']
     
     def __init__(self, *args, **kwargs):
         # Call the super class constructor to save the serial port
