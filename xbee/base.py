@@ -277,9 +277,11 @@ class XBeeBase(threading.Thread):
         # Apply parsing rules if any exist
         if 'parsing' in packet:
             for parse_rule in packet['parsing']:
-                # Apply the parse function to the indicated field and 
-                # replace the raw data with the result
-                info[parse_rule[0]] = parse_rule[1](self, info)                                                                                   
+                # Only apply a rule if it is relevant (raw data is available)
+                if parse_rule[0] in info:
+                    # Apply the parse function to the indicated field and 
+                    # replace the raw data with the result
+                    info[parse_rule[0]] = parse_rule[1](self, info)                                                                                   
             
         return info
         

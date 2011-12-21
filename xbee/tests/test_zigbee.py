@@ -93,6 +93,24 @@ class TestZigBee(unittest.TestCase):
         
         self.assertEqual(info, expected_info)
         
+    def test_parsing_may_encounter_field_which_does_not_exist(self):
+        """
+        Some fields are optional and may not exist; parsing should not crash
+        if/when they are not available.
+        """
+        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1aIS\x01'
+        info = self.zigbee._split_response(data)
+        expected_info = {
+            'id': 'remote_at_response',
+            'frame_id': b'A',
+            'source_addr_long': b'\x00\x13\xa2\x00@oG\xe4',
+            'source_addr': b'v\x1a',
+            'command': b'IS',
+            'status': b'\x01',
+        }
+        
+        self.assertEqual(info, expected_info)
+        
 
 class TestParseZigBeeIOData(unittest.TestCase):
     """
