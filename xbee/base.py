@@ -273,13 +273,13 @@ class XBeeBase(threading.Thread):
             raise ValueError(
                 "Response packet was longer than expected; expected: %d, got: %d bytes" % (index, 
                                                                                            len(data)))
-                
-        # Check if this packet was an IO sample
-        # If so, process the sample data
-        if 'parse_as_io_samples' in packet:
-            field_to_process = packet['parse_as_io_samples']
-            info[field_to_process] = self._parse_samples(
-                                        info[field_to_process])
+                                                                                           
+        # Apply parsing rules if any exist
+        if 'parsing' in packet:
+            for parse_rule in packet['parsing']:
+                # Apply the parse function to the indicated field and 
+                # replace the raw data with the result
+                info[parse_rule[0]] = parse_rule[1](self, info)                                                                                   
             
         return info
         

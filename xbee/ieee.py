@@ -72,7 +72,12 @@ class XBee(XBeeBase):
     #                [ {'name': name of field, 'len':length of field}
     #                  ...
     #                  ]
-    #            parse_as_io_samples:name of field to parse as io
+    #            parsing: [(name of field to parse,
+	#						function which accepts an xbee object and the
+	#							partially-parsed dictionary of data received
+	#							and returns bytes to replace the
+	#							field to parse's data with
+	#						)]},
     #           }
     #           ...
     #        }
@@ -98,7 +103,9 @@ class XBee(XBeeBase):
                              {'name':'rssi',            'len':1},
                              {'name':'options',         'len':1},
                              {'name':'samples',         'len':None}],
-                         'parse_as_io_samples':'samples'},
+                         'parsing': [('samples', 
+									  lambda xbee,original: xbee._parse_samples(original['samples'])
+									 )]},
                      b"\x83":
                         {'name':'rx_io_data',
                          'structure':
@@ -106,7 +113,9 @@ class XBee(XBeeBase):
                              {'name':'rssi',        'len':1},
                              {'name':'options',     'len':1},
                              {'name':'samples',     'len':None}],
-                         'parse_as_io_samples':'samples'},
+                         'parsing': [('samples',
+									  lambda xbee,original: xbee._parse_samples(original['samples'])
+									 )]},
                      b"\x89":
                         {'name':'tx_status',
                          'structure':

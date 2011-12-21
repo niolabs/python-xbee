@@ -122,7 +122,7 @@ class TestSplitResponse(InitXBee):
         try:
             self.xbee._split_response(data)
         except CommandFrameException:
-			# Passes
+            # Passes
             return
             
         # Test Fails
@@ -187,6 +187,28 @@ class TestSplitResponse(InitXBee):
                          'parameter':b'ABCDEF'}
         self.assertEqual(info, expected_info)
         
+    def test_generalized_packet_parsing(self):
+        """
+        _split_response should properly parse packets in a generalized
+        manner when specified by the protocol definition.
+        """
+        
+        # Temporarily add parsing rule
+        self.xbee.api_responses[b"\x88"]["parsing"] = [("parameter", lambda self,orig: b"GHIJKL")]
+        
+        data = b'\x88DMY\x01ABCDEF'
+        
+        info = self.xbee._split_response(data)
+        expected_info = {'id':'at_response',
+                         'frame_id':b'D',
+                         'command':b'MY',
+                         'status':b'\x01',
+                         'parameter':b'GHIJKL'}
+                         
+        # Remove all parsing rules
+        del(self.xbee.api_responses[b"\x88"]["parsing"])  
+                       
+        self.assertEqual(info, expected_info)
         
 class TestParseIOData(InitXBee):
     """
