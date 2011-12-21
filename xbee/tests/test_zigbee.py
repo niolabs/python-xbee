@@ -111,6 +111,30 @@ class TestZigBee(unittest.TestCase):
         
         self.assertEqual(info, expected_info)
         
+    def test_nd_at_response_parameter_parsed(self):
+        """
+        An at_response for an ND command must be parsed.
+        """
+        data = b'\x88AND\x00v\x1a\x00\x13\xa2\x00@oG\xe4ENDPOINT-1\x00\xff\xfe\x01\x00\xc1\x05\x10\x1e'
+        info = self.zigbee._split_response(data)
+        expected_info = {
+            'id': 'at_response',
+            'frame_id': b'A',
+            'command': b'ND',
+            'status': b'\x00',
+            'parameter': {'source_addr': b'\x76\x1a',
+                          'source_addr_long': b'\x00\x13\xa2\x00\x40\x6f\x47\xe4',
+                          'node_identifier': b'ENDPOINT-1',
+                          'parent_address': b'\xff\xfe',
+                          'device_type': b'\x01',
+                          'status': b'\x00',
+                          'profile_id': b'\xc1\x05',
+                          'manufacturer': b'\x10\x1e',
+                          }
+        }
+        
+        self.maxDiff = None
+        self.assertEqual(info, expected_info)
 
 class TestParseZigBeeIOData(unittest.TestCase):
     """

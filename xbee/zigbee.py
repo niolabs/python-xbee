@@ -133,7 +133,12 @@ class ZigBee(XBeeBase):
                             [{'name':'frame_id',    'len':1},
                              {'name':'command',     'len':2},
                              {'name':'status',      'len':1},
-                             {'name':'parameter',   'len':None}]},
+                             {'name':'parameter',   'len':None}],
+                         'parsing': [('parameter',
+                                       lambda self, original: self._parse_IS_at_response(original)),
+                                     ('parameter',
+                                       lambda self, original: self._parse_ND_at_response(original))]
+                             },
                      b"\x97": #Checked GDR (not sure about parameter, could be 4 bytes)
                         {'name':'remote_at_response',
                          'structure':
@@ -167,8 +172,41 @@ class ZigBee(XBeeBase):
         If the given packet is a successful remote AT response for an IS
         command, parse the parameter field as IO data.
         """
-        if packet_info['id'] in ('at_response','remote_at_response') and packet_info['status'] == b'\x00':
+        if packet_info['id'] in ('at_response','remote_at_response') and packet_info['command'] == b'IS' and packet_info['status'] == b'\x00':
                return self._parse_samples(packet_info['parameter'])
+        else:
+            return packet_info['parameter']
+            
+    def _parse_ND_at_response(self, packet_info):
+        """
+        If the given packet is a successful AT response for an ND
+        command, parse the parameter field.
+        """
+        if packet_info['id'] == 'at_response' and packet_info['command'] == b'ND' and packet_info['status'] == b'\x00':
+               result = {}
+               
+               # Parse each field directly
+               result['source_addr'] = packet_info['parameter'][0:2]
+               result['source_addr_long'] = packet_info['parameter'][2:10]
+               
+               # Parse the null-terminated node identifier field
+               null_terminator_index = 10
+               while packet_info['parameter'][null_terminator_index:null_terminator_index+1] != b'\x00':
+                   null_terminator_index += 1;
+               
+               # Parse each field thereafter directly    
+               result['node_identifier'] = packet_info['parameter'][10:null_terminator_index]
+               result['parent_address'] = packet_info['parameter'][null_terminator_index+1:null_terminator_index+3]
+               result['device_type'] = packet_info['parameter'][null_terminator_index+3:null_terminator_index+4]
+               result['status'] = packet_info['parameter'][null_terminator_index+4:null_terminator_index+5]
+               result['profile_id'] = packet_info['parameter'][null_terminator_index+5:null_terminator_index+7]
+               result['manufacturer'] = packet_info['parameter'][null_terminator_index+7:null_terminator_index+9]
+               
+               # Simple check to ensure a good parse
+               if null_terminator_index+9 != len(packet_info['parameter']):
+                   raise ValueError("Improper ND response length: expected {0}, read {1} bytes".format(len(packet_info['parameter']), null_terminator_index+9))
+               
+               return result
         else:
             return packet_info['parameter']
     
