@@ -112,7 +112,9 @@ class ZigBee(XBeeBase):
                              {'name':'source_addr',     'len':2},
                              {'name':'options',         'len':1},
                              {'name':'samples',         'len':None}],
-                         'parse_as_io_samples':'samples'},
+                         'parsing': [('samples', 
+									  lambda xbee,original: xbee._parse_samples(original['samples'])
+									 )]},
                      b"\x8b":
                         {'name':'tx_status',
                          'structure':
