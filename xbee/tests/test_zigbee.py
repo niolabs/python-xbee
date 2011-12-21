@@ -69,6 +69,30 @@ class TestZigBee(unittest.TestCase):
             }
             
             self.assertEqual(info, expected_info)
+    
+    def test_is_remote_at_response_parameter_parsed_as_io_samples(self):
+        """
+        A remote AT command of IS, to take a sample immediately and respond
+        with the results, must be appropriately parsed for IO data.
+        """
+        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1aIS\x00\x01\x1c\xc0\x06\x18\x00\x02\x8c\x03\x96'
+        info = self.zigbee._split_response(data)
+        expected_info = {
+            'id': 'remote_at_response',
+            'frame_id': b'A',
+            'source_addr_long': b'\x00\x13\xa2\x00@oG\xe4',
+            'source_addr': b'v\x1a',
+            'command': b'IS',
+            'status': b'\x00',
+            'parameter': [{'dio-10': False, 
+                           'adc-2': 918, 
+                           'dio-6': False, 
+                           'dio-11': True, 
+                           'adc-1': 652}]
+        }
+        
+        self.assertEqual(info, expected_info)
+        
 
 class TestParseZigBeeIOData(unittest.TestCase):
     """
