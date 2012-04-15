@@ -59,7 +59,6 @@ class XBeeBase(threading.Thread):
         if callback:
             self._callback = callback
             self._thread_continue = True
-            self._thread_quit = threading.Event()
             self.start()
 
     def halt(self):
@@ -72,7 +71,7 @@ class XBeeBase(threading.Thread):
         """
         if self._callback:
             self._thread_continue = False
-            self._thread_quit.wait()
+            self.join()
         
     def _write(self, data):
         """
@@ -96,7 +95,6 @@ class XBeeBase(threading.Thread):
                 self._callback(self.wait_read_frame())
             except ThreadQuitException:
                 break
-        self._thread_quit.set()
     
     def _wait_for_frame(self):
         """
