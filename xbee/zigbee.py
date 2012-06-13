@@ -172,7 +172,7 @@ class ZigBee(XBeeBase):
         If the given packet is a successful remote AT response for an IS
         command, parse the parameter field as IO data.
         """
-        if packet_info['id'] in ('at_response','remote_at_response') and packet_info['command'] == b'IS' and packet_info['status'] == b'\x00':
+        if packet_info['id'] in ('at_response','remote_at_response') and packet_info['command'].lower() == b'is' and packet_info['status'] == b'\x00':
                return self._parse_samples(packet_info['parameter'])
         else:
             return packet_info['parameter']
@@ -182,7 +182,7 @@ class ZigBee(XBeeBase):
         If the given packet is a successful AT response for an ND
         command, parse the parameter field.
         """
-        if packet_info['id'] == 'at_response' and packet_info['command'] == b'ND' and packet_info['status'] == b'\x00':
+        if packet_info['id'] == 'at_response' and packet_info['command'].lower() == b'nd' and packet_info['status'] == b'\x00':
                result = {}
                
                # Parse each field directly

@@ -93,6 +93,29 @@ class TestZigBee(unittest.TestCase):
         
         self.assertEqual(info, expected_info)
         
+    def test_lowercase_is_remote_at_response_parameter_parsed_as_io_samples(self):
+        """
+        A remote AT command of lowercase is, to take a sample immediately and respond
+        with the results, must be appropriately parsed for IO data.
+        """
+        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1ais\x00\x01\x1c\xc0\x06\x18\x00\x02\x8c\x03\x96'
+        info = self.zigbee._split_response(data)
+        expected_info = {
+            'id': 'remote_at_response',
+            'frame_id': b'A',
+            'source_addr_long': b'\x00\x13\xa2\x00@oG\xe4',
+            'source_addr': b'v\x1a',
+            'command': b'is',
+            'status': b'\x00',
+            'parameter': [{'dio-10': False, 
+                           'adc-2': 918, 
+                           'dio-6': False, 
+                           'dio-11': True, 
+                           'adc-1': 652}]
+        }
+        
+        self.assertEqual(info, expected_info)
+        
     def test_parsing_may_encounter_field_which_does_not_exist(self):
         """
         Some fields are optional and may not exist; parsing should not crash
@@ -133,7 +156,30 @@ class TestZigBee(unittest.TestCase):
                           }
         }
         
-        self.maxDiff = None
+        self.assertEqual(info, expected_info)
+        
+    def test_lowercase_nd_at_response_parameter_parsed(self):
+        """
+        An at_response for a lowercase nd command must be parsed.
+        """
+        data = b'\x88And\x00v\x1a\x00\x13\xa2\x00@oG\xe4ENDPOINT-1\x00\xff\xfe\x01\x00\xc1\x05\x10\x1e'
+        info = self.zigbee._split_response(data)
+        expected_info = {
+            'id': 'at_response',
+            'frame_id': b'A',
+            'command': b'nd',
+            'status': b'\x00',
+            'parameter': {'source_addr': b'\x76\x1a',
+                          'source_addr_long': b'\x00\x13\xa2\x00\x40\x6f\x47\xe4',
+                          'node_identifier': b'ENDPOINT-1',
+                          'parent_address': b'\xff\xfe',
+                          'device_type': b'\x01',
+                          'status': b'\x00',
+                          'profile_id': b'\xc1\x05',
+                          'manufacturer': b'\x10\x1e',
+                          }
+        }
+        
         self.assertEqual(info, expected_info)
 
 class TestParseZigBeeIOData(unittest.TestCase):
