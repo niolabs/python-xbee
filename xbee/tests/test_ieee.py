@@ -630,6 +630,23 @@ class TestReadFromDevice(unittest.TestCase):
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             self.fail("".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
+            
+    def test_read_at_params_in_escaped_mode(self):
+        """
+        read and parse an AT command with a parameter in escaped API mode
+        """
+        device = FakeReadDevice(
+            b'~\x00\t\x88DMY\x01}^}]}1}3m'
+        )
+        xbee = XBee(device, escaped=True)
+        
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'at_response',
+                         'frame_id':b'D',
+                         'command':b'MY',
+                         'status':b'\x01',
+                         'parameter':b'\x7E\x7D\x11\x13'}
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()
