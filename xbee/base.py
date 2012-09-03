@@ -356,7 +356,7 @@ class XBeeBase(threading.Thread):
                         
             for i in aio_chans:
                 # only first 10 bits are significant
-                analog_sample = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0)) & 0x03FF
+                analog_sample = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0))
                 tmp_samples['adc-{0}'.format(i)] = analog_sample
             
             samples.append(tmp_samples)

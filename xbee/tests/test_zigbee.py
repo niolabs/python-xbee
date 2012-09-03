@@ -198,3 +198,22 @@ class TestParseZigBeeIOData(unittest.TestCase):
                                  'adc-3': 518}]
             results = self.zigbee._parse_samples(data)
             self.assertEqual(results, expected_results)
+            
+    def test_parse_dio_adc_supply_voltage_not_clamped(self):
+        """
+        When bit 7 on the ADC mask is set, the supply voltage is included
+        in the ADC I/O sample section. This sample may exceed 10 bits of
+        precision, even though all other ADC channels are limited to a
+        range of 0-1.2v with 10 bits of precision. I assume that a voltage
+        divider and the firmware is used internally to compute the actual
+        Vcc voltage.
+        
+        Therefore, the I/O sampling routine must not clamp this ADC
+        channel to 10 bits of precision.
+        """ 
+        data = b'\x01\x00\x00\x80\x0D\x18'
+        expected_results = [{'adc-7':0xD18}]
+        #import pdb
+        #pdb.set_trace()
+        results = self.zigbee._parse_samples(data)
+        self.assertEqual(results, expected_results)
