@@ -136,6 +136,12 @@ class XBeeBase(threading.Thread):
                 try:
                     # Try to parse and return result
                     frame.parse()
+                    
+                    # Ignore empty frames
+                    if len(frame.data) == 0:
+                        frame = APIFrame()
+                        continue
+                        
                     return frame
                 except ValueError:
                     # Bad frame, so restart

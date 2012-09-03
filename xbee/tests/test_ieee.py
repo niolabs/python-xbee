@@ -647,6 +647,22 @@ class TestReadFromDevice(unittest.TestCase):
                          'status':b'\x01',
                          'parameter':b'\x7E\x7D\x11\x13'}
         self.assertEqual(info, expected_info)
+        
+    def test_empty_frame_ignored(self):
+        """
+        If an empty frame is received from a device, it must be ignored.
+        """
+        device = FakeReadDevice(b'\x7E\x00\x00\xFF\x7E\x00\x05\x88DMY\x01\x8c')
+        xbee = XBee(device)
+        
+        #import pdb
+        #pdb.set_trace()
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'at_response',
+                         'frame_id':b'D',
+                         'command':b'MY',
+                         'status':b'\x01'}
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()
