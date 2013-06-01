@@ -512,6 +512,15 @@ class TestSendShorthand(unittest.TestCase):
         expected_data = b'\x7E\x00\x06\x08AMY\x00\x00\x10'
         self.assertEqual(self.ser.data, expected_data)
         
+    def test_send_tx_with_close_brace(self):
+        """
+        Calling tx where the given data string includes a close brace '}'
+        must write correctly.
+        """
+        self.xbee.tx(dest_addr=b'\x01\x02',data=b'{test=1}')
+        expected_data = b'\x7E\x00\x0D\x01\x00\x01\x02\x00{test=1}\xD5'
+        self.assertEqual(self.ser.data, expected_data)
+        
     def test_shorthand_disabled(self):
         """
         When shorthand is disabled, any attempt at calling a 
