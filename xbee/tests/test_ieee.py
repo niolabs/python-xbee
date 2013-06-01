@@ -739,6 +739,38 @@ class TestReadFromDevice(unittest.TestCase):
                          'command':b'MY',
                          'status':b'\x01'}
         self.assertEqual(info, expected_info)
+        
+    def test_read_rx_with_close_brace(self):
+        """
+        An rx data frame including a close brace must be read properly.
+        """
+        device = FakeReadDevice(APIFrame(b'\x81\x01\x02\x55\x00{test=1}').output())
+        xbee = XBee(device)
+        
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'rx',
+                         'source_addr':b'\x01\x02',
+                         'rssi':b'\x55',
+                         'options':b'\x00',
+                         'rf_data':b'{test=1}'}
+        self.assertEqual(info, expected_info)
+        
+    def test_read_rx_with_close_brace_escaped(self):
+        """
+        An escaped rx data frame including a close brace must be read properly.
+        """
+        device = FakeReadDevice(
+            APIFrame(b'\x81\x01\x02\x55\x00{test=1}', escaped=True).output()
+        )
+        xbee = XBee(device, escaped=True)
+        
+        info = xbee.wait_read_frame()
+        expected_info = {'id':'rx',
+                         'source_addr':b'\x01\x02',
+                         'rssi':b'\x55',
+                         'options':b'\x00',
+                         'rf_data':b'{test=1}'}
+        self.assertEqual(info, expected_info)
 
 if __name__ == '__main__':
     unittest.main()
