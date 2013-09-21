@@ -233,7 +233,7 @@ class ZigBee(XBeeBase):
         sample_count = byteToInt(io_bytes[0])
         
         # bytes 1 and 2 are the DIO mask; bits 9 and 8 aren't used
-        dio_mask = (byteToInt(io_bytes[1]) << 8 | byteToInt(io_bytes[2])) & 0x0E7F
+        dio_mask = (byteToInt(io_bytes[1]) << 8 | byteToInt(io_bytes[2])) & 0x1CFF
         
         # byte 3 is the AIO mask
         aio_mask = byteToInt(io_bytes[3])
