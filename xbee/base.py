@@ -48,13 +48,15 @@ class XBeeBase(threading.Thread):
                  XBee device's documentation for more information.
     """
 
-    def __init__(self, ser, shorthand=True, callback=None, escaped=False):
+    def __init__(self, ser, shorthand=True, callback=None, escaped=False,
+                 error_callback=None):
         super(XBeeBase, self).__init__()
         self.serial = ser
         self.shorthand = shorthand
         self._callback = None
         self._thread_continue = False
         self._escaped = escaped
+        self._error_callback = error_callback
 
         if callback:
             self._callback = callback
@@ -94,6 +96,12 @@ class XBeeBase(threading.Thread):
             try:
                 self._callback(self.wait_read_frame())
             except ThreadQuitException:
+                # Expected termintation of thread due to self.halt()
+                break
+            except Exception as e:
+                # Unexpected thread quit.
+                if self._error_callback:
+                    self._error_callback(e)
                 break
 
     def _wait_for_frame(self):
