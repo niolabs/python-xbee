@@ -46,6 +46,11 @@ class XBeeBase(threading.Thread):
                  in accordance with the XBee API. This setting must match
                  the appropriate api_mode setting of an XBee device; see your
                  XBee device's documentation for more information.
+
+        error_callback: function which should be called with an Exception
+                 whenever an exception is raised while waiting for data from
+                 the serial port. This will only take affect if the callback
+                 argument is also used.
     """
 
     def __init__(self, ser, shorthand=True, callback=None, escaped=False,
