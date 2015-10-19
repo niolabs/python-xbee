@@ -4,7 +4,7 @@ XBee
 XBee provides an implementation of the XBee serial communication API. It
 allows one to easily access advanced features of one or more XBee
 devices from an application written in Python. An example use case might
-look like this::
+look like this:
 
 ```python
 #! /usr/bin/python
@@ -35,7 +35,7 @@ Installation
 ============
 
 Extract the source code to your computer, then run the following command
-in the root of the source tree::
+in the root of the source tree:
 
 ```
 python setup.py install
@@ -44,7 +44,7 @@ python setup.py install
 This will automatically test and install the package for you. 
 
 Additionally, one may run this package's automated tests at any time
-by executing::
+by executing:
 
 ```
 python setup.py test
