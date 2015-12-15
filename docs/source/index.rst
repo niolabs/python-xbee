@@ -24,7 +24,8 @@ raw communication details.
     This library is compatible with both XBee 802.15.4 (Series 1)
     and XBee ZigBee (Series 2) modules, normal and PRO. The following
     examples are applicable to XBee 802.15.4 modules; to follow
-    these examples with a XBee ZigBee device, change the line::
+    these examples with a XBee ZigBee device or a Series 1 device loaded 
+    with Digimesh firmware, change the line::
         
         xbee = XBee(serial_port)
 
