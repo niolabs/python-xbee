@@ -11,28 +11,35 @@ look like this:
     #! /usr/bin/python
 
     # Import and init an XBee device
-    from xbee import XBee,ZigBee
+    from xbee import XBee, ZigBee
     import serial
 
     ser = serial.Serial('/dev/ttyUSB0', 9600)
 
     # Use an XBee 802.15.4 device
-    # To use with an XBee ZigBee device, replace with:
-    #xbee = ZigBee(ser)
     xbee = XBee(ser)
+    # To use with an XBee ZigBee device, replace with:
+    # xbee = ZigBee(ser)
 
     # Set remote DIO pin 2 to low (mode 4)
     xbee.remote_at(
-        dest_addr='\x56\x78',
+        dest_addr=b'\x56\x78',
         command='D2',
-        parameter='\x04')
+        parameter=b'\x04')
 
     xbee.remote_at(
-        dest_addr='\x56\x78',
+        dest_addr=b'\x56\x78',
         command='WR')
 
 Installation
 ============
+
+::
+
+    pip install xbee
+
+Install from Source
+-------------------
 
 Extract the source code to your computer, then run the following command
 in the root of the source tree:
@@ -62,9 +69,7 @@ order to force the installation to proceed. Do so at your own risk.
 Documentation
 =============
 
-See the python-xbee project on Google Code
-(https://code.google.com/p/python-xbee/downloads/list) for the latest
-documentation.
+See the python-xbee project on [Read the Docs](http://python-xbee.readthedocs.org/en/latest/).
 
 To build the documentation yourself, ensure that Sphynx
 (http://sphinx.pocoo.org/) is installed. Then cd into the docs folder,
@@ -95,8 +100,10 @@ supported and may result in unspecified behavior.
 Contributors
 ============
 
-Paul Malmsten pmalmsten@gmail.com Greg Rapp gdrapp@gmail.com Brian
-blalor@bravo5.org Chris Brackert cbrackert@gmail.com
+* Paul Malmsten pmalmsten@gmail.com
+* Greg Rapp gdrapp@gmail.com
+* Brian blalor@bravo5.org
+* Chris Brackert cbrackert@gmail.com
 
 Special Thanks
 ==============
