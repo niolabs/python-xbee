@@ -53,10 +53,10 @@ This will automatically install the package for you.
 Documentation
 =============
 
-See the python-xbee project on [Read the Docs](http://python-xbee.readthedocs.org/en/latest/).
+See the python-xbee project on `Read the Docs <https://python-xbee.readthedocs.io/en/latest/>`_.
 
-To build the documentation yourself, ensure that Sphynx
-(http://sphinx.pocoo.org/) is installed. Then cd into the docs folder,
+To build the documentation yourself, ensure that `Sphinx
+<http://sphinx-doc.org/>`_ is installed. Then cd into the docs folder,
 and run ‘make html’. The documentation can then be opened in any modern
 web browser at docs/build/html/index.html.
 
@@ -71,8 +71,9 @@ PySerial
 Additional Dependencies
 -----------------------
 
-To run automated tests: Nose (https://github.com/nose-devs/nose/) To
-build the documentation: Sphinx (http://sphinx.pocoo.org/)
+To run automated tests: `Nose <https://github.com/nose-devs/nose/>`_
+
+To build the documentation: `Sphinx <http://sphinx-doc.org/>`_
 
 XBee Firmware
 -------------
