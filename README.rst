@@ -87,7 +87,7 @@ PySerial
 Additional Dependencies
 -----------------------
 
-To run automated tests: Nose (https://code.google.com/p/python-nose/) To
+To run automated tests: Nose (https://github.com/nose-devs/nose/) To
 build the documentation: Sphinx (http://sphinx.pocoo.org/)
 
 XBee Firmware
