@@ -48,31 +48,15 @@ in the root of the source tree:
 
     python setup.py install
 
-This will automatically test and install the package for you.
-
-Additionally, one may run this package’s automated tests at any time by
-executing:
-
-::
-
-    python setup.py test
-
-If a Test Fails
----------------
-
-If an automated test fails, the installation will be halted to prevent
-one from using a potentially broken build.
-
-In this event, one may comment out the ‘strict’ flag in setup.cfg in
-order to force the installation to proceed. Do so at your own risk.
+This will automatically install the package for you.
 
 Documentation
 =============
 
-See the python-xbee project on [Read the Docs](http://python-xbee.readthedocs.org/en/latest/).
+See the python-xbee project on `Read the Docs <https://python-xbee.readthedocs.io/en/latest/>`_.
 
-To build the documentation yourself, ensure that Sphynx
-(http://sphinx.pocoo.org/) is installed. Then cd into the docs folder,
+To build the documentation yourself, ensure that `Sphinx
+<http://sphinx-doc.org/>`_ is installed. Then cd into the docs folder,
 and run ‘make html’. The documentation can then be opened in any modern
 web browser at docs/build/html/index.html.
 
@@ -87,8 +71,9 @@ PySerial
 Additional Dependencies
 -----------------------
 
-To run automated tests: Nose (https://code.google.com/p/python-nose/) To
-build the documentation: Sphinx (http://sphinx.pocoo.org/)
+To run automated tests: `Nose <https://github.com/nose-devs/nose/>`_
+
+To build the documentation: `Sphinx <http://sphinx-doc.org/>`_
 
 XBee Firmware
 -------------
