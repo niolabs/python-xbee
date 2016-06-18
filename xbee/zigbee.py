@@ -63,7 +63,7 @@ class ZigBee(XBeeBase):
                         [{'name':'id',              'len':1,        'default':b'\x11'},
                          {'name':'frame_id',        'len':1,        'default':b'\x00'},
                          {'name':'dest_addr_long',  'len':8,        'default':None},
-                         {'name':'dest_addr',       'len':2,        'default':None},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
                          {'name':'src_endpoint',    'len':1,        'default':None},
                          {'name':'dest_endpoint',   'len':1,        'default':None},
                          {'name':'cluster',         'len':2,        'default':None},
