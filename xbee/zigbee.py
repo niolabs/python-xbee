@@ -94,6 +94,14 @@ class ZigBee(XBeeBase):
                              {'name':'source_addr',     'len':2},
                              {'name':'options',         'len':1},
                              {'name':'rf_data',         'len':None}]},
+                     b"\xa1":
+                        {'name':'route_record_indicator',
+                         'structure':
+                            [{'name':'source_addr_long','len':8},
+                             {'name':'source_addr',     'len':2},
+                             {'name':'options',         'len':1},
+                             {'name':'number_addresses','len':1},
+                             {'name':'addresses',       'len':None}]},
                      b"\x91":
                         {'name':'rx_explicit',
                          'structure':
@@ -166,7 +174,7 @@ class ZigBee(XBeeBase):
                              {'name':'digi_profile_id', 'len':2},
                              {'name':'manufacturer_id', 'len':2}]}
                      }
-    
+
     def _parse_IS_at_response(self, packet_info):
         """
         If the given packet is a successful remote AT response for an IS
