@@ -94,7 +94,7 @@ class ZigBee(XBeeBase):
                              {'name':'source_addr',     'len':2},
                              {'name':'options',         'len':1},
                              {'name':'rf_data',         'len':None}]},
-                     b"\xa1":
+                     b"\xa1": # See http://ftp1.digi.com/support/documentation/90002002.pdf
                         {'name':'route_record_indicator',
                          'structure':
                             [{'name':'source_addr_long','len':8},
@@ -147,7 +147,7 @@ class ZigBee(XBeeBase):
                                      ('parameter',
                                        lambda self, original: self._parse_ND_at_response(original))]
                              },
-                     b"\x97": #Checked GDR (not sure about parameter, could be 4 bytes)
+                     b"\x97": # Checked GDR (not sure about parameter, could be 4 bytes)
                         {'name':'remote_at_response',
                          'structure':
                             [{'name':'frame_id',        'len':1},
