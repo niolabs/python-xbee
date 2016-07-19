@@ -99,8 +99,8 @@ class ZigBee(XBeeBase):
                          'structure':
                             [{'name':'source_addr_long','len':8},
                              {'name':'source_addr',     'len':2},
-                             {'name':'options',         'len':1},
-                             {'name':'number_addresses','len':1},
+                             {'name':'receive_options', 'len':1},
+                             {'name':'hop_count',       'len':1},
                              {'name':'addresses',       'len':None}]},
                      b"\x91":
                         {'name':'rx_explicit',
