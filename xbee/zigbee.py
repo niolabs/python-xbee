@@ -45,8 +45,7 @@ class ZigBee(XBeeBase):
                     "remote_at":
                         [{'name':'id',              'len':1,        'default':b'\x17'},
                          {'name':'frame_id',        'len':1,        'default':b'\x00'},
-                         # dest_addr_long is 8 bytes (64 bits), so use an unsigned long long
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>Q', 0)},
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
                          {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
                          {'name':'options',         'len':1,        'default':b'\x02'},
                          {'name':'command',         'len':2,        'default':None},
@@ -54,16 +53,16 @@ class ZigBee(XBeeBase):
                     "tx":
                         [{'name':'id',              'len':1,        'default':b'\x10'},
                          {'name':'frame_id',        'len':1,        'default':b'\x01'},
-                         {'name':'dest_addr_long',  'len':8,        'default':None},
-                         {'name':'dest_addr',       'len':2,        'default':None},
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
                          {'name':'broadcast_radius','len':1,        'default':b'\x00'},
                          {'name':'options',         'len':1,        'default':b'\x00'},
                          {'name':'data',            'len':None,     'default':None}],
                     "tx_explicit":
                         [{'name':'id',              'len':1,        'default':b'\x11'},
                          {'name':'frame_id',        'len':1,        'default':b'\x00'},
-                         {'name':'dest_addr_long',  'len':8,        'default':None},
-                         {'name':'dest_addr',       'len':2,        'default':None},
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
                          {'name':'src_endpoint',    'len':1,        'default':None},
                          {'name':'dest_endpoint',   'len':1,        'default':None},
                          {'name':'cluster',         'len':2,        'default':None},
