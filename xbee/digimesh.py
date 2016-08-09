@@ -42,7 +42,7 @@ class DigiMesh(XBeeBase):
                          {'name':'frame_id',  'len':1,      'default':'\x00'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
-                    #explicit adrresing command frame - to do!
+                    # todo: explicit adrresing command frame
                     "remote_at":
                         [{'name':'id',              'len':1,        'default':'\x17'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
@@ -103,14 +103,14 @@ class DigiMesh(XBeeBase):
                              {'name':'reserved',    'len':2},
                              {'name':'options',     'len':1},
                              {'name':'data',        'len':None}]},
-                    # b"\x91": to do!
-                    #    {'name':'explicit_rx_indicator',
-                    #     'structure':
-                    #        [{'name':'source_addr', 'len':2},
-                    #         {'name':'rssi',        'len':1},
-                    #         {'name':'options',     'len':1},
-                    #         {'name':'rf_data',     'len':None}]},
-                    # b"\x92": data sample rx indicator {}
+                     # todo: Explicit RX Indicator
+                     # b"\x91":
+                     #    {'name':'explicit_rx_indicator',
+                     #     'structure':
+                     #        [{'name':'source_addr', 'len':2},
+                     #         {'name':'rssi',        'len':1},
+                     #         {'name':'options',     'len':1},
+                     #         {'name':'rf_data',     'len':None}]},
                      b"\x95":
                         {'name':'node_id',
                          'structure':
