@@ -42,7 +42,7 @@ class DigiMesh(XBeeBase):
                          {'name':'frame_id',  'len':1,      'default':'\x00'},
                          {'name':'command',   'len':2,      'default':None},
                          {'name':'parameter', 'len':None,   'default':None}],
-                    # todo: explicit adrresing command frame
+                    # todo: Explicit Adrresing Command Frame
                     "remote_at":
                         [{'name':'id',              'len':1,        'default':'\x17'},
                          {'name':'frame_id',        'len':1,        'default':'\x00'},
