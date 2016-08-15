@@ -243,6 +243,6 @@ class TestParseZigBeeIOData(unittest.TestCase):
         channel to 10 bits of precision.
         """ 
         data = b'\x01\x00\x00\x80\x0D\x18'
-        expected_results = [{'adc-7':280}]
+        expected_results = [{'adc-7':0xD18}]
         results = self.zigbee._parse_samples(data)
         self.assertEqual(results, expected_results)

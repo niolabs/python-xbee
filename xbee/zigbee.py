@@ -150,7 +150,7 @@ class ZigBee(XBeeBase):
                           'parsing': [('parameter',
                                        lambda self, original: self._parse_IS_at_response(original))]
                              },
-                     b"\xa1": # See http://www.digi.com/resources/documentation/digidocs/pdfs/90002002.pdf
+                     b"\xa1": # See http://ftp1.digi.com/support/documentation/90002002.pdf
                         {'name':'route_record_indicator',
                          'structure':
                             [{'name':'source_addr_long','len':8},
