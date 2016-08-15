@@ -1,5 +1,5 @@
 """
-xbee.py
+base.py
 
 By Paul Malmsten, 2010
 Inspired by code written by Amit Synderman and Marco Sangalli
@@ -107,7 +107,9 @@ class XBeeBase(threading.Thread):
                 # Unexpected thread quit.
                 if self._error_callback:
                     self._error_callback(e)
-                break
+                # Do not break on error as this is not thread safe
+                # See: http://axotron.se/blog/problems-with-python-xbee-2-2-3-package/
+                # break
 
     def _wait_for_frame(self):
         """
