@@ -1,6 +1,6 @@
 #! /usr/bin/python
 """
-test_xbee.py
+test_base.py
 
 By Paul Malmsten, 2010
 pmalmsten@gmail.com
