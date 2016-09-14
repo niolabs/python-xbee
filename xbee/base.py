@@ -107,7 +107,7 @@ class XBeeBase(threading.Thread):
                 # Unexpected thread quit.
                 if self._error_callback:
                     self._error_callback(e)
-                break
+
 
     def _wait_for_frame(self):
         """
