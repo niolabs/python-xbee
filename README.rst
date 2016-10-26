@@ -1,6 +1,9 @@
 XBee
 ====
 
+.. image:: https://travis-ci.org/nioinnovation/python-xbee.svg?branch=master
+    :target: https://travis-ci.org/nioinnovation/python-xbee
+
 XBee provides an implementation of the XBee serial communication API. It
 allows one to easily access advanced features of one or more XBee
 devices from an application written in Python. An example use case might
