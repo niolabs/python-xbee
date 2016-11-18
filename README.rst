@@ -60,7 +60,7 @@ To build the documentation yourself, ensure that `Sphinx
 and run ‘make html’. The documentation can then be opened in any modern
 web browser at docs/build/html/index.html.
 
-For more information about building or modifying this project’s
+For more information about building or modifying this project's
 documentation, see the documentation for the Sphinx project.
 
 Dependencies
