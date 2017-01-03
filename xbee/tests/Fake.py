@@ -27,7 +27,7 @@ class Serial(object):
         self.stopbits = stopbits
         self.xonxoff  = xonxoff
         self.rtscts   = rtscts
-        self._isOpen  = True        
+        self._is_open = True        
         
         self._data_written = ""
         self._read_data    = ""
@@ -94,7 +94,7 @@ class Serial(object):
             'stopbits' : self.stopbits, 
             'xonxoff'  : self.xonxoff, 
             'rtscts'   : self.rtscts 
-        };
+        }
         return settings
 
     def set_read_data( self, data ):
@@ -120,7 +120,7 @@ class Serial(object):
         Returns a string representation of the serial class.
         """
         return  "Serial<id=0xa81c10, open=%s>( port='%s', baudrate=%d," \
-               % ( str(self.is_open), self.port, self.baudrate ) \
+               % ( str(self._is_open), self.port, self.baudrate ) \
                + " bytesize=%d, parity='%s', stopbits=%d, xonxoff=%d, rtscts=%d)"\
                % ( self.bytesize, self.parity, self.stopbits, self.xonxoff,
                    self.rtscts )
