@@ -96,4 +96,6 @@ Contributors
 Special Thanks
 ==============
 
-Amit Synderman, Marco Sangalli
+* Amit Synderman
+* Marco Sangalli
+* James Saunders

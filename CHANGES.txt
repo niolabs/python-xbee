@@ -1,96 +1,103 @@
-v1.5.0, 6/27/10 -- Initial Packaging. Fully restructured into a unified API with tests.
-v1.7.0  6/29/10 -- Now supports both Series 1 and Series 2 modules 
-                   (the API turned out to be the same). Additionally:
-                   * API frame logic was split into its own class, APIFrame
-                   * XBee renamed to XBeeBase
-                   * XBee1 renamed to XBee
-                   * Tests updated to reflect changes; API frame tests
-                     moved to test_frame.py, now test APIFrame instead of
-                     XBee base class
-                   * Test files renamed appropriately
-                   * PyLint score improved
-                   * Various docstring updates
-                   * Updated example code to reflect changes
-v1.7.1 7/7/2010 -- Bug fix: Now supports receiving I/O data with 64-bit addressing
-                   * Previously, an exception was raised when a packet with ID 0x82
-                   * arrived, which contains I/O samples with a 64-bit source address
-                   * This has been fixed.
-v1.8.0  7/8/10  -- Implemented threading support
-                   * If a callback method is given to the XBeeBase constructor,
-                     a new thread will automatically be spawned. This thread
-                     will read from the serial port and call the given callback
-                     method whenever a valid data packet arrives.
-                   * XBeeBase.halt() was added. This method ensures the proper
-                     shutdown of a separate thread if one has been spawned.
-                     This method must be called before closing the serial
-                     port used by an XBee instance in order to prevent
-                     improper use of the serial port.
-v1.9.0  7/10/10 -- Implemented Dispatch helper as xbee.helpers.dispatch
-                   * Dispatch allows one to filter incoming packets
-                     between one or more handler functions. This simplifies
-                     application logic which must handle more than one
-                     packet type.
-                   Automated tests are now run as a part of the build process
-                   * nose must be installed for this feature to operate.
-                     If it is not installed, the tests will be skipped
-                     and a warning will be generated.
-                   * A 'test' command has been added to setup.py
-v1.9.1  8/11/10 -- Added support for I/O sample data packet with 64-bit
-                     addressing.
-                   Fixed bug where threading.Thread library was not
-                     properly initalized in all use cases.
-                   Added initial documentation.
-                   Properly included distutils_extensions.py in source
-                     distribution archives
-v1.9.2  8/19/10 -- Fixed bug where _write() call on a serial object
-                     should have been write()
-v2.0.0  12/29/10 -- Added preiminary support for XBee ZB devices; thanks
-                      Greg and Brian!
-                    Improved & unified sample data header parsing code.
-                    Improved documentation.
-v2.1.0  4/14/13 -- Support for XBee ZB devices significantly improved.
-                   Now raises a KeyError with a useful message when a 
-                     response that looks like a command is received. This 
-                     helps debug devices that are not in API mode.
-                   Improper lengths for the ZigBee tx_explicit cluster 
-                     and profile fields have been corrected.
-                   Removed auto-testing distutils extension for lack of 
-                     easy cross-version compatibility.
-                   Now compatible with both Python 2.X and Python 3.X.
-                   Fixed bug in APIFrame.escape().
-                   Fixed crash where a failed call to Serial.read() 
-                     could return nothing.
-                   Packet-parsing subsystem generalized to allow for 
-                     much more general parsing behavior.
-                   ZigBee now parses IS command responses.
-                   Node Discover responses for ZigBee devices are 
-                     now parsed.
-                   Added tests for escaped API communication.
-                   Fixes issue #31 on Google Code: parameter information
-                     for lowercase nd or is commands were not parsed.
-                   Closes issue 35, as reported by Mark Fickett
-                   If an empty frame is received from a device, it is 
-                     ignored.
-                   Removed deprecated build process files.
-                   Backported parsing of IS AT command response as I/O 
-                     data from ZigBee devices.
+v1.5.0  06/27/2010 -- * Initial Packaging. 
+                      * Fully restructured into a unified API with tests.
+v1.7.0  06/29/2010 -- * Now supports both Series 1 and Series 2 modules 
+                        (the API turned out to be the same).
+                      * API frame logic was split into its own class, APIFrame
+                      * XBee renamed to XBeeBase
+                      * XBee1 renamed to XBee
+                      * Tests updated to reflect changes; API frame tests
+                        moved to test_frame.py, now test APIFrame instead of
+                        XBee base class
+                      * Test files renamed appropriately
+                      * PyLint score improved
+                      * Various docstring updates
+                      * Updated example code to reflect changes
+v1.7.1  07/07/2010 -- * Bug fix: Now supports receiving I/O data with 64-bit addressing
+                      * Previously, an exception was raised when a packet with ID 0x82
+                      * arrived, which contains I/O samples with a 64-bit source address
+                      * This has been fixed.
+v1.8.0  07/08/2010 -- Implemented threading support
+                      * If a callback method is given to the XBeeBase constructor,
+                        a new thread will automatically be spawned. This thread
+                        will read from the serial port and call the given callback
+                        method whenever a valid data packet arrives.
+                      * XBeeBase.halt() was added. This method ensures the proper
+                        shutdown of a separate thread if one has been spawned.
+                        This method must be called before closing the serial
+                        port used by an XBee instance in order to prevent
+                        improper use of the serial port.
+v1.9.0  07/10/2010 -- * Implemented Dispatch helper as xbee.helpers.dispatch
+                      * Dispatch allows one to filter incoming packets
+                        between one or more handler functions. This simplifies
+                        application logic which must handle more than one
+                        packet type.
+                        Automated tests are now run as a part of the build process
+                      * nose must be installed for this feature to operate.
+                        If it is not installed, the tests will be skipped
+                        and a warning will be generated.
+                      * A 'test' command has been added to setup.py
+v1.9.1  08/11/2010 -- * Added support for I/O sample data packet with 64-bit addressing.
+                      * Fixed bug where threading.Thread library was not
+                        properly initalized in all use cases.
+                      * Added initial documentation.
+                      * Properly included distutils_extensions.py in source
+                        distribution archives
+v1.9.2  08/19/2010 -- * Fixed bug where _write() call on a serial object
+                        should have been write()
+v2.0.0  12/29/2010 -- * Added preiminary support for XBee ZB devices; thanks
+                        Greg and Brian!
+                      * Improved & unified sample data header parsing code.
+                      * Improved documentation.
+v2.1.0  04/14/2013 -- * Support for XBee ZB devices significantly improved.
+                      * Now raises a KeyError with a useful message when a 
+                        response that looks like a command is received. This 
+                        helps debug devices that are not in API mode.
+                      * Improper lengths for the ZigBee tx_explicit cluster 
+                        and profile fields have been corrected.
+                      * Removed auto-testing distutils extension for lack of 
+                        easy cross-version compatibility.
+                      * Now compatible with both Python 2.X and Python 3.X.
+                      * Fixed bug in APIFrame.escape().
+                      * Fixed crash where a failed call to Serial.read() 
+                        could return nothing.
+                      * Packet-parsing subsystem generalized to allow for 
+                        much more general parsing behavior.
+                      * ZigBee now parses IS command responses.
+                      * Node Discover responses for ZigBee devices are 
+                        now parsed.
+                      * Added tests for escaped API communication.
+                      * Fixes issue #31 on Google Code: parameter information
+                        for lowercase nd or is commands were not parsed.
+                      * Closes issue 35, as reported by Mark Fickett
+                      * If an empty frame is received from a device, it is 
+                       ignored.
+                      * Removed deprecated build process files.
+                      * Backported parsing of IS AT command response as I/O 
+                        data from ZigBee devices.
                      
-                   BACKWARDS-INCOMPATIBLE CHANGES:
-                     XBee IS "Force Sample" AT response (and Remote AT Response) 'parameter'
-                       value is no longer raw; it is parsed as I/O samples. 
-                       See the documentation for details.
-                     ZigBee IS "Force Sample" AT response (and Remote AT Response) 'parameter'
-                       value is no longer raw; it is parsed as I/O samples.
-                       See the documentation for details.
-                     ZigBee ND "Node Discover" AT response (and Remote AT Response) 'parameter'
-                       value is no longer raw; it is parsed into a node
-                       discover dictionary. See the documentation for details.
-v2.2.2  11/19/15 -- Add error_callback function to XBeeBase
-                   * If an error_callback method is given to the XBeeBase constructor
-                     (in addition to the callback method),
-                     a new thread will automatically be spawned. This thread
-                     will read from the serial port and call the error_callback
-                     when an unexpected Exception (not ThreadQuitException) is raised
-                     while waiting for serial data. This generally indicates that the XBee
-                     serial interface needs to be reconnected.
-v2.2.3  11/21/15 --  Fix README for GitHub and PyPI
+                      BACKWARDS-INCOMPATIBLE CHANGES:
+                      * XBee IS "Force Sample" AT response (and Remote AT Response) 'parameter'
+                        value is no longer raw; it is parsed as I/O samples. 
+                        See the documentation for details.
+                      * ZigBee IS "Force Sample" AT response (and Remote AT Response) 'parameter'
+                        value is no longer raw; it is parsed as I/O samples.
+                        See the documentation for details.
+                      * ZigBee ND "Node Discover" AT response (and Remote AT Response) 'parameter'
+                        value is no longer raw; it is parsed into a node
+                        discover dictionary. See the documentation for details.
+v2.2.2  11/19/2015 -- * Add error_callback function to XBeeBase.
+                      * If an error_callback method is given to the XBeeBase constructor
+                        (in addition to the callback method),
+                        a new thread will automatically be spawned. This thread
+                        will read from the serial port and call the error_callback
+                        when an unexpected Exception (not ThreadQuitException) is raised
+                        while waiting for serial data. This generally indicates that the XBee
+                        serial interface needs to be reconnected.
+v2.2.3  11/21/2015 -- * Fix README for GitHub and PyPI
+v2.2.4  01/11/2017 -- * Added DigiMesh support.
+                      * Added support for Route Record Indicator and Many-to-One Route Request packets.
+                      * Improved and simplified tests.
+                      * Documentation updates and comment typo corrections.
+                      * Do not break on error, rather log error.
+                      * Add Travis CI for unit tests.
+                      * Modernized setup.py.
