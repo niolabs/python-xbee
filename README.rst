@@ -92,10 +92,6 @@ Contributors
 * Greg Rapp gdrapp@gmail.com
 * Brian blalor@bravo5.org
 * Chris Brackert cbrackert@gmail.com
-
-Special Thanks
-==============
-
 * Amit Synderman
 * Marco Sangalli
 * James Saunders
