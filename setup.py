@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='XBee',
-    version='2.2.3',
+    version='2.2.4',
     description='Python tools for working with XBee radios',
     long_description=open('README.rst').read(),
     url='https://github.com/nioinnovation/python-xbee',
