@@ -158,6 +158,12 @@ class ZigBee(XBeeBase):
                              {'name':'receive_options', 'len':1},
                              {'name':'hop_count',       'len':1},
                              {'name':'addresses',       'len':None}]},
+                     b"\xa3":
+                        {'name':'many_to_one_rri',
+                         'structure':
+                            [{'name':'source_addr_long',  'len':8},
+                             {'name':'source_addr',       'len':2},
+                             {'name':'reserved',          'len':1}]},
                      b"\x95":
                         {'name':'node_id_indicator',
                          'structure':
