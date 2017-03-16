@@ -1,7 +1,7 @@
 """
 test_digimesh.py
 
-By James saunders, 2016
+By James Saunders, 2016
 james@saunders-family.net
 
 Tests the XBee DigiMesh implementation class for API compliance

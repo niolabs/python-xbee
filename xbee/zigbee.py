@@ -126,6 +126,20 @@ class ZigBee(XBeeBase):
                         {'name':'status',
                          'structure':
                             [{'name':'status',      'len':1}]},
+                     b"\x8d":
+                        {'name':'route_information',
+                         'structure':
+                         [   {'name':'source_event',    'len':1},
+                             {'name':'info_length',     'len':1},
+                             {'name':'timestamp',       'len':4},
+                             {'name':'ack_timeout_count','len':1},
+                             {'name':'tx_blocked_count','len':1},
+                             {'name':'reserved',        'len':1},
+                             {'name':'dest_addr',       'len':8},
+                             {'name':'source_addr',     'len':8},
+                             {'name':'responder_addr',  'len':8},
+                             {'name':'receiver_addr',   'len':8}
+                             ]},
                      b"\x88":
                         {'name':'at_response',
                          'structure':

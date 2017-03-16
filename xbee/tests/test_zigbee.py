@@ -188,6 +188,25 @@ class TestZigBee(unittest.TestCase):
         
         self.assertEqual(info, expected_info)
 
+    def test_split_route_information(self):
+            data = b'\x8d\x12\x27\x9c\x93\x81\x7f\x00\x00\x00\x00\x13\xa2\x00\x40\x52\xaa\xaa\x00\x13\xa2\x00\x40\x52\xdd\xdd\x00\x13\xa2\x00\x40\x52\xbb\xbb\x00\x13\xa2\x00\x40\x52\xcc\xcc'
+            info = self.zigbee._split_response(data)
+            expected_info = {
+                'id': 'route_information',
+                'source_event': b'\x12',
+                'info_length': b'\x27',
+                'timestamp': b'\x9c\x93\x81\x7f',
+                'ack_timeout_count': b'\x00',
+                'tx_blocked_count': b'\x00',
+                'reserved': b'\x00',
+                'dest_addr': b'\x00\x13\xa2\x00\x40\x52\xaa\xaa',
+                'source_addr': b'\x00\x13\xa2\x00\x40\x52\xdd\xdd',
+                'responder_addr': b'\x00\x13\xa2\x00\x40\x52\xbb\xbb',
+                'receiver_addr': b'\x00\x13\xa2\x00\x40\x52\xcc\xcc',
+            }
+
+            self.assertEqual(info, expected_info)
+
 class TestParseZigBeeIOData(unittest.TestCase):
     """
     Test parsing ZigBee specific IO data
