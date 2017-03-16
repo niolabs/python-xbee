@@ -16,7 +16,7 @@ v1.7.1  07/07/2010 -- * Bug fix: Now supports receiving I/O data with 64-bit add
                       * Previously, an exception was raised when a packet with ID 0x82
                       * arrived, which contains I/O samples with a 64-bit source address
                       * This has been fixed.
-v1.8.0  07/08/2010 -- Implemented threading support
+v1.8.0  07/08/2010 -- * Implemented threading support
                       * If a callback method is given to the XBeeBase constructor,
                         a new thread will automatically be spawned. This thread
                         will read from the serial port and call the given callback
@@ -94,8 +94,8 @@ v2.2.2  11/19/2015 -- * Add error_callback function to XBeeBase.
                         while waiting for serial data. This generally indicates that the XBee
                         serial interface needs to be reconnected.
 v2.2.3  11/21/2015 -- * Fix README for GitHub and PyPI
-v2.2.4  01/11/2017 -- * Added DigiMesh support.
-                      * Added support for Route Record Indicator and Many-to-One Route Request packets.
+v2.2.4  03/16/2017 -- * Added DigiMesh support.
+                      * Added support for Route Record Indicator, Many-to-One Route Request and Route Information packets.
                       * Improved and simplified tests.
                       * Documentation updates and comment typo corrections.
                       * Do not break on error, rather log error.
