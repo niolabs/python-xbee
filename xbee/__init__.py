@@ -1,9 +1,13 @@
 """
 XBee package initalization file
 
-By Paul Malmsten, 2010
-pmalmsten@gmail.com
+info@n.io
 """
+
+__title__ = 'xbee'
+__version__ = '2.2.4'
+__author__ = 'n.io'
+__license__ = 'MIT'
 
 from xbee.ieee import XBee
 from xbee.zigbee import ZigBee
