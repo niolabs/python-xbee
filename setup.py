@@ -1,13 +1,21 @@
+import re
 from setuptools import setup, find_packages
+
+# Auto detect the library version from the __init__.py file
+with open('xbee/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
+if not version:
+    raise RuntimeError('Cannot find version information')
 
 setup(
     name='XBee',
-    version='2.2.4',
+    version=version,
     description='Python tools for working with XBee radios',
     long_description=open('README.rst').read(),
     url='https://github.com/nioinnovation/python-xbee',
-    author='Paul Malmsten',
-    author_email='pmalmsten@gmail.com',
+    author='n.io',
+    author_email='info@n.io',
     license='MIT',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
