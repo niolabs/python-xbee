@@ -98,8 +98,7 @@ class DigiMesh(XBeeBase):
                      b"\x90":
                         {'name':'rx',
                          'structure':
-                            [{'name':'frame_id',    'len':1},
-                             {'name':'source_addr', 'len':7},
+                            [{'name':'source_addr', 'len':8},
                              {'name':'reserved',    'len':2},
                              {'name':'options',     'len':1},
                              {'name':'data',        'len':None}]},
