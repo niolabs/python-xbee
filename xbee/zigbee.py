@@ -69,7 +69,22 @@ class ZigBee(XBeeBase):
                          {'name':'profile',         'len':2,        'default':None},
                          {'name':'broadcast_radius','len':1,        'default':b'\x00'},
                          {'name':'options',         'len':1,        'default':b'\x00'},
-                         {'name':'data',            'len':None,     'default':None}]
+                         {'name':'data',            'len':None,     'default':None}],
+                    "create_source_route":
+                        [{'name':'id',              'len':1,        'default':b'\x21'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
+                         {'name':'options',         'len':1,        'default':b'\x00'},
+                         {'name':'address_count',   'len':1,        'default':b'\x00'},
+                         {'name':'route',           'len':None,     'default':None}],
+                    "register_joining_device":
+                        [{'name':'id',              'len':1,        'default':b'\x24'},
+                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
+                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
+                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
+                         {'name':'options',         'len':1,        'default':b'\x00'},
+                         {'name':'key',             'len':None,     'default':None}]
                     }
     
     # Packets which can be received from an XBee
