@@ -76,8 +76,8 @@ class ZigBee(XBeeBase):
                          {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
                          {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
                          {'name':'options',         'len':1,        'default':b'\x00'},
-                         {'name':'address_count',   'len':1,        'default':b'\x00'},
-                         {'name':'route',           'len':None,     'default':None}],
+                         {'name':'hop_count',       'len':1,        'default':b'\x00'},
+                         {'name':'addresses',       'len':None,     'default':None}],
                     "register_joining_device":
                         [{'name':'id',              'len':1,        'default':b'\x24'},
                          {'name':'frame_id',        'len':1,        'default':b'\x00'},
