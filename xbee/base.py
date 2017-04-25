@@ -53,8 +53,7 @@ class XBeeBase(threading.Thread):
                  argument is also used.
     """
 
-    def __init__(self, ser, shorthand=True, callback=None, escaped=False,
-                 error_callback=None):
+    def __init__(self, ser, shorthand=True, callback=None, escaped=False, error_callback=None):
         super(XBeeBase, self).__init__()
         self.serial = ser
         self.shorthand = shorthand
@@ -107,7 +106,6 @@ class XBeeBase(threading.Thread):
                 # Unexpected thread quit.
                 if self._error_callback:
                     self._error_callback(e)
-
 
     def _wait_for_frame(self):
         """
@@ -234,7 +232,7 @@ class XBeeBase(threading.Thread):
         except AttributeError:
             raise NotImplementedError("API response specifications could not be found; use a derived class which defines 'api_responses'.")
         except KeyError:
-            # Check to see if this ID can be found among transmittible packets
+            # Check to see if this ID can be found among transmittable packets
             for cmd_name, cmd in list(self.api_commands.items()):
                 if cmd[0]['default'] == data[0:1]:
                     raise CommandFrameException("Incoming frame with id %s looks like a command frame of type '%s' (these should not be received). Are you sure your devices are in API mode?"
