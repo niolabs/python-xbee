@@ -38,7 +38,7 @@ v1.9.2 - 18 Aug 2010
 * Fixed bug where _write() call on a serial object should have been write().
 
 v2.0.0 - 29 Dec 2010
-* Added preiminary support for XBee ZB devices; thanks Greg and Brian!
+* Added preliminary support for XBee ZB devices; thanks Greg and Brian!
 * Improved & unified sample data header parsing code.
 * Improved documentation.
 
@@ -79,3 +79,10 @@ v2.2.4 - 17 Mar 2017
 * Do not break on error, rather log error.
 * Add Travis CI for unit tests.
 * Modernized setup.py.
+
+v2.2.5 - 25 Apr 2017
+* Formatting tidy in line with PEP8 recommendations.
+* Added 'create_source_route' and 'register_joining_device' Zigbee frame definitions.
+* Moved version information to __init__.py.
+* Fixed DigiMesh for Python 3.
+* Fixed DigiMesh 'tx' frame definition.

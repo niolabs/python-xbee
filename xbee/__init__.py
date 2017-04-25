@@ -5,7 +5,7 @@ info@n.io
 """
 
 __title__ = 'xbee'
-__version__ = '2.2.4'
+__version__ = '2.2.5'
 __author__ = 'n.io'
 __license__ = 'MIT'
 
