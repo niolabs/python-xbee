@@ -24,7 +24,7 @@ class DigiMesh(XBeeBase):
     asynchronous reads, see the definition of XBeeBase.
     """
     # Packets which can be sent to an XBee
-    
+
     # Format: 
     #   {
     #       name of command: [
@@ -46,7 +46,7 @@ class DigiMesh(XBeeBase):
             {'name': 'command',          'len': 2,      'default': None},
             {'name': 'parameter',        'len': None,   'default': None}
         ],
-        # todo: Explicit Adrresing Command Frame
+        # todo: Explicit Addressing Command Frame
         "remote_at": [
             {'name': 'id',               'len': 1,      'default': b'\x17'},
             {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
@@ -68,7 +68,7 @@ class DigiMesh(XBeeBase):
     }
     
     # Packets which can be received from an XBee
-    
+
     # Format: 
     #   {
     #       id byte received from XBee: {
@@ -91,13 +91,13 @@ class DigiMesh(XBeeBase):
                 {'name': 'parameter',         'len': None}
             ]
         },
-        b'\x8a': {
+        b'\x8A': {
             'name': 'status',
             'structure': [
                 {'name': 'status',            'len': 1}
             ]
         },
-        b'\x8b': {
+        b'\x8B': {
             'name': 'tx_status',
             'structure': [
                 {'name': 'frame_id',          'len': 1},
@@ -152,5 +152,7 @@ class DigiMesh(XBeeBase):
     }
     
     def __init__(self, *args, **kwargs):
-        # Call the super class constructor to save the serial port
+        """
+        Call the super class constructor to save the serial port
+        """
         super(DigiMesh, self).__init__(*args, **kwargs)

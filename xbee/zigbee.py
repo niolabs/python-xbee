@@ -21,193 +21,226 @@ class ZigBee(XBeeBase):
     a serial port object (see PySerial) and then calling the send
     method with the proper information specified by the API. Data may
     be read from a device synchronously by calling wait_read_frame.
-    For asynchronous reads, see the defintion of XBeeBase.
+    For asynchronous reads, see the definition of XBeeBase.
     """
     # Packets which can be sent to an XBee
-    
+
     # Format: 
-    #        {name of command:
-    #           [{name:field name, len:field length, default: default value sent}
-    #            ...
-    #            ]
-    #         ...
-    #         }
-    api_commands = {"at":
-                        [{'name':'id',        'len':1,      'default':b'\x08'},
-                         {'name':'frame_id',  'len':1,      'default':b'\x01'},
-                         {'name':'command',   'len':2,      'default':None},
-                         {'name':'parameter', 'len':None,   'default':None}],
-                    "queued_at":
-                        [{'name':'id',        'len':1,      'default':b'\x09'},
-                         {'name':'frame_id',  'len':1,      'default':b'\x01'},
-                         {'name':'command',   'len':2,      'default':None},
-                         {'name':'parameter', 'len':None,   'default':None}],
-                    "remote_at":
-                        [{'name':'id',              'len':1,        'default':b'\x17'},
-                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
-                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
-                         {'name':'options',         'len':1,        'default':b'\x02'},
-                         {'name':'command',         'len':2,        'default':None},
-                         {'name':'parameter',       'len':None,     'default':None}],
-                    "tx":
-                        [{'name':'id',              'len':1,        'default':b'\x10'},
-                         {'name':'frame_id',        'len':1,        'default':b'\x01'},
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
-                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
-                         {'name':'broadcast_radius','len':1,        'default':b'\x00'},
-                         {'name':'options',         'len':1,        'default':b'\x00'},
-                         {'name':'data',            'len':None,     'default':None}],
-                    "tx_explicit":
-                        [{'name':'id',              'len':1,        'default':b'\x11'},
-                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
-                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
-                         {'name':'src_endpoint',    'len':1,        'default':None},
-                         {'name':'dest_endpoint',   'len':1,        'default':None},
-                         {'name':'cluster',         'len':2,        'default':None},
-                         {'name':'profile',         'len':2,        'default':None},
-                         {'name':'broadcast_radius','len':1,        'default':b'\x00'},
-                         {'name':'options',         'len':1,        'default':b'\x00'},
-                         {'name':'data',            'len':None,     'default':None}],
-                    "create_source_route":
-                        [{'name':'id',              'len':1,        'default':b'\x21'},
-                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
-                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
-                         {'name':'options',         'len':1,        'default':b'\x00'},
-                         {'name':'hop_count',       'len':1,        'default':b'\x00'},
-                         {'name':'addresses',       'len':None,     'default':None}],
-                    "register_joining_device":
-                        [{'name':'id',              'len':1,        'default':b'\x24'},
-                         {'name':'frame_id',        'len':1,        'default':b'\x00'},
-                         {'name':'dest_addr_long',  'len':8,        'default':struct.pack('>q', -1)},
-                         {'name':'dest_addr',       'len':2,        'default':b'\xFF\xFE'},
-                         {'name':'options',         'len':1,        'default':b'\x00'},
-                         {'name':'key',             'len':None,     'default':None}]
-                    }
+    #   {
+    #       name of command: [
+    #           {name: field name,      len: field length,      default: default value sent}
+    #           ...
+    #       ]
+    #       ...
+    #   }
+    api_commands = {
+        "at": [
+            {'name': 'id',               'len': 1,      'default': b'\x08'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x01'},
+            {'name': 'command',          'len': 2,      'default': None},
+            {'name': 'parameter',        'len': None,   'default': None}
+        ],
+        "queued_at": [
+            {'name': 'id',               'len': 1,      'default': b'\x09'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x01'},
+            {'name': 'command',          'len': 2,      'default': None},
+            {'name': 'parameter',        'len': None,   'default': None}
+        ],
+        "remote_at": [
+            {'name': 'id',               'len': 1,      'default': b'\x17'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
+            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>q', -1)},
+            {'name': 'dest_addr',        'len': 2,      'default': b'\xFF\xFE'},
+            {'name': 'options',          'len': 1,      'default': b'\x02'},
+            {'name': 'command',          'len': 2,      'default': None},
+            {'name': 'parameter',        'len': None,   'default': None}
+        ],
+        "tx": [
+            {'name': 'id',               'len': 1,      'default': b'\x10'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x01'},
+            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>q', -1)},
+            {'name': 'dest_addr',        'len': 2,      'default': b'\xFF\xFE'},
+            {'name': 'broadcast_radius', 'len': 1,      'default': b'\x00'},
+            {'name': 'options',          'len': 1,      'default': b'\x00'},
+            {'name': 'data',             'len': None,   'default': None}
+        ],
+        "tx_explicit": [
+            {'name': 'id',               'len': 1,      'default': b'\x11'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
+            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>q', -1)},
+            {'name': 'dest_addr',        'len': 2,      'default': b'\xFF\xFE'},
+            {'name': 'src_endpoint',     'len': 1,      'default': None},
+            {'name': 'dest_endpoint',    'len': 1,      'default': None},
+            {'name': 'cluster',          'len': 2,      'default': None},
+            {'name': 'profile',          'len': 2,      'default': None},
+            {'name': 'broadcast_radius', 'len': 1,      'default': b'\x00'},
+            {'name': 'options',          'len': 1,      'default': b'\x00'},
+            {'name': 'data',             'len': None,   'default': None}
+        ],
+        "create_source_route": [
+            {'name': 'id',               'len': 1,      'default': b'\x21'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
+            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>q', -1)},
+            {'name': 'dest_addr',        'len': 2,      'default': b'\xFF\xFE'},
+            {'name': 'options',          'len': 1,      'default': b'\x00'},
+            {'name': 'hop_count',        'len': 1,      'default': b'\x00'},
+            {'name': 'addresses',        'len': None,   'default': None}
+        ],
+        "register_joining_device": [
+            {'name': 'id',               'len': 1,      'default': b'\x24'},
+            {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
+            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>q', -1)},
+            {'name': 'dest_addr',        'len': 2,      'default': b'\xFF\xFE'},
+            {'name': 'options',          'len': 1,      'default': b'\x00'},
+            {'name': 'key',              'len': None,   'default': None}
+        ]
+    }
     
     # Packets which can be received from an XBee
-    
+
     # Format: 
-    #        {id byte received from XBee:
-    #           {name: name of response
-    #            structure:
-    #                [ {'name': name of field, 'len':length of field}
-    #                  ...
-    #                  ]
-    #            parse_as_io_samples:name of field to parse as io
-    #           }
-    #           ...
-    #        }
-    #
-    api_responses = {b"\x90":
-                        {'name':'rx',
-                         'structure':
-                            [{'name':'source_addr_long','len':8},
-                             {'name':'source_addr',     'len':2},
-                             {'name':'options',         'len':1},
-                             {'name':'rf_data',         'len':None}]},
-                     b"\x91":
-                        {'name':'rx_explicit',
-                         'structure':
-                            [{'name':'source_addr_long','len':8},
-                             {'name':'source_addr',     'len':2},
-                             {'name':'source_endpoint', 'len':1},
-                             {'name':'dest_endpoint',   'len':1},
-                             {'name':'cluster',         'len':2},
-                             {'name':'profile',         'len':2},
-                             {'name':'options',         'len':1},
-                             {'name':'rf_data',         'len':None}]},
-                     b"\x92": # Checked by GDR-parse_samples_header function appears to need update to support
-                        {'name':'rx_io_data_long_addr',
-                         'structure':
-                            [{'name':'source_addr_long','len':8},
-                             {'name':'source_addr',     'len':2},
-                             {'name':'options',         'len':1},
-                             {'name':'samples',         'len':None}],
-                         'parsing': [('samples', 
-                                      lambda xbee,original: xbee._parse_samples(original['samples'])
-                                     )]},
-                     b"\x8b":
-                        {'name':'tx_status',
-                         'structure':
-                            [{'name':'frame_id',        'len':1},
-                             {'name':'dest_addr',       'len':2},
-                             {'name':'retries',         'len':1},
-                             {'name':'deliver_status',  'len':1},
-                             {'name':'discover_status', 'len':1}]},
-                     b"\x8a":
-                        {'name':'status',
-                         'structure':
-                            [{'name':'status',      'len':1}]},
-                     b"\x8d":
-                        {'name':'route_information',
-                         'structure':
-                         [   {'name':'source_event',    'len':1},
-                             {'name':'info_length',     'len':1},
-                             {'name':'timestamp',       'len':4},
-                             {'name':'ack_timeout_count','len':1},
-                             {'name':'tx_blocked_count','len':1},
-                             {'name':'reserved',        'len':1},
-                             {'name':'dest_addr',       'len':8},
-                             {'name':'source_addr',     'len':8},
-                             {'name':'responder_addr',  'len':8},
-                             {'name':'receiver_addr',   'len':8}
-                             ]},
-                     b"\x88":
-                        {'name':'at_response',
-                         'structure':
-                            [{'name':'frame_id',    'len':1},
-                             {'name':'command',     'len':2},
-                             {'name':'status',      'len':1},
-                             {'name':'parameter',   'len':None}],
-                         'parsing': [('parameter',
-                                       lambda self, original: self._parse_IS_at_response(original)),
-                                     ('parameter',
-                                       lambda self, original: self._parse_ND_at_response(original))]
-                             },
-                     b"\x97": # Checked GDR (not sure about parameter, could be 4 bytes)
-                        {'name':'remote_at_response',
-                         'structure':
-                            [{'name':'frame_id',        'len':1},
-                             {'name':'source_addr_long','len':8},
-                             {'name':'source_addr',     'len':2},
-                             {'name':'command',         'len':2},
-                             {'name':'status',          'len':1},
-                             {'name':'parameter',       'len':None}],
-                          'parsing': [('parameter',
-                                       lambda self, original: self._parse_IS_at_response(original))]
-                             },
-                     b"\xa1": # See http://www.digi.com/resources/documentation/digidocs/pdfs/90002002.pdf
-                        {'name':'route_record_indicator',
-                         'structure':
-                            [{'name':'source_addr_long','len':8},
-                             {'name':'source_addr',     'len':2},
-                             {'name':'receive_options', 'len':1},
-                             {'name':'hop_count',       'len':1},
-                             {'name':'addresses',       'len':None}]},
-                     b"\xa3":
-                        {'name':'many_to_one_rri',
-                         'structure':
-                            [{'name':'source_addr_long',  'len':8},
-                             {'name':'source_addr',       'len':2},
-                             {'name':'reserved',          'len':1}]},
-                     b"\x95":
-                        {'name':'node_id_indicator',
-                         'structure':
-                            [{'name':'sender_addr_long','len':8},
-                             {'name':'sender_addr',     'len':2},
-                             {'name':'options',         'len':1},
-                             {'name':'source_addr',     'len':2},
-                             {'name':'source_addr_long','len':8},
-                             {'name':'node_id',         'len':'null_terminated'},
-                             {'name':'parent_source_addr','len':2},
-                             {'name':'device_type',     'len':1},
-                             {'name':'source_event',    'len':1},
-                             {'name':'digi_profile_id', 'len':2},
-                             {'name':'manufacturer_id', 'len':2}]}
-                     }
+    #   {
+    #       id byte received from XBee: {
+    #           name: name of response
+    #           structure: [
+    #               {'name': name of field,     'len': length of field}
+    #               ...
+    #           ]
+    #           parse_as_io_samples: name of field to parse as io
+    #       }
+    #       ...
+    #   }
+    api_responses = {
+        b'\x90': {
+            'name': 'rx',
+            'structure': [
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'options',           'len': 1},
+                {'name': 'rf_data',           'len': None}
+            ]
+        },
+        b'\x91': {
+            'name': 'rx_explicit',
+            'structure': [
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'source_endpoint',   'len': 1},
+                {'name': 'dest_endpoint',     'len': 1},
+                {'name': 'cluster',           'len': 2},
+                {'name': 'profile',           'len': 2},
+                {'name': 'options',           'len': 1},
+                {'name': 'rf_data',           'len': None}
+            ]
+        },
+        b'\x92': {
+            'name': 'rx_io_data_long_addr',
+            # Checked by GDR-parse_samples_header function appears to need update to support
+            'structure': [
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'options',           'len': 1},
+                {'name': 'samples',           'len': None}
+            ],
+            'parsing': [
+                ('samples', lambda xbee, original: xbee._parse_samples(original['samples']))
+            ]
+        },
+        b'\x8B': {
+            'name': 'tx_status',
+            'structure': [
+                {'name': 'frame_id',          'len': 1},
+                {'name': 'dest_addr',         'len': 2},
+                {'name': 'retries',           'len': 1},
+                {'name': 'deliver_status',    'len': 1},
+                {'name': 'discover_status',   'len': 1}
+            ]
+        },
+        b'\x8A': {
+            'name': 'status',
+            'structure': [
+                {'name':'status',             'len':1}
+            ]
+        },
+        b'\x8D': {
+            'name': 'route_information',
+            'structure': [
+                {'name': 'source_event',      'len': 1},
+                {'name': 'info_length',       'len': 1},
+                {'name': 'timestamp',         'len': 4},
+                {'name': 'ack_timeout_count', 'len': 1},
+                {'name': 'tx_blocked_count',  'len': 1},
+                {'name': 'reserved',          'len': 1},
+                {'name': 'dest_addr',         'len': 8},
+                {'name': 'source_addr',       'len': 8},
+                {'name': 'responder_addr',    'len': 8},
+                {'name': 'receiver_addr',     'len': 8}
+            ]
+        },
+        b'\x88': {
+            'name': 'at_response',
+            'structure': [
+                {'name': 'frame_id',          'len': 1},
+                {'name': 'command',           'len': 2},
+                {'name': 'status',            'len': 1},
+                {'name': 'parameter',         'len': None}
+            ],
+            'parsing': [
+                ('parameter', lambda self, original: self._parse_IS_at_response(original)),
+                ('parameter', lambda self, original: self._parse_ND_at_response(original))
+            ]
+        },
+        b'\x97': {
+            'name': 'remote_at_response',
+            # Checked GDR (not sure about parameter, could be 4 bytes)
+            'structure': [
+                {'name': 'frame_id',          'len': 1},
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'command',           'len': 2},
+                {'name': 'status',            'len': 1},
+                {'name': 'parameter',         'len': None}
+            ],
+            'parsing': [
+                ('parameter', lambda self, original: self._parse_IS_at_response(original))
+            ]
+        },
+        b'\xA1': {
+            'name': 'route_record_indicator',
+            # See http://www.digi.com/resources/documentation/digidocs/pdfs/90002002.pdf
+            'structure': [
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'receive_options',   'len': 1},
+                {'name': 'hop_count',         'len': 1},
+                {'name': 'addresses',         'len': None}
+            ]
+        },
+        b'\xA3': {
+            'name': 'many_to_one_rri',
+            'structure': [
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'reserved',          'len': 1}
+            ]
+        },
+        b'\x95': {
+            'name': 'node_id_indicator',
+            'structure': [
+                {'name': 'sender_addr_long',  'len': 8},
+                {'name': 'sender_addr',       'len': 2},
+                {'name': 'options',           'len': 1},
+                {'name': 'source_addr',       'len': 2},
+                {'name': 'source_addr_long',  'len': 8},
+                {'name': 'node_id',           'len': 'null_terminated'},
+                {'name': 'parent_source_addr','len': 2},
+                {'name': 'device_type',       'len': 1},
+                {'name': 'source_event',      'len': 1},
+                {'name': 'digi_profile_id',   'len': 2},
+                {'name': 'manufacturer_id',   'len': 2}
+            ]
+        }
+    }
 
     def _parse_IS_at_response(self, packet_info):
         """
@@ -234,7 +267,7 @@ class ZigBee(XBeeBase):
                # Parse the null-terminated node identifier field
                null_terminator_index = 10
                while packet_info['parameter'][null_terminator_index:null_terminator_index+1] != b'\x00':
-                   null_terminator_index += 1;
+                   null_terminator_index += 1
                
                # Parse each field thereafter directly    
                result['node_identifier'] = packet_info['parameter'][10:null_terminator_index]
@@ -253,7 +286,9 @@ class ZigBee(XBeeBase):
             return packet_info['parameter']
     
     def __init__(self, *args, **kwargs):
-        # Call the super class constructor to save the serial port
+        """
+        Call the super class constructor to save the serial port
+        """
         super(ZigBee, self).__init__(*args, **kwargs)
 
     def _parse_samples_header(self, io_bytes):
