@@ -1,8 +1,14 @@
 XBee
 ====
 
-.. image:: https://travis-ci.org/nioinnovation/python-xbee.svg?branch=master
+|build_status_badge| |pypi_badge| |py_versions_badge|
+
+.. |build_status_badge| image:: https://travis-ci.org/nioinnovation/python-xbee.svg?branch=master
     :target: https://travis-ci.org/nioinnovation/python-xbee
+.. |pypi_badge| image:: https://img.shields.io/pypi/v/XBee.svg   
+    :target: https://pypi.python.org/pypi/XBee
+.. |py_versions_badge| image:: https://img.shields.io/pypi/pyversions/XBee.svg   
+    :target: https://pypi.python.org/pypi/XBee
 
 XBee provides an implementation of the XBee serial communication API. It
 allows one to easily access advanced features of one or more XBee
