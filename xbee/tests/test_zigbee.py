@@ -8,6 +8,7 @@ Tests the XBee ZB (ZigBee) implementation class for API compliance
 """
 import unittest
 from xbee.zigbee import ZigBee
+from xbee.tests.Fake import Serial
 
 class TestZigBee(unittest.TestCase):
     """
@@ -16,6 +17,17 @@ class TestZigBee(unittest.TestCase):
 
     def setUp(self):
         self.zigbee = ZigBee(None)
+
+    def test_send(self):
+        """
+        Test send() with AT command.
+        """
+        device = Serial()
+        xbee = ZigBee(device)
+        xbee.send('at', command='MY')
+        result = device.get_data_written()
+        expected = b'~\x00\x04\x08\x01MYP'
+        self.assertEqual(result, expected)
 
     def test_null_terminated_field(self):
         """

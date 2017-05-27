@@ -181,6 +181,9 @@ class XBeeBase(threading.Thread):
             try:
                 # Read this field's name from the function arguments dict
                 data = kwargs[field['name']]
+                if isinstance(data, str):
+                    data = str.encode(data)
+
             except KeyError:
                 # Data wasn't given
                 # Only a problem if the field has a specific length
@@ -205,9 +208,8 @@ class XBeeBase(threading.Thread):
                     "The data provided for '%s' was not %d bytes long"\
                     % (field['name'], field['len']))
 
-            # Add the data to the packet, if it has been specified
-            # Otherwise, the parameter was of variable length, and not
-            #  given
+            # Add the data to the packet, if it has been specified.
+            # Otherwise, the parameter was of variable length, and not given.
             if data:
                 packet += data
 
@@ -392,7 +394,6 @@ class XBeeBase(threading.Thread):
         """
         # Pass through the keyword arguments
         self._write(self._build_command(cmd, **kwargs))
-
 
     def wait_read_frame(self):
         """
