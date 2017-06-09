@@ -13,7 +13,7 @@ series-specific functionality.
 """
 import struct, threading, time
 from xbee.frame import APIFrame
-from xbee.python2to3 import byteToInt, intToByte
+from xbee.python2to3 import byteToInt, intToByte, stringToBytes
 
 class ThreadQuitException(Exception):
     pass
@@ -182,7 +182,7 @@ class XBeeBase(threading.Thread):
                 # Read this field's name from the function arguments dict
                 data = kwargs[field['name']]
                 if isinstance(data, str):
-                    data = str.encode(data)
+                    data = stringToBytes(data)
 
             except KeyError:
                 # Data wasn't given
