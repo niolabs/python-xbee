@@ -162,6 +162,13 @@ class ZigBee(XBeeBase):
                 {'name':'status',             'len':1}
             ]
         },
+        b'\x98': {
+            'name': 'extended_status',
+            'structure': [
+                {'name': 'status',            'len': 1},
+                {'name': 'data',              'len': None}
+            ]
+        },
         b'\x8D': {
             'name': 'route_information',
             'structure': [
