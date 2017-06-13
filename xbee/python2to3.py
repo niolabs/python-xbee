@@ -5,6 +5,7 @@ By Paul Malmsten, 2011
 
 Helper functions for handling Python 2 and Python 3 datatype shenanigans.
 """
+import sys
 
 def byteToInt(byte):
     """
@@ -31,4 +32,4 @@ def stringToBytes(s):
 
     Converts a string into an appropriate bytes object
     """
-    return s.encode('ascii')
+    return s.encode('ascii') if sys.version_info >= (3, 0) else s
