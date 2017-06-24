@@ -8,8 +8,9 @@ pmalmsten@gmail.com
 Tests the XBeeBase superclass module for XBee API conformance.
 """
 import unittest
-from xbee.base import XBeeBase
+from xbee.backend.base import XBeeBase
 from xbee.tests.Fake import Serial
+
 
 class TestWriteToDevice(unittest.TestCase):
     """
@@ -62,45 +63,6 @@ class TestWriteToDevice(unittest.TestCase):
         result_frame   = device.get_data_written()
         self.assertEqual(result_frame, expected_frame)
 
-class TestReadFromDevice(unittest.TestCase):
-    """
-    XBeeBase class should properly read and extract data from a valid
-    API frame
-    """
-    def test_read(self):
-        """
-        _wait_for_frame should properly read a frame of data
-        """
-        device = Serial()
-        device.set_read_data(b'\x7E\x00\x01\x00\xFF')
-        xbee = XBeeBase(device)
-
-        frame = xbee._wait_for_frame()
-        self.assertEqual(frame.data, b'\x00')
-
-    def test_read_invalid_followed_by_valid(self):
-        """
-        _wait_for_frame should skip invalid data
-        """
-        device = Serial()
-        device.set_read_data(b'\x7E\x00\x01\x00\xFA' + b'\x7E\x00\x01\x05\xFA')
-        xbee = XBeeBase(device)
-
-        frame = xbee._wait_for_frame()
-        self.assertEqual(frame.data, b'\x05')
-
-    def test_read_escaped(self):
-        """
-        _wait_for_frame should properly read a frame of data
-        Verify that API mode 2 escaped bytes are read correctly
-        """
-        device = Serial()
-        device.set_read_data(b'\x7E\x00\x04\x7D\x5E\x7D\x5D\x7D\x31\x7D\x33\xE0')
-
-        xbee = XBeeBase(device,escaped=True)
-
-        frame = xbee._wait_for_frame()
-        self.assertEqual(frame.data, b'\x7E\x7D\x11\x13')
 
 class TestNotImplementedFeatures(unittest.TestCase):
     """
@@ -140,6 +102,7 @@ class TestNotImplementedFeatures(unittest.TestCase):
         else:
             self.fail("Shorthand call on XBeeBase base class should raise NotImplementedError")
 
+
 class TestAsyncCallback(unittest.TestCase):
     """
     XBeeBase constructor should accept an optional callback function
@@ -171,21 +134,6 @@ class TestAsyncCallback(unittest.TestCase):
                              callback=self.callback,
                              error_callback=self.error_callback)
 
-class TestInitialization(unittest.TestCase):
-    """
-    Ensures that XBeeBase objects are properly constructed
-    """
-
-    def setUp(self):
-        self.base = XBeeBase(None)
-
-    def test_thread_always_initialized(self):
-        """
-        Even when a callback method is not supplied to the XBeeBase
-        constructor, it must be properly initalized as a
-        threading.Thread object
-        """
-        self.assertFalse(self.base.is_alive())
 
 if __name__ == '__main__':
     unittest.main()

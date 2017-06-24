@@ -9,7 +9,8 @@ packets from an XBee device and call an appropriate method when
 one arrives.
 """
 
-from xbee import XBee
+from xbee.thread import XBee
+
 
 class Dispatch(object):
     def __init__(self, ser=None, xbee=None):
@@ -18,14 +19,15 @@ class Dispatch(object):
             self.xbee = xbee
         elif ser:
             self.xbee = XBee(ser)
-            
+
         self.handlers = []
         self.names = set()
-            
+
     def register(self, name, callback, filter):
         """
-        register: string, function: string, data -> None, function: data -> boolean -> None
-        
+        register: string, function: string, data -> None,
+        function: data -> boolean -> None
+
         Register will save the given name, callback, and filter function
         for use when a packet arrives. When one arrives, the filter
         function will be called to determine whether to call its associated
@@ -34,38 +36,40 @@ class Dispatch(object):
         which triggered the call.
         """
         if name in self.names:
-            raise ValueError("A callback has already been registered with the name '%s'" % name)
-        
-        self.handlers.append(
-            {'name':name,
-             'callback':callback,
-             'filter':filter}
-        )
-        
+            raise ValueError("A callback has already been registered with \
+                             the name '%s'" % name)
+
+        self.handlers.append({
+            'name': name,
+            'callback': callback,
+            'filter': filter
+        })
+
         self.names.add(name)
-        
+
     def run(self, oneshot=False):
         """
         run: boolean -> None
-        
-        run will read and dispatch any packet which arrives from the 
+
+        run will read and dispatch any packet which arrives from the
         XBee device
         """
         if not self.xbee:
-            raise ValueError("Either a serial port or an XBee must be provided to __init__ to execute run()")
-        
+            raise ValueError("Either a serial port or an XBee must be provided \
+                             to __init__ to execute run()")
+
         while True:
             self.dispatch(self.xbee.wait_read_frame())
-                    
+
             if oneshot:
                 break
-    
+
     def dispatch(self, packet):
         """
         dispatch: XBee data dict -> None
-        
-        When called, dispatch checks the given packet against each 
-        registered callback method and calls each callback whose filter 
+
+        When called, dispatch checks the given packet against each
+        registered callback method and calls each callback whose filter
         function returns true.
         """
         for handler in self.handlers:

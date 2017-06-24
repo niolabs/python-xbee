@@ -11,17 +11,15 @@ This class defines data and methods common to all XBee modules.
 This class should be subclassed in order to provide
 series-specific functionality.
 """
-import struct, threading, time
 from xbee.frame import APIFrame
-from xbee.python2to3 import byteToInt, intToByte, stringToBytes
+from xbee.python2to3 import byteToInt, stringToBytes
 
-class ThreadQuitException(Exception):
-    pass
 
 class CommandFrameException(KeyError):
     pass
 
-class XBeeBase(threading.Thread):
+
+class XBeeBase(object):
     """
     Abstract base class providing command generation and response
     parsing methods for XBee modules.
@@ -29,16 +27,12 @@ class XBeeBase(threading.Thread):
     Constructor arguments:
         ser:    The file-like serial port to use.
 
-
         shorthand: boolean flag which determines whether shorthand command
                    calls (i.e. xbee.at(...) instead of xbee.send("at",...)
                    are allowed.
 
         callback: function which should be called with frame data
                   whenever a frame arrives from the serial port.
-                  When this is not None, a background thread to monitor
-                  the port and call the given function is automatically
-                  started.
 
         escaped: boolean flag which determines whether the library should
                  operate in escaped mode. In this mode, certain data bytes
@@ -53,19 +47,16 @@ class XBeeBase(threading.Thread):
                  argument is also used.
     """
 
-    def __init__(self, ser, shorthand=True, callback=None, escaped=False, error_callback=None):
-        super(XBeeBase, self).__init__()
+    def __init__(self, ser, shorthand=True, callback=None,
+                 escaped=False, error_callback=None):
         self.serial = ser
         self.shorthand = shorthand
         self._callback = None
-        self._thread_continue = False
         self._escaped = escaped
         self._error_callback = error_callback
 
         if callback:
             self._callback = callback
-            self._thread_continue = True
-            self.start()
 
     def halt(self):
         """
@@ -75,9 +66,7 @@ class XBeeBase(threading.Thread):
         halted. This method will wait until the thread has cleaned
         up before returning.
         """
-        if self._callback:
-            self._thread_continue = False
-            self.join()
+        pass
 
     def _write(self, data):
         """
@@ -88,75 +77,6 @@ class XBeeBase(threading.Thread):
         """
         frame = APIFrame(data, self._escaped).output()
         self.serial.write(frame)
-
-    def run(self):
-        """
-        run: None -> None
-
-        This method overrides threading.Thread.run() and is automatically
-        called when an instance is created with threading enabled.
-        """
-        while True:
-            try:
-                self._callback(self.wait_read_frame())
-            except ThreadQuitException:
-                # Expected termintation of thread due to self.halt()
-                break
-            except Exception as e:
-                # Unexpected thread quit.
-                if self._error_callback:
-                    self._error_callback(e)
-
-    def _wait_for_frame(self):
-        """
-        _wait_for_frame: None -> binary data
-
-        _wait_for_frame will read from the serial port until a valid
-        API frame arrives. It will then return the binary data
-        contained within the frame.
-
-        If this method is called as a separate thread
-        and self.thread_continue is set to False, the thread will
-        exit by raising a ThreadQuitException.
-        """
-        frame = APIFrame(escaped=self._escaped)
-
-        while True:
-                if self._callback and not self._thread_continue:
-                    raise ThreadQuitException
-
-                if self.serial.inWaiting() == 0:
-                    time.sleep(.01)
-                    continue
-
-                byte = self.serial.read()
-
-                if byte != APIFrame.START_BYTE:
-                    continue
-
-                # Save all following bytes, if they are not empty
-                if len(byte) == 1:
-                    frame.fill(byte)
-
-                while(frame.remaining_bytes() > 0):
-                    byte = self.serial.read()
-
-                    if len(byte) == 1:
-                        frame.fill(byte)
-
-                try:
-                    # Try to parse and return result
-                    frame.parse()
-
-                    # Ignore empty frames
-                    if len(frame.data) == 0:
-                        frame = APIFrame()
-                        continue
-
-                    return frame
-                except ValueError:
-                    # Bad frame, so restart
-                    frame = APIFrame(escaped=self._escaped)
 
     def _build_command(self, cmd, **kwargs):
         """
@@ -173,7 +93,9 @@ class XBeeBase(threading.Thread):
         try:
             cmd_spec = self.api_commands[cmd]
         except AttributeError:
-            raise NotImplementedError("API command specifications could not be found; use a derived class which defines 'api_commands'.")
+            raise NotImplementedError("API command specifications could not be "
+                                      "found; use a derived class which defines"
+                                      " 'api_commands'.")
 
         packet = b''
 
@@ -196,8 +118,11 @@ class XBeeBase(threading.Thread):
                     else:
                         # Otherwise, fail
                         raise KeyError(
-                            "The expected field %s of length %d was not provided"
-                            % (field['name'], field['len']))
+                            "The expected field {} of length {} "
+                            "was not provided".format(
+                                field['name'], field['len']
+                            )
+                        )
                 else:
                     # No specific length, ignore it
                     data = None
@@ -205,8 +130,9 @@ class XBeeBase(threading.Thread):
             # Ensure that the proper number of elements will be written
             if field['len'] and len(data) != field['len']:
                 raise ValueError(
-                    "The data provided for '%s' was not %d bytes long"\
-                    % (field['name'], field['len']))
+                    "The data provided for '{}' was not {} "
+                    "bytes long".format(field['name'], field['len'])
+                )
 
             # Add the data to the packet, if it has been specified.
             # Otherwise, the parameter was of variable length, and not given.
@@ -232,13 +158,21 @@ class XBeeBase(threading.Thread):
         try:
             packet = self.api_responses[packet_id]
         except AttributeError:
-            raise NotImplementedError("API response specifications could not be found; use a derived class which defines 'api_responses'.")
+            raise NotImplementedError("API response specifications could not "
+                                      "be found; use a derived class which "
+                                      "defines 'api_responses'.")
         except KeyError:
             # Check to see if this ID can be found among transmittable packets
             for cmd_name, cmd in list(self.api_commands.items()):
                 if cmd[0]['default'] == data[0:1]:
-                    raise CommandFrameException("Incoming frame with id %s looks like a command frame of type '%s' (these should not be received). Are you sure your devices are in API mode?"
-                            % (data[0], cmd_name))
+                    raise CommandFrameException("Incoming frame with id {} "
+                                                "looks like a command frame of "
+                                                "type '{}' (these should not be"
+                                                " received). Are you sure your "
+                                                "devices are in "
+                                                "API mode?".format(
+                                                    data[0], cmd_name)
+                                                )
 
             raise KeyError(
                 "Unrecognized response packet with id byte {0}".format(data[0]))
@@ -247,7 +181,7 @@ class XBeeBase(threading.Thread):
         index = 1
 
         # Result info
-        info = {'id':packet['name']}
+        info = {'id': packet['name']}
         packet_spec = packet['structure']
 
         # Parse the packet in the order specified
@@ -267,7 +201,10 @@ class XBeeBase(threading.Thread):
                 # Are we trying to read beyond the last data element?
                 expected_len = index + field['len']
                 if expected_len > len(data):
-                    raise ValueError("Response packet was shorter than expected; expected: %d, got: %d bytes" % (expected_len, len(data)))
+                    raise ValueError("Response packet was shorter than "
+                                     "expected; expected: {}, got: {} "
+                                     "bytes".format(expected_len, len(data))
+                                     )
 
                 field_data = data[index:index + field['len']]
                 info[field['name']] = field_data
@@ -287,7 +224,10 @@ class XBeeBase(threading.Thread):
 
         # If there are more bytes than expected, raise an exception
         if index < len(data):
-            raise ValueError("Response packet was longer than expected; expected: %d, got: %d bytes" % (index, len(data)))
+            raise ValueError("Response packet was longer than expected; "
+                             "expected: {}, got: {} bytes".format(
+                                 index, len(data))
+                             )
 
         # Apply parsing rules if any exist
         if 'parsing' in packet:
@@ -297,6 +237,7 @@ class XBeeBase(threading.Thread):
                     # Apply the parse function to the indicated field and
                     # replace the raw data with the result
                     info[parse_rule[0]] = parse_rule[1](self, info)
+
         return info
 
     def _parse_samples_header(self, io_bytes):
@@ -315,7 +256,8 @@ class XBeeBase(threading.Thread):
         sample_count = byteToInt(io_bytes[0])
 
         # part of byte 1 and byte 2 are the DIO mask ( 9 bits )
-        dio_mask = (byteToInt(io_bytes[1]) << 8 | byteToInt(io_bytes[2])) & 0x01FF
+        dio_mask = (byteToInt(io_bytes[1]) << 8 | byteToInt(io_bytes[2])) \
+            & 0x01FF
 
         # upper 7 bits of byte 1 is the AIO mask
         aio_mask = (byteToInt(io_bytes[1]) & 0xFE) >> 1
@@ -324,13 +266,13 @@ class XBeeBase(threading.Thread):
         dio_chans = []
         aio_chans = []
 
-        for i in range(0,9):
+        for i in range(0, 9):
             if dio_mask & (1 << i):
                 dio_chans.append(i)
 
         dio_chans.sort()
 
-        for i in range(0,7):
+        for i in range(0, 7):
             if aio_mask & (1 << i):
                 aio_chans.append(i)
 
@@ -364,11 +306,13 @@ class XBeeBase(threading.Thread):
 
             if dio_chans:
                 # we have digital data
-                digital_data_set = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0))
+                digital_data_set = (sample_bytes.pop(0) << 8 |
+                                    sample_bytes.pop(0))
                 digital_values = dio_mask & digital_data_set
 
                 for i in dio_chans:
-                    tmp_samples['dio-{0}'.format(i)] = True if (digital_values >> i) & 1 else False
+                    tmp_samples['dio-{0}'.format(i)] = True \
+                        if (digital_values >> i) & 1 else False
 
             for i in aio_chans:
                 analog_sample = (sample_bytes.pop(0) << 8 | sample_bytes.pop(0))
@@ -395,19 +339,6 @@ class XBeeBase(threading.Thread):
         # Pass through the keyword arguments
         self._write(self._build_command(cmd, **kwargs))
 
-    def wait_read_frame(self):
-        """
-        wait_read_frame: None -> frame info dictionary
-
-        wait_read_frame calls XBee._wait_for_frame() and waits until a
-        valid frame appears on the serial port. Once it receives a frame,
-        wait_read_frame attempts to parse the data contained within it
-        and returns the resulting dictionary
-        """
-
-        frame = self._wait_for_frame()
-        return self._split_response(frame.data)
-
     def __getattr__(self, name):
         """
         If a method by the name of a valid api command is called,
@@ -418,7 +349,9 @@ class XBeeBase(threading.Thread):
         # If api_commands is not defined, raise NotImplementedError\
         #  If its not defined, _getattr__ will be called with its name
         if name == 'api_commands':
-            raise NotImplementedError("API command specifications could not be found; use a derived class which defines 'api_commands'.")
+            raise NotImplementedError("API command specifications could not be "
+                                      "found; use a derived class which defines "
+                                      "'api_commands'.")
 
         # Is shorthand enabled, and is the called name a command?
         if self.shorthand and name in self.api_commands:

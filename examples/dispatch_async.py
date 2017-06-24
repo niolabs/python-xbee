@@ -10,7 +10,7 @@ This example continuously reads the serial port and dispatches packets
 which arrive to appropriate methods for processing in a separate thread.
 """
 
-from xbee import XBee
+from xbee.thread import XBee
 from xbee.helpers.dispatch import Dispatch
 import time
 import serial
@@ -45,13 +45,13 @@ dispatch = Dispatch(ser)
 #  The third argument is a function which determines whether to call its
 #   associated callback when a packet arrives. It should return a boolean.
 dispatch.register(
-    "status", 
-    status_handler, 
+    "status",
+    status_handler,
     lambda packet: packet['id']=='status'
 )
 
 dispatch.register(
-    "io_data", 
+    "io_data",
     io_sample_handler,
     lambda packet: packet['id']=='rx_io_data'
 )
