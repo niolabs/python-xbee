@@ -158,13 +158,13 @@ class TestSplitResponse(InitXBee):
                          'status':b'\x01'}
         
         self.assertEqual(info, expected_info)
-        
+
     def test_split_short_at_response(self):
         """
         _split_response should properly split an at_response packet which
         has no parameter data
         """
-        
+
         data = b'\x88DMY\x01'
         info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
@@ -187,28 +187,29 @@ class TestSplitResponse(InitXBee):
                          'status':b'\x01',
                          'parameter':b'ABCDEF'}
         self.assertEqual(info, expected_info)
-        
+
     def test_generalized_packet_parsing(self):
         """
         _split_response should properly parse packets in a generalized
         manner when specified by the protocol definition.
         """
-        
-        # Temporarily add parsing rule
+
+        # Temporarily modify parsing rule (taking a backup of the original rule)
+        parse_rule_orig = self.xbee.api_responses[b"\x88"]["parsing"]
         self.xbee.api_responses[b"\x88"]["parsing"] = [("parameter", lambda self,orig: b"GHIJKL")]
-        
+
         data = b'\x88DMY\x01ABCDEF'
-        
+
         info = self.xbee._split_response(data)
         expected_info = {'id':'at_response',
                          'frame_id':b'D',
                          'command':b'MY',
                          'status':b'\x01',
                          'parameter':b'GHIJKL'}
-                         
-        # Remove all parsing rules
-        del(self.xbee.api_responses[b"\x88"]["parsing"])  
-                       
+
+        # Restore parsing rule to original
+        self.xbee.api_responses[b"\x88"]["parsing"] = parse_rule_orig
+
         self.assertEqual(info, expected_info)
         
 class TestParseIOData(InitXBee):
@@ -580,20 +581,20 @@ class TestReadFromDevice(unittest.TestCase):
         """
         I/O data in a AT response for an IS command is parsed.
         """
-         ## Build IO data
+        # Build IO data
         # One sample, ADC 0 enabled
         # DIO 1,3,5,7 enabled
         header = b'\x01\x02\xAA'
-        
+
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
         # ADC0 value of 255
         sample = b'\x00\xAA\x00\xFF'
         data = header + sample
-        
+
         device = Serial()
-        device.set_read_data(APIFrame(data = b'\x88DIS\x00' + data).output());
+        device.set_read_data(APIFrame(data = b'\x88DIS\x00' + data).output())
         xbee = XBee(device)
-        
+
         info = xbee.wait_read_frame()
         expected_info = {'id':'at_response',
                          'frame_id':b'D',
@@ -605,16 +606,16 @@ class TestReadFromDevice(unittest.TestCase):
                                       'dio-7':True,
                                       'adc-0':255}]}
         self.assertEqual(info, expected_info)
-        
+
     def test_is_remote_response_parsed_as_io(self):
         """
         I/O data in a Remote AT response for an IS command is parsed.
         """
-         ## Build IO data
+        # Build IO data
         # One sample, ADC 0 enabled
         # DIO 1,3,5,7 enabled
         header = b'\x01\x02\xAA'
-        
+
         # First 7 bits ignored, DIO8 low, DIO 0-7 alternating
         # ADC0 value of 255
         sample = b'\x00\xAA\x00\xFF'
@@ -622,9 +623,9 @@ class TestReadFromDevice(unittest.TestCase):
 
         device = Serial()
         device.set_read_data(APIFrame(data = b'\x97D\x00\x13\xa2\x00@oG\xe4v\x1aIS\x00' + data).output())
-        
+
         xbee = XBee(device)
-        
+
         info = xbee.wait_read_frame()
         expected_info = {'id':'remote_at_response',
                          'frame_id':b'D',
@@ -643,7 +644,7 @@ class TestReadFromDevice(unittest.TestCase):
         """
         XBee class should properly read and parse incoming IO data
         """
-        ## Build IO data
+        # Build IO data
         # One sample, ADC 0 enabled
         # DIO 1,3,5,7 enabled
         header = b'\x01\x02\xAA'
@@ -732,7 +733,7 @@ class TestReadFromDevice(unittest.TestCase):
         device = Serial()
         device.set_read_data(b'\x7E\x00\x00\xFF\x7E\x00\x05\x88DMY\x01\x8c')
         xbee = XBee(device)
-        
+
         #import pdb
         #pdb.set_trace()
         info = xbee.wait_read_frame()
