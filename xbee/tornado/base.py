@@ -101,7 +101,7 @@ class XBeeBase(_XBeeBase):
     @gen.coroutine
     def wait_read_frame(self):
         frame = yield self._get_frame()
-        return self._split_response(frame.data)
+        raise gen.Return(self._split_response(frame.data))
 
     def _get_frame(self):
         future = Future()
