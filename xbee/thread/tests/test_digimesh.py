@@ -7,7 +7,8 @@ james@saunders-family.net
 Tests the XBee DigiMesh implementation class for API compliance
 """
 import unittest
-from xbee.digimesh import DigiMesh
+from xbee.thread.digimesh import DigiMesh
+
 
 class TestDigiMesh(unittest.TestCase):
     """

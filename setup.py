@@ -27,5 +27,8 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     packages=find_packages(exclude=['tests', '*.tests']),
-    install_requires=['pyserial']
+    install_requires=['pyserial'],
+    extras_require={
+        'tornado': ['tornado']
+    }
 )

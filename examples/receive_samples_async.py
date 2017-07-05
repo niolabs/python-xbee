@@ -10,7 +10,7 @@ This example reads the serial port and asynchronously processes IO data
 received from a remote XBee.
 """
 
-from xbee import XBee
+from xbee.thread import XBee
 import time
 import serial
 

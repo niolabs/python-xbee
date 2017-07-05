@@ -9,6 +9,6 @@ __version__ = '2.2.5'
 __author__ = 'n.io'
 __license__ = 'MIT'
 
-from xbee.ieee import XBee
-from xbee.zigbee import ZigBee
-from xbee.digimesh import DigiMesh
+from xbee.thread import XBee
+from xbee.thread import ZigBee
+from xbee.thread import DigiMesh

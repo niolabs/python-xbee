@@ -9,14 +9,13 @@ This module provides an XBee (Digimesh) API library.
 
 Updated by Thom Nichols http://blog.thomnichols.org
 """
-import struct
-from xbee.base import XBeeBase
 
-class DigiMesh(XBeeBase):
+
+class DigiMesh(object):
     """
     Provides an implementation of the XBee API for DigiMesh modules
     with recent firmware.
-    
+
     Commands may be sent to a device by instantiating this class with
     a serial port object (see PySerial) and then calling the send
     method with the proper information specified by the API. Data may
@@ -25,14 +24,14 @@ class DigiMesh(XBeeBase):
     """
     # Packets which can be sent to an XBee
 
-    # Format: 
-    #   {
-    #       name of command: [
-    #           {name: field name,      len: field length,      default: default value sent}
-    #           ...
-    #       ]
-    #       ...
-    #   }
+    # Format:
+    #  {
+    #    name of command: [
+    #      {name: field name, len: field length, default: default value sent}
+    #      ...
+    #    ]
+    #    ...
+    #  }
     api_commands = {
         "at": [
             {'name': 'id',               'len': 1,      'default': b'\x08'},
@@ -59,17 +58,17 @@ class DigiMesh(XBeeBase):
         "tx": [
             {'name': 'id',               'len': 1,      'default': b'\x10'},
             {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
-            {'name': 'dest_addr' ,       'len': 8,      'default': None},
+            {'name': 'dest_addr',        'len': 8,      'default': None},
             {'name': 'reserved',         'len': 2,      'default': b'\xFF\xFE'},
             {'name': 'broadcast_radius', 'len': 1,      'default': b'\x00'},
             {'name': 'options',          'len': 1,      'default': b'\x00'},
             {'name': 'data',             'len': None,   'default': None}
         ]
     }
-    
+
     # Packets which can be received from an XBee
 
-    # Format: 
+    # Format:
     #   {
     #       id byte received from XBee: {
     #           name: name of response
@@ -101,7 +100,7 @@ class DigiMesh(XBeeBase):
             'name': 'tx_status',
             'structure': [
                 {'name': 'frame_id',          'len': 1},
-                {'name': 'reserved',          'len': 2,       'default': b'\xFF\xFE'},
+                {'name': 'reserved',          'len': 2, 'default': b'\xFF\xFE'},
                 {'name': 'retries',           'len': 1},
                 {'name': 'deliver_status',    'len': 1},
                 {'name': 'discover_status',   'len': 1}
@@ -127,7 +126,7 @@ class DigiMesh(XBeeBase):
         #     ]
         # },
         b'\x95': {
-            'name':'node_id',
+            'name': 'node_id',
             'structure': [
                 {'name': 'source_addr_long',  'len': 8},
                 {'name': 'network_addr',      'len': 2},
@@ -139,7 +138,7 @@ class DigiMesh(XBeeBase):
                 {'name': 'unknown',           'len': None}]},
 
         b'\x97': {
-            'name':'remote_at_response',
+            'name': 'remote_at_response',
             'structure': [
                 {'name': 'frame_id',          'len': 1},
                 {'name': 'source_addr',       'len': 8},
@@ -150,7 +149,7 @@ class DigiMesh(XBeeBase):
             ]
         }
     }
-    
+
     def __init__(self, *args, **kwargs):
         """
         Call the super class constructor to save the serial port

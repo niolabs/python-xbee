@@ -8,13 +8,13 @@ pmalmsten@gmail.com
 This module provides an XBee (IEEE 802.15.4) API library.
 """
 import struct
-from xbee.base import XBeeBase
 
-class XBee(XBeeBase):
+
+class XBee(object):
     """
     Provides an implementation of the XBee API for IEEE 802.15.4 modules
     with recent firmware.
-    
+
     Commands may be sent to a device by instansiating this class with
     a serial port object (see PySerial) and then calling the send
     method with the proper information specified by the API. Data may
@@ -23,14 +23,14 @@ class XBee(XBeeBase):
     """
     # Packets which can be sent to an XBee
 
-    # Format: 
-    #   {
-    #       name of command: [
-    #           {name: field name,      len: field length,      default: default value sent}
-    #           ...
-    #       ]
-    #       ...
-    #   }
+    # Format:
+    #  {
+    #    name of command: [
+    #      {name: field name, len: field length, default: default value sent}
+    #      ...
+    #    ]
+    #    ...
+    #  }
     api_commands = {
         "at": [
             {'name': 'id',               'len': 1,      'default': b'\x08'},
@@ -48,7 +48,7 @@ class XBee(XBeeBase):
             {'name': 'id',               'len': 1,      'default': b'\x17'},
             {'name': 'frame_id',         'len': 1,      'default': b'\x00'},
             # dest_addr_long is 8 bytes (64 bits), so use an unsigned long
-            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>Q', 0)},
+            {'name': 'dest_addr_long',   'len': 8,      'default': struct.pack('>Q', 0)},  # noqa
             {'name': 'dest_addr',        'len': 2,      'default': b'\xFF\xFE'},
             {'name': 'options',          'len': 1,      'default': b'\x02'},
             {'name': 'command',          'len': 2,      'default': None},
@@ -69,7 +69,7 @@ class XBee(XBeeBase):
             {'name': 'data',             'len': None,   'default': None}
         ]
     }
-    
+
     # Packets which can be received from an XBee
 
     # Format:
@@ -117,7 +117,7 @@ class XBee(XBeeBase):
                 {'name': 'samples',           'len': None}
             ],
             'parsing': [
-                ('samples', lambda xbee, original: xbee._parse_samples(original['samples']))
+                ('samples', lambda xbee, original: xbee._parse_samples(original['samples']))  # noqa
             ]
         },
         b'\x83': {
@@ -129,7 +129,7 @@ class XBee(XBeeBase):
                 {'name': 'samples',           'len': None}
             ],
             'parsing': [
-                ('samples', lambda xbee, original: xbee._parse_samples(original['samples']))
+                ('samples', lambda xbee, original: xbee._parse_samples(original['samples']))  # noqa
             ]
         },
         b'\x89': {
@@ -154,7 +154,7 @@ class XBee(XBeeBase):
                 {'name': 'parameter',         'len': None}
             ],
             'parsing': [
-                ('parameter', lambda xbee, original: xbee._parse_IS_at_response(original))
+                ('parameter', lambda xbee, original: xbee._parse_IS_at_response(original))  # noqa
             ]
         },
         b'\x97': {
@@ -167,21 +167,23 @@ class XBee(XBeeBase):
                 {'name': 'status',            'len': 1},
                 {'name': 'parameter',         'len': None}],
             'parsing': [
-                ('parameter', lambda xbee, original: xbee._parse_IS_at_response(original))
+                ('parameter', lambda xbee, original: xbee._parse_IS_at_response(original))  # noqa
             ]
         }
     }
-                     
+
     def _parse_IS_at_response(self, packet_info):
         """
         If the given packet is a successful remote AT response for an IS
         command, parse the parameter field as IO data.
         """
-        if packet_info['id'] in ('at_response','remote_at_response') and packet_info['command'].lower() == b'is' and packet_info['status'] == b'\x00':
-               return self._parse_samples(packet_info['parameter'])
+        if packet_info['id'] in ('at_response', 'remote_at_response') and \
+                packet_info['command'].lower() == b'is' and \
+                packet_info['status'] == b'\x00':
+            return self._parse_samples(packet_info['parameter'])
         else:
             return packet_info['parameter']
-    
+
     def __init__(self, *args, **kwargs):
         """
         Call the super class constructor to save the serial port

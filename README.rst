@@ -59,6 +59,13 @@ in the root of the source tree:
 
 This will automatically install the package for you.
 
+Install with Tornado Support
+----------------------------
+
+::
+    pip install xbee[tornado]
+
+
 Documentation
 =============
 
@@ -80,7 +87,9 @@ PySerial
 Additional Dependencies
 -----------------------
 
-To run automated tests: `Nose <https://github.com/nose-devs/nose/>`_
+If wanting to use the Tornado IOLoop: `Tornado <http://www.tornadoweb.org/>`_
+
+To run automated tests: `pytest <https://docs.pytest.org>`_
 
 To build the documentation: `Sphinx <http://sphinx-doc.org/>`_
 
@@ -101,3 +110,4 @@ Contributors
 * Amit Synderman
 * Marco Sangalli
 * James Saunders james@saunders-family.net
+* David Walker dwalker@n.io

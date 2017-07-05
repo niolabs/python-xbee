@@ -10,7 +10,7 @@ This example continuously reads the serial port and processes IO data
 received from a remote XBee.
 """
 
-from xbee import XBee
+from xbee.thread import XBee
 import serial
 
 PORT = '/dev/ttyUSB0'
@@ -29,5 +29,5 @@ while True:
         print response
     except KeyboardInterrupt:
         break
-        
+
 ser.close()

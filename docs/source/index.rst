@@ -42,7 +42,12 @@ Usage
    must be enabled. For instructions about how to do this, see
    the documentation for your XBee device.
 
-Synchonous Mode
+.. note::
+    The default implementation of the python-xbee library is to 
+    use threads.  There is an implementation that utilizes the
+    Tornado IOLoop, if imported.
+
+Threaded Synchonous Mode
 ~~~~~~~~~~~~~~~
 
 The following code demonstrates a minimal use-case for the
@@ -67,7 +72,7 @@ print out any data frames which arrive from a connected XBee
 device. Be aware that wait_read_frame() will block until
 a valid frame is received from the associated XBee device.
 
-Asynchronous Mode
+Threaded Asynchronous Mode
 ~~~~~~~~~~~~~~~~~
 
 The xbee package is used only slightly differently when 
@@ -109,6 +114,46 @@ Note that a background thread is automatically started
 to handle receiving and processing incoming data from an
 XBee device. This example is functionally equivalent to the non-asyncronous
 example above.
+
+Tornado IOLoop
+~~~~~~~~~~~~~~~~~~
+Tornado provides a simple and easy to use IOLoop for asynchronous listening
+for XBee communications.  The library usage is seemingly identical to the
+threaded implementation, excepting importing and yielding.  The example
+highlights the key differences::
+
+    import serial
+    from tornado import ioloop, gen
+    from xbee.tornado import XBee
+
+    serial_port = serial.Serial('/dev/ttyUSB0', 9600)
+
+    def print_data(data):
+        """
+        This method is called whenever data is received
+        from the associated XBee device. Its first and
+        only argument is the data contained within the
+        frame.
+        """
+        print data
+
+    @gen.coroutine
+    def main():
+        xbee = XBee(serial_port, callback=print_data)
+
+        try:
+            while True:
+                yield gen.sleep(0.001)
+        except KeyboardInterrupt:
+            ioloop.IOLoop.current().stop()
+        finally
+            xbee.halt()
+            serial_port.close()
+
+    ioloop.IOLoop.current().spawn_callback(main)
+    ioloop.IOLoop.current().start()
+    ioloop.IOLoop.current().close()
+
 
 Additional Examples
 ~~~~~~~~~~~~~~~~~~~
