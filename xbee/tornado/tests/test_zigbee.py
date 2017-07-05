@@ -6,6 +6,9 @@ pmalmsten@gmail.com
 
 Tests the XBee ZB (ZigBee) implementation class for API compliance
 """
+import pytest
+pytest.importorskip("tornado")
+
 import unittest
 from xbee.tornado.zigbee import ZigBee
 from xbee.tests.Fake import Serial
@@ -18,6 +21,7 @@ class TestZigBee(unittest.TestCase):
 
     def setUp(self):
         self.zigbee = ZigBee(None)
+        super(TestZigBee, self).setUp()
 
     def test_send(self):
         """
@@ -231,6 +235,7 @@ class TestParseZigBeeIOData(unittest.TestCase):
 
     def setUp(self):
         self.zigbee = ZigBee(None)
+        super(TestParseZigBeeIOData, self).setUp()
 
     def test_parse_dio_adc(self):
             data = b'\x01\x08\x00\x0e\x08\x00\x00\x00\x02P\x02\x06'

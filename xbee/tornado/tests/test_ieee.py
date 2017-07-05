@@ -7,6 +7,9 @@ pmalmsten@gmail.com
 
 Tests the XBee (IEEE 802.15.4) implementation class for XBee API compliance
 """
+import pytest
+pytest.importorskip("tornado")
+
 from xbee.tests.Fake import Serial
 from xbee.tornado.ieee import XBee
 from xbee.frame import APIFrame
@@ -14,6 +17,7 @@ from xbee.python2to3 import intToByte, stringToBytes
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.test.util import unittest
 import sys
+import pytest
 import traceback
 
 
@@ -22,11 +26,11 @@ class InitXBee(AsyncTestCase):
     Base initalization class
     """
 
-    def setUp(self, *args, **kwargs):
+    def setUp(self):
         """
         Initialize XBee object
         """
-        super(InitXBee, self).setUp(*args, **kwargs)
+        super(InitXBee, self).setUp()
         self.xbee = XBee(None)
 
 
@@ -443,7 +447,7 @@ class TestParseIOData(InitXBee):
         self.assertEqual(results, expected_results)
 
 
-class TestWriteToDevice(AsyncTestCase):
+class TestWriteToDevice(InitXBee):
     """
     XBee class should properly write binary data in a valid API
     frame to a given serial device, including a valid command packet.
@@ -490,17 +494,17 @@ class TestWriteToDevice(AsyncTestCase):
         self.assertEqual(result_data, expected_data)
 
 
-class TestSendShorthand(AsyncTestCase):
+class TestSendShorthand(InitXBee):
     """
     Tests shorthand for sending commands to an XBee provided by
     XBee.__getattr__
     """
 
-    def setUp(self, *args, **kwargs):
+    def setUp(self):
         """
         Prepare a fake device to read from
         """
-        super(TestSendShorthand, self).setUp(*args, **kwargs)
+        super(TestSendShorthand, self).setUp()
         self.ser = Serial()
         self.xbee = XBee(self.ser)
 
@@ -556,7 +560,7 @@ class TestSendShorthand(AsyncTestCase):
             self.fail("Specified shorthand command should not exist")
 
 
-class TestReadFromDevice(AsyncTestCase):
+class TestReadFromDevice(InitXBee):
     """
     XBee class should properly read and parse binary data from a serial
     port device.

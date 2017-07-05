@@ -4,6 +4,6 @@ python:
   - "3.4"
   - "3.5"
 install:
-    pip install pytest
+    pip install -e .[tornado]
 # command to run tests
 script: py.test

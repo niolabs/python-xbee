@@ -6,6 +6,9 @@ james@saunders-family.net
 
 Tests the XBee DigiMesh implementation class for API compliance
 """
+import pytest
+pytest.importorskip("tornado")
+
 import unittest
 from xbee.tornado.digimesh import DigiMesh
 
@@ -18,6 +21,7 @@ class TestDigiMesh(unittest.TestCase):
 
     def setUp(self):
         self.digimesh = DigiMesh(None)
+        super(TestDigiMesh, self).setUp()
 
     def test_split_tx_status(self):
             data = b'\x8b\x01\xff\xff\x01\x01\x01'

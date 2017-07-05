@@ -7,6 +7,10 @@ pmalmsten@gmail.com
 
 Tests the XBeeBase superclass module for XBee API conformance.
 """
+
+import pytest
+pytest.importorskip("tornado")
+
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.test.util import unittest
 from xbee.tornado.base import XBeeBase
