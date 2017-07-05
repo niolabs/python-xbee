@@ -202,7 +202,8 @@ class TestSplitResponse(InitXBee):
         manner when specified by the protocol definition.
         """
 
-        # Temporarily add parsing rule
+        # Temporarily modify parsing rule (taking a backup of the original rule)
+        parse_rule_orig = self.xbee.api_responses[b"\x88"]["parsing"]
         self.xbee.api_responses[b"\x88"]["parsing"] = \
             [("parameter", lambda self, orig: b"GHIJKL")]
 
@@ -215,8 +216,8 @@ class TestSplitResponse(InitXBee):
                          'status': b'\x01',
                          'parameter': b'GHIJKL'}
 
-        # Remove all parsing rules
-        del(self.xbee.api_responses[b"\x88"]["parsing"])
+        # Restore parsing rule to original
+        self.xbee.api_responses[b"\x88"]["parsing"] = parse_rule_orig
 
         self.assertEqual(info, expected_info)
 
