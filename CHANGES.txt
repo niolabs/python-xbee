@@ -86,3 +86,8 @@ v2.2.5 - 25 Apr 2017
 * Moved version information to __init__.py.
 * Fixed DigiMesh for Python 3.
 * Fixed DigiMesh 'tx' frame definition.
+
+v2.3.0 - 05 Jul 2017
+* Python 3 compatibility bugfix in _build_command().
+* Added Extended Modem Status frame type (0x98) frame definition.
+* Break out thread implementation, add Tornado Support (Credit David Walker).
