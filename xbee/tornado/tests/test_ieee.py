@@ -12,6 +12,7 @@ from xbee.tornado.ieee import XBee
 from xbee.frame import APIFrame
 from xbee.python2to3 import intToByte, stringToBytes
 from tornado.testing import AsyncTestCase, gen_test
+from tornado.test.util import unittest
 import sys
 import traceback
 
@@ -25,7 +26,7 @@ class InitXBee(AsyncTestCase):
         """
         Initialize XBee object
         """
-        super().setUp(*args, **kwargs)
+        super(InitXBee, self).setUp(*args, **kwargs)
         self.xbee = XBee(None)
 
 
@@ -498,7 +499,7 @@ class TestSendShorthand(AsyncTestCase):
         """
         Prepare a fake device to read from
         """
-        super().setUp(*args, **kwargs)
+        super(TestSendShorthand, self).setUp(*args, **kwargs)
         self.ser = Serial()
         self.xbee = XBee(self.ser)
 
@@ -733,7 +734,7 @@ class TestReadFromDevice(AsyncTestCase):
 
         try:
             xbee._process_input(None, None)
-            info = yield xbee.wait_read_frame()
+            yield xbee.wait_read_frame()
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             self.fail("".join(traceback.format_exception(
@@ -812,6 +813,7 @@ class TestReadFromDevice(AsyncTestCase):
                          'options': b'\x00',
                          'rf_data': b'{test=1}'}
         self.assertEqual(info, expected_info)
+
 
 if __name__ == '__main__':
     unittest.main()

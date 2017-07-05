@@ -31,3 +31,7 @@ class TestDigiMesh(unittest.TestCase):
                 'discover_status': b'\x01'
             }
             self.assertEqual(info, expected_info)
+
+
+if __name__ == '__main__':
+    unittest.main()

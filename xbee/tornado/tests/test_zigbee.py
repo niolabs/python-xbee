@@ -37,14 +37,15 @@ class TestZigBee(unittest.TestCase):
         """
         expected_data = b'\x01\x02\x03\x04'
         terminator = b'\x00'
-        node_identifier = b'\x95' + b'\x00' * 21 + expected_data + terminator + b'\x00' * 8
+        node_identifier = b'\x95' + b'\x00' * 21 + expected_data + \
+            terminator + b'\x00' * 8
 
         data = self.zigbee._split_response(node_identifier)
 
         self.assertEqual(data['node_id'], expected_data)
 
     def test_split_node_identification_identifier(self):
-            data = b'\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaa\x20\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
+            data = b'\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaa\x20\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'  # noqa
             info = self.zigbee._split_response(data)
             expected_info = {
                 'id': 'node_id_indicator',
@@ -64,7 +65,7 @@ class TestZigBee(unittest.TestCase):
             self.assertEqual(info, expected_info)
 
     def test_split_node_identification_identifier2(self):
-            data = b'\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaaCoordinator\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'
+            data = b'\x95\x00\x13\xa2\x00\x40\x52\x2b\xaa\x7d\x84\x02\x7d\x84\x00\x13\xa2\x00\x40\x52\x2b\xaaCoordinator\x00\xff\xfe\x01\x01\xc1\x05\x10\x1e'  # noqa
             info = self.zigbee._split_response(data)
             expected_info = {
                 'id': 'node_id_indicator',
@@ -88,7 +89,7 @@ class TestZigBee(unittest.TestCase):
         A remote AT command of IS, to take a sample immediately and respond
         with the results, must be appropriately parsed for IO data.
         """
-        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1aIS\x00\x01\x1c\xc0\x06\x18\x00\x02\x8c\x03\x96'
+        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1aIS\x00\x01\x1c\xc0\x06\x18\x00\x02\x8c\x03\x96'  # noqa
         info = self.zigbee._split_response(data)
         expected_info = {
             'id': 'remote_at_response',
@@ -109,12 +110,12 @@ class TestZigBee(unittest.TestCase):
 
         self.assertEqual(info, expected_info)
 
-    def test_lowercase_is_remote_at_response_parameter_parsed_as_io_samples(self):
+    def test_lowercase_is_remote_at_response_parameter_parsed_as_io_samples(self):  # noqa
         """
-        A remote AT command of lowercase is, to take a sample immediately and respond
-        with the results, must be appropriately parsed for IO data.
+        A remote AT command of lowercase is, to take a sample immediately and
+        respond with the results, must be appropriately parsed for IO data.
         """
-        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1ais\x00\x01\x1c\xc0\x06\x18\x00\x02\x8c\x03\x96'
+        data = b'\x97A\x00\x13\xa2\x00@oG\xe4v\x1ais\x00\x01\x1c\xc0\x06\x18\x00\x02\x8c\x03\x96'  # noqa
         info = self.zigbee._split_response(data)
         expected_info = {
             'id': 'remote_at_response',
@@ -157,22 +158,23 @@ class TestZigBee(unittest.TestCase):
         """
         An at_response for an ND command must be parsed.
         """
-        data = b'\x88AND\x00v\x1a\x00\x13\xa2\x00@oG\xe4ENDPOINT-1\x00\xff\xfe\x01\x00\xc1\x05\x10\x1e'
+        data = b'\x88AND\x00v\x1a\x00\x13\xa2\x00@oG\xe4ENDPOINT-1\x00\xff\xfe\x01\x00\xc1\x05\x10\x1e'  # noqa
         info = self.zigbee._split_response(data)
         expected_info = {
             'id': 'at_response',
             'frame_id': b'A',
             'command': b'ND',
             'status': b'\x00',
-            'parameter': {'source_addr': b'\x76\x1a',
-                          'source_addr_long': b'\x00\x13\xa2\x00\x40\x6f\x47\xe4',
-                          'node_identifier': b'ENDPOINT-1',
-                          'parent_address': b'\xff\xfe',
-                          'device_type': b'\x01',
-                          'status': b'\x00',
-                          'profile_id': b'\xc1\x05',
-                          'manufacturer': b'\x10\x1e',
-                          }
+            'parameter': {
+                'source_addr': b'\x76\x1a',
+                'source_addr_long': b'\x00\x13\xa2\x00\x40\x6f\x47\xe4',
+                'node_identifier': b'ENDPOINT-1',
+                'parent_address': b'\xff\xfe',
+                'device_type': b'\x01',
+                'status': b'\x00',
+                'profile_id': b'\xc1\x05',
+                'manufacturer': b'\x10\x1e',
+            }
         }
 
         self.assertEqual(info, expected_info)
@@ -181,28 +183,29 @@ class TestZigBee(unittest.TestCase):
         """
         An at_response for a lowercase nd command must be parsed.
         """
-        data = b'\x88And\x00v\x1a\x00\x13\xa2\x00@oG\xe4ENDPOINT-1\x00\xff\xfe\x01\x00\xc1\x05\x10\x1e'
+        data = b'\x88And\x00v\x1a\x00\x13\xa2\x00@oG\xe4ENDPOINT-1\x00\xff\xfe\x01\x00\xc1\x05\x10\x1e'  # noqa
         info = self.zigbee._split_response(data)
         expected_info = {
             'id': 'at_response',
             'frame_id': b'A',
             'command': b'nd',
             'status': b'\x00',
-            'parameter': {'source_addr': b'\x76\x1a',
-                          'source_addr_long': b'\x00\x13\xa2\x00\x40\x6f\x47\xe4',
-                          'node_identifier': b'ENDPOINT-1',
-                          'parent_address': b'\xff\xfe',
-                          'device_type': b'\x01',
-                          'status': b'\x00',
-                          'profile_id': b'\xc1\x05',
-                          'manufacturer': b'\x10\x1e',
-                          }
+            'parameter': {
+                'source_addr': b'\x76\x1a',
+                'source_addr_long': b'\x00\x13\xa2\x00\x40\x6f\x47\xe4',
+                'node_identifier': b'ENDPOINT-1',
+                'parent_address': b'\xff\xfe',
+                'device_type': b'\x01',
+                'status': b'\x00',
+                'profile_id': b'\xc1\x05',
+                'manufacturer': b'\x10\x1e',
+            }
         }
 
         self.assertEqual(info, expected_info)
 
     def test_split_route_information(self):
-            data = b'\x8d\x12\x27\x9c\x93\x81\x7f\x00\x00\x00\x00\x13\xa2\x00\x40\x52\xaa\xaa\x00\x13\xa2\x00\x40\x52\xdd\xdd\x00\x13\xa2\x00\x40\x52\xbb\xbb\x00\x13\xa2\x00\x40\x52\xcc\xcc'
+            data = b'\x8d\x12\x27\x9c\x93\x81\x7f\x00\x00\x00\x00\x13\xa2\x00\x40\x52\xaa\xaa\x00\x13\xa2\x00\x40\x52\xdd\xdd\x00\x13\xa2\x00\x40\x52\xbb\xbb\x00\x13\xa2\x00\x40\x52\xcc\xcc'  # noqa
             info = self.zigbee._split_response(data)
             expected_info = {
                 'id': 'route_information',
@@ -279,3 +282,7 @@ class TestParseZigBeeIOData(unittest.TestCase):
         expected_results = [{'adc-7': 0xD18}]
         results = self.zigbee._parse_samples(data)
         self.assertEqual(results, expected_results)
+
+
+if __name__ == '__main__':
+    unittest.main()
