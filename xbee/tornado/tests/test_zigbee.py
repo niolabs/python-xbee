@@ -6,12 +6,14 @@ pmalmsten@gmail.com
 
 Tests the XBee ZB (ZigBee) implementation class for API compliance
 """
-import pytest
-pytest.importorskip("tornado")
-
 import unittest
-from xbee.tornado.zigbee import ZigBee
-from xbee.tests.Fake import Serial
+from xbee.tornado import has_tornado
+
+if not has_tornado:
+    raise unittest.SkipTest("Requires Tornado")
+
+from xbee.tornado.zigbee import ZigBee  # noqa
+from xbee.tests.Fake import Serial  # noqa
 
 
 class TestZigBee(unittest.TestCase):

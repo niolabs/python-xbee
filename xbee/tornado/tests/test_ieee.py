@@ -7,18 +7,20 @@ pmalmsten@gmail.com
 
 Tests the XBee (IEEE 802.15.4) implementation class for XBee API compliance
 """
-import pytest
-pytest.importorskip("tornado")
+import unittest
+from xbee.tornado import has_tornado
 
-from xbee.tests.Fake import Serial
-from xbee.tornado.ieee import XBee
-from xbee.frame import APIFrame
-from xbee.python2to3 import intToByte, stringToBytes
-from tornado.testing import AsyncTestCase, gen_test
-from tornado.test.util import unittest
-import sys
-import pytest
-import traceback
+if not has_tornado:
+    raise unittest.SkipTest("Requires Tornado")
+
+from xbee.tests.Fake import Serial  # noqa
+from xbee.tornado.ieee import XBee  # noqa
+from xbee.frame import APIFrame  # noqa
+from xbee.python2to3 import intToByte, stringToBytes  # noqa
+from tornado.testing import AsyncTestCase, gen_test  # noqa
+from tornado.test.util import unittest  # noqa
+import sys  # noqa
+import traceback  # noqa
 
 
 class InitXBee(AsyncTestCase):

@@ -31,7 +31,6 @@ def main():
             xbee.send('at', frame_id='B', command='DL')
     except KeyboardInterrupt:
         ioloop.IOLoop.current().stop()
-        return
     finally:
         xbee.halt()
         ser.close()

@@ -8,13 +8,16 @@ pmalmsten@gmail.com
 Tests the XBeeBase superclass module for XBee API conformance.
 """
 
-import pytest
-pytest.importorskip("tornado")
+import unittest
+from xbee.tornado import has_tornado
 
-from tornado.testing import AsyncTestCase, gen_test
-from tornado.test.util import unittest
-from xbee.tornado.base import XBeeBase
-from xbee.tests.Fake import Serial
+if not has_tornado:
+    raise unittest.SkipTest("Requires Tornado")
+
+from tornado.testing import AsyncTestCase, gen_test  # noqa
+from tornado.test.util import unittest  # noqa
+from xbee.tornado.base import XBeeBase  # noqa
+from xbee.tests.Fake import Serial  # noqa
 
 
 class TestReadFromDevice(AsyncTestCase):

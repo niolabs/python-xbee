@@ -6,11 +6,13 @@ james@saunders-family.net
 
 Tests the XBee DigiMesh implementation class for API compliance
 """
-import pytest
-pytest.importorskip("tornado")
-
 import unittest
-from xbee.tornado.digimesh import DigiMesh
+from xbee.tornado import has_tornado
+
+if not has_tornado:
+    raise unittest.SkipTest("Requires Tornado")
+
+from xbee.tornado.digimesh import DigiMesh  # noqa
 
 
 class TestDigiMesh(unittest.TestCase):
