@@ -91,3 +91,7 @@ v2.3.0 - 05 Jul 2017
 * Python 3 compatibility bugfix in _build_command().
 * Added Extended Modem Status frame type (0x98) frame definition.
 * Break out thread implementation, add Tornado Support (Credit David Walker).
+
+v2.3.1 - 06 Jul 2017
+* New features - Adds support for the Tornado I/O loop
+* If your application already uses the Tornado I/O loop then integrating python-xbee should be a breeze. Check out https://python-xbee.readthedocs.io/en/latest/#tornado-ioloop for usage and more details.
