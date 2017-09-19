@@ -157,6 +157,15 @@ class XBee(object):
                 ('parameter', lambda xbee, original: xbee._parse_IS_at_response(original))  # noqa
             ]
         },
+        b'\x90': {
+            'name': 'receive_packet',
+            'structure':[
+                {'name': 'source_addr_long',    'len':8},
+                {'name': 'source_addr',         'len':2},
+                {'name': 'rec_options',         'len':1},
+                {'name': 'rf_data',             'len': None}
+            ]
+        },
         b'\x97': {
             'name': 'remote_at_response',
             'structure': [
