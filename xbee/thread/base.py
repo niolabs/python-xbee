@@ -20,6 +20,9 @@ import time
 class ThreadQuitException(Exception):
     pass
 
+class TimeoutException(Exception):
+    pass
+
 
 class XBeeBase(_XBeeBase):
     """
@@ -93,7 +96,7 @@ class XBeeBase(_XBeeBase):
                 if self._error_callback:
                     self._error_callback(e)
 
-    def wait_read_frame(self):
+    def wait_read_frame(self, timeout=None):
         """
         wait_read_frame: None -> frame info dictionary
 
@@ -102,10 +105,10 @@ class XBeeBase(_XBeeBase):
         wait_read_frame attempts to parse the data contained within it
         and returns the resulting dictionary
         """
-        frame = self._wait_for_frame()
+        frame = self._wait_for_frame(timeout)
         return self._split_response(frame.data)
 
-    def _wait_for_frame(self):
+    def _wait_for_frame(self, timeout=None):
         """
         _wait_for_frame: None -> binary data
 
@@ -119,11 +122,17 @@ class XBeeBase(_XBeeBase):
         """
         frame = APIFrame(escaped=self._escaped)
 
+        deadline = 0
+        if timeout is not None and timeout > 0:
+            deadline = time.time() + timeout
+
         while True:
                 if self._callback and not self._thread_continue:
                     raise ThreadQuitException
 
                 if self.serial.inWaiting() == 0:
+                    if deadline and time.time() > deadline:
+                        raise TimeoutException
                     time.sleep(.01)
                     continue
 
