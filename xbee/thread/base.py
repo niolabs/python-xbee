@@ -13,14 +13,12 @@ series-specific functionality.
 """
 from xbee.frame import APIFrame
 from xbee.backend.base import XBeeBase as _XBeeBase
+from xbee.backend.base import TimeoutException as _TimeoutException
 import threading
 import time
 
 
 class ThreadQuitException(Exception):
-    pass
-
-class TimeoutException(Exception):
     pass
 
 
@@ -132,7 +130,7 @@ class XBeeBase(_XBeeBase):
 
                 if self.serial.inWaiting() == 0:
                     if deadline and time.time() > deadline:
-                        raise TimeoutException
+                        raise _TimeoutException
                     time.sleep(.01)
                     continue
 
