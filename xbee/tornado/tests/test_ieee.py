@@ -8,6 +8,10 @@ pmalmsten@gmail.com
 Tests the XBee (IEEE 802.15.4) implementation class for XBee API compliance
 """
 import unittest
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 from xbee.tornado import has_tornado
 
 if not has_tornado:
@@ -17,6 +21,7 @@ from xbee.tests.Fake import Serial  # noqa
 from xbee.tornado.ieee import XBee  # noqa
 from xbee.frame import APIFrame  # noqa
 from xbee.python2to3 import intToByte, stringToBytes  # noqa
+from tornado import ioloop  # noqa
 from tornado.testing import AsyncTestCase, gen_test  # noqa
 from tornado.test.util import unittest  # noqa
 import sys  # noqa
@@ -33,7 +38,10 @@ class InitXBee(AsyncTestCase):
         Initialize XBee object
         """
         super(InitXBee, self).setUp()
-        self.xbee = XBee(None)
+        self._patch_io = ioloop.IOLoop.current()
+        self._patch_io.add_handler = Mock()
+        serial_port = Serial()
+        self.xbee = XBee(serial_port, io_loop=self._patch_io)
 
 
 class TestBuildCommand(InitXBee):
@@ -462,7 +470,7 @@ class TestWriteToDevice(InitXBee):
         """
 
         serial_port = Serial()
-        xbee = XBee(serial_port)
+        xbee = XBee(serial_port, io_loop=self._patch_io)
 
         # Send an AT command
         xbee.send('at', frame_id=stringToBytes('A'),
@@ -480,7 +488,7 @@ class TestWriteToDevice(InitXBee):
         """
 
         serial_port = Serial()
-        xbee = XBee(serial_port)
+        xbee = XBee(serial_port, io_loop=self._patch_io)
 
         # Send an AT command
         xbee.send(
@@ -508,7 +516,7 @@ class TestSendShorthand(InitXBee):
         """
         super(TestSendShorthand, self).setUp()
         self.ser = Serial()
-        self.xbee = XBee(self.ser)
+        self.xbee = XBee(self.ser, io_loop=self._patch_io)
 
     def test_send_at_command(self):
         """
@@ -552,7 +560,7 @@ class TestSendShorthand(InitXBee):
         When shorthand is disabled, any attempt at calling a
         non-existant attribute should raise AttributeError
         """
-        self.xbee = XBee(self.ser, shorthand=False)
+        self.xbee = XBee(self.ser, shorthand=False, io_loop=self._patch_io)
 
         try:
             self.xbee.at
@@ -575,7 +583,7 @@ class TestReadFromDevice(InitXBee):
         """
         device = Serial()
         device.set_read_data(b'\x7E\x00\x05\x88DMY\x01\x8c')
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -592,7 +600,7 @@ class TestReadFromDevice(InitXBee):
         """
         device = Serial()
         device.set_read_data(b'\x7E\x00\x08\x88DMY\x01\x00\x00\x00\x8c')
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -620,7 +628,7 @@ class TestReadFromDevice(InitXBee):
 
         device = Serial()
         device.set_read_data(APIFrame(data=b'\x88DIS\x00' + data).output())
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -655,7 +663,7 @@ class TestReadFromDevice(InitXBee):
             data=b'\x97D\x00\x13\xa2\x00@oG\xe4v\x1aIS\x00' + data).output()
         )
 
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -693,7 +701,7 @@ class TestReadFromDevice(InitXBee):
 
         device = Serial()
         device.set_read_data(b'\x7E\x00\x0C' + rx_io_resp + data + b'\xfd')
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -737,7 +745,7 @@ class TestReadFromDevice(InitXBee):
                     return super(BadReadDevice, self).read()
 
         badDevice = BadReadDevice(1, b'\x7E\x00\x05\x88DMY\x01\x8c')
-        xbee = XBee(badDevice)
+        xbee = XBee(badDevice, io_loop=self._patch_io)
 
         try:
             xbee._process_input(None, None)
@@ -755,7 +763,7 @@ class TestReadFromDevice(InitXBee):
         """
         device = Serial()
         device.set_read_data(b'~\x00\t\x88DMY\x01}^}]}1}3m')
-        xbee = XBee(device, escaped=True)
+        xbee = XBee(device, escaped=True, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -773,7 +781,7 @@ class TestReadFromDevice(InitXBee):
         """
         device = Serial()
         device.set_read_data(b'\x7E\x00\x00\xFF\x7E\x00\x05\x88DMY\x01\x8c')
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         xbee._process_input(None, None)
@@ -791,7 +799,7 @@ class TestReadFromDevice(InitXBee):
         """
         device = Serial()
         device.set_read_data(APIFrame(b'\x81\x01\x02\x55\x00{test=1}').output())
-        xbee = XBee(device)
+        xbee = XBee(device, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()
@@ -810,7 +818,7 @@ class TestReadFromDevice(InitXBee):
         device = Serial()
         device.set_read_data(APIFrame(b'\x81\x01\x02\x55\x00{test=1}',
                                       escaped=True).output())
-        xbee = XBee(device, escaped=True)
+        xbee = XBee(device, escaped=True, io_loop=self._patch_io)
 
         xbee._process_input(None, None)
         info = yield xbee.wait_read_frame()

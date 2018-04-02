@@ -7,11 +7,18 @@ james@saunders-family.net
 Tests the XBee DigiMesh implementation class for API compliance
 """
 import unittest
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
+
 from xbee.tornado import has_tornado
 
 if not has_tornado:
     raise unittest.SkipTest("Requires Tornado")
 
+from tornado import ioloop # noqa
+from xbee.tests.Fake import Serial  # noqa
 from xbee.tornado.digimesh import DigiMesh  # noqa
 
 
@@ -22,8 +29,11 @@ class TestDigiMesh(unittest.TestCase):
     """
 
     def setUp(self):
-        self.digimesh = DigiMesh(None)
         super(TestDigiMesh, self).setUp()
+        patch_io = ioloop.IOLoop.current()
+        patch_io.add_handler = Mock()
+        serial_port = Serial()
+        self.digimesh = DigiMesh(serial_port, io_loop=patch_io)
 
     def test_split_tx_status(self):
             data = b'\x8b\x01\xff\xff\x01\x01\x01'

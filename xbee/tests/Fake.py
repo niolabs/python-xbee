@@ -29,6 +29,7 @@ class Serial(object):
         self.xonxoff = xonxoff
         self.rtscts = rtscts
         self._is_open = True
+        self.fd = 0
 
         self._data_written = ""
         self._read_data = ""
