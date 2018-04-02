@@ -18,6 +18,9 @@ from xbee.python2to3 import byteToInt, stringToBytes
 class CommandFrameException(KeyError):
     pass
 
+class TimeoutException(Exception):
+    pass
+
 
 class XBeeBase(object):
     """
