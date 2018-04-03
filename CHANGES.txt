@@ -95,3 +95,7 @@ v2.3.0 - 05 Jul 2017
 v2.3.1 - 06 Jul 2017
 * New features - Adds support for the Tornado I/O loop
 * If your application already uses the Tornado I/O loop then integrating python-xbee should be a breeze. Check out https://python-xbee.readthedocs.io/en/latest/#tornado-ioloop for usage and more details.
+
+v2.3.2 - 03 Apr 2018
+* Added Receive Packet frame type (0x90) definition.
+* Added an optional timeout to wait_read_frame.
