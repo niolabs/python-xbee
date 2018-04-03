@@ -7,11 +7,16 @@ pmalmsten@gmail.com
 Tests the XBee ZB (ZigBee) implementation class for API compliance
 """
 import unittest
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 from xbee.tornado import has_tornado
 
 if not has_tornado:
     raise unittest.SkipTest("Requires Tornado")
 
+from tornado import ioloop  # noqa
 from xbee.tornado.zigbee import ZigBee  # noqa
 from xbee.tests.Fake import Serial  # noqa
 
@@ -22,15 +27,18 @@ class TestZigBee(unittest.TestCase):
     """
 
     def setUp(self):
-        self.zigbee = ZigBee(None)
         super(TestZigBee, self).setUp()
+        self._patch_io = ioloop.IOLoop.current()
+        self._patch_io.add_handler = Mock()
+        serial_port = Serial()
+        self.zigbee = ZigBee(serial_port, io_loop=self._patch_io)
 
     def test_send(self):
         """
         Test send() with AT command.
         """
         device = Serial()
-        xbee = ZigBee(device)
+        xbee = ZigBee(device, io_loop=self._patch_io)
         xbee.send('at', command='MY')
         result = device.get_data_written()
         expected = b'~\x00\x04\x08\x01MYP'
@@ -236,8 +244,11 @@ class TestParseZigBeeIOData(unittest.TestCase):
     """
 
     def setUp(self):
-        self.zigbee = ZigBee(None)
         super(TestParseZigBeeIOData, self).setUp()
+        patch_io = ioloop.IOLoop.current()
+        patch_io.add_handler = Mock()
+        serial_port = Serial()
+        self.zigbee = ZigBee(serial_port, io_loop=patch_io)
 
     def test_parse_dio_adc(self):
             data = b'\x01\x08\x00\x0e\x08\x00\x00\x00\x02P\x02\x06'

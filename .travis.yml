@@ -4,6 +4,7 @@ python:
   - "3.4"
   - "3.5"
 install:
-    pip install -e .[tornado]
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install mock; fi
+  - pip install -e .[tornado]
 # command to run tests
 script: py.test

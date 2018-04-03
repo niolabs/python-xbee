@@ -11,6 +11,7 @@ series-specific functionality.
 """
 from xbee.frame import APIFrame
 from xbee.backend.base import XBeeBase as _XBeeBase
+from xbee.backend.base import TimeoutException as _TimeoutException
 from tornado import ioloop, gen
 from tornado.locks import Event
 from tornado.concurrent import Future
@@ -45,15 +46,15 @@ class XBeeBase(_XBeeBase):
                  argument is also used.
     """
     def __init__(self, *args, **kwargs):
+        if 'io_loop' in kwargs:
+            self._ioloop = kwargs.pop('io_loop')
+        else:
+            self._ioloop = ioloop.IOLoop.current()
+
         super(XBeeBase, self).__init__(*args, **kwargs)
 
         self._running = Event()
         self._running.set()
-
-        if 'io_loop' in kwargs:
-            self._ioloop = kwargs['io_loop']
-        else:
-            self._ioloop = ioloop.IOLoop.current()
 
         self._frame_future = None
         self._frame_queue = deque()
@@ -61,10 +62,11 @@ class XBeeBase(_XBeeBase):
         if self._callback:
             # Make Non-Blocking
             self.serial.timeout = 0
-            self._ioloop.add_handler(self.serial.fd,
-                                     self._process_input,
-                                     ioloop.IOLoop.READ)
             self.process_frames()
+
+        self._ioloop.add_handler(self.serial.fd,
+                                 self._process_input,
+                                 ioloop.IOLoop.READ)
 
     def halt(self):
         """
@@ -99,15 +101,25 @@ class XBeeBase(_XBeeBase):
                     self._error_callback(e)
 
     @gen.coroutine
-    def wait_read_frame(self):
-        frame = yield self._get_frame()
+    def wait_read_frame(self, timeout=None):
+        frame = yield self._get_frame(timeout=timeout)
         raise gen.Return(self._split_response(frame.data))
 
-    def _get_frame(self):
+    def _get_frame(self, timeout=None):
         future = Future()
         if self._frame_queue:
             future.set_result(self._frame_queue.popleft())
         else:
+            if timeout is not None:
+                def on_timeout():
+                    future.set_exception(_TimeoutException())
+
+                handle = self._ioloop.add_timeout(
+                    self._ioloop.time() + timeout, on_timeout
+                )
+                future.add_done_callback(lambda _:
+                                         self._ioloop.remove_timeout(handle))
+
             self._frame_future = future
 
         return future
