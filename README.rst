@@ -84,6 +84,8 @@ Dependencies
 ============
 
 PySerial
+pip >= 6.0
+setuptools >= 8.0
 
 Additional Dependencies
 -----------------------
