@@ -233,6 +233,14 @@ class ZigBee(object):
                 {'name': 'reserved',          'len': 1}
             ]
         },
+        b'\xA4': {
+            'name': 'register_device_status',
+            # See https://www.digi.com/resources/documentation/digidocs/pdfs/90001539.pdf
+            'structure': [
+                {'name': 'frame_id',          'len': 1},
+                {'name': 'status',            'len': 1}
+            ]
+        },
         b'\x95': {
             'name': 'node_id_indicator',
             'structure': [
